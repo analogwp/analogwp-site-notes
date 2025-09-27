@@ -11,7 +11,7 @@ import apiFetch from '@wordpress/api-fetch';
 import CommentToggle from './CommentToggle';
 import CommentOverlay from './CommentOverlay';
 import CommentPopup from './CommentPopup';
-import CommentsDisplay from './CommentsDisplay';
+import CommentSidebar from './CommentSidebar';
 
 const VisualCommentsApp = () => {
     const [isActive, setIsActive] = useState(false);
@@ -32,11 +32,10 @@ const VisualCommentsApp = () => {
         if (!isActive) return;
 
         const handleElementClick = (e) => {
-            // Ignore clicks on comment elements, toggle buttons, admin bar, overlay, and popups
+            // Prevent creating popups when clicking specific UI elements
             if (
-                e.target.closest('.cht-comment-marker') || 
                 e.target.closest('.cht-comment-popup') ||
-                e.target.closest('.cht-comment-detail-popup') ||
+                e.target.closest('.cht-comment-sidebar') ||
                 e.target.closest('.cht-toggle-button') ||
                 e.target.closest('#wp-admin-bar-cht-toggle') ||
                 e.target.closest('.cht-admin-bar-item') ||
@@ -45,7 +44,13 @@ const VisualCommentsApp = () => {
                 e.target.hasAttribute('data-cht-ignore') ||
                 e.target.closest('[data-cht-ignore]') ||
                 e.target.closest('.react-draggable') ||
-                e.target.closest('[class*="draggable"]')
+                e.target.closest('[class*="draggable"]') ||
+                e.target.classList.contains('cht-close-btn') ||
+                e.target.closest('.cht-close-btn') ||
+                e.target.classList.contains('cht-popup-close') ||
+                e.target.closest('.cht-popup-close') ||
+                e.target.classList.contains('cht-sidebar-close') ||
+                e.target.closest('.cht-sidebar-close')
             ) {
                 return;
             }
@@ -148,7 +153,7 @@ const VisualCommentsApp = () => {
     };
 
     // Save new comment
-    const saveComment = async (commentText, screenshotUrl = '') => {
+    const saveComment = async (commentText, screenshotUrl = '', priority = 'medium') => {
         if (!selectedElement) return;
 
         try {
@@ -166,7 +171,8 @@ const VisualCommentsApp = () => {
                     screenshot_url: screenshotUrl,
                     x_position: Math.round(selectedElement.x),
                     y_position: Math.round(selectedElement.y),
-                    page_url: window.location.href
+                    page_url: window.location.href,
+                    priority: priority
                 })
             });
 
@@ -284,11 +290,13 @@ const VisualCommentsApp = () => {
                 <>
                     <CommentOverlay />
                     
-                    <CommentsDisplay 
+                    <CommentSidebar
                         comments={comments}
                         onAddReply={addReply}
                         onUpdateStatus={updateCommentStatus}
                         canManageComments={chtAjax.canManageComments}
+                        isVisible={isActive}
+                        onClose={() => setIsActive(false)}
                     />
                     
                     {showCommentForm && selectedElement && (

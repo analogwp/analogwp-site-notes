@@ -16,14 +16,14 @@
     "@wordpress/scripts": "^26.0.0"
   },
   "dependencies": {
-    "@wordpress/element": "^5.0.0",
     "@wordpress/api-fetch": "^6.0.0",
     "@wordpress/components": "^25.0.0",
-    "@wordpress/i18n": "^4.0.0",
     "@wordpress/data": "^9.0.0",
+    "@wordpress/element": "^5.0.0",
     "@wordpress/hooks": "^3.0.0",
+    "@wordpress/i18n": "^4.0.0",
     "html2canvas": "^1.4.1",
-    "react-draggable": "^4.4.5"
+    "react-draggable": "^4.5.0"
   },
   "author": "Your Name",
   "license": "GPL-2.0-or-later",

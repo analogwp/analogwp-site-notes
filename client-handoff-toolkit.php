@@ -50,6 +50,9 @@ class ClientHandoffToolkit {
 		add_action( 'wp_ajax_cht_add_reply', array( $this, 'addReply' ) );
 		add_action( 'wp_ajax_cht_delete_comment', array( $this, 'deleteComment' ) );
 		add_action( 'wp_ajax_cht_get_dashboard_stats', array( $this, 'getDashboardStats' ) );
+		add_action( 'wp_ajax_cht_get_admin_data', array( $this, 'getAdminData' ) );
+		add_action( 'wp_ajax_cht_get_pages', array( $this, 'getPages' ) );
+		add_action( 'wp_ajax_cht_add_new_task', array( $this, 'addNewTask' ) );
 		add_action( 'admin_bar_menu', array( $this, 'addAdminBarToggle' ), 100 );
 
 		// Register activation and deactivation hooks
@@ -83,6 +86,7 @@ class ClientHandoffToolkit {
             y_position int(11) DEFAULT 0,
             page_url varchar(500) NOT NULL,
             status varchar(20) DEFAULT 'open',
+            priority varchar(20) DEFAULT 'medium',
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
@@ -120,23 +124,10 @@ class ClientHandoffToolkit {
 			'dashicons-feedback',
 			30
 		);
-
-		add_submenu_page(
-			'client-handoff-toolkit',
-			__( 'Visual Comments', 'client-handoff-toolkit' ),
-			__( 'Visual Comments', 'client-handoff-toolkit' ),
-			'manage_options',
-			'cht-comments',
-			array( $this, 'commentsPage' )
-		);
 	}
 
 	public function adminPage() {
 		include CHT_PLUGIN_PATH . 'admin/admin-page.php';
-	}
-
-	public function commentsPage() {
-		include CHT_PLUGIN_PATH . 'admin/comments-page.php';
 	}
 
 	public function enqueueFrontendScripts() {
@@ -245,13 +236,14 @@ class ClientHandoffToolkit {
 			array(
 				'post_id' => intval( $_POST['post_id'] ),
 				'user_id' => get_current_user_id(),
-				'comment_text' => sanitize_textarea_field( $_POST['comment_text'] ),
+				'comment_text'     => sanitize_textarea_field( $_POST['comment_text'] ),
 				'element_selector' => sanitize_text_field( $_POST['element_selector'] ),
 				'screenshot_url' => $screenshot_url,
 				'x_position' => intval( $_POST['x_position'] ),
 				'y_position' => intval( $_POST['y_position'] ),
 				'page_url' => sanitize_url( $_POST['page_url'] ),
 				'status' => 'open',
+				'priority' => isset( $_POST['priority'] ) ? sanitize_text_field( $_POST['priority'] ) : 'medium',
 			)
 		);
 
@@ -493,6 +485,193 @@ class ClientHandoffToolkit {
 					'total' => (int) $total_count,
 				),
 				'recent_comments' => $recent_comments,
+			)
+		);
+	}
+
+	public function getAdminData() {
+		// Verify nonce
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'cht_nonce' ) ) {
+			wp_die( 'Security check failed' );
+		}
+
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'cht_comments';
+		$replies_table = $wpdb->prefix . 'cht_comment_replies';
+
+		// Get all comments
+		$comments = $wpdb->get_results(
+			"
+            SELECT c.*, u.display_name, p.post_title
+            FROM $table_name c
+            LEFT JOIN {$wpdb->users} u ON c.user_id = u.ID
+            LEFT JOIN {$wpdb->posts} p ON c.post_id = p.ID
+            ORDER BY c.created_at DESC
+        "
+		);
+
+		// Get replies for each comment
+		$comments_with_replies = array();
+		foreach ( $comments as $comment ) {
+			$replies = $wpdb->get_results(
+				$wpdb->prepare(
+					"
+                    SELECT r.*, u.display_name
+                    FROM $replies_table r
+                    LEFT JOIN {$wpdb->users} u ON r.user_id = u.ID
+                    WHERE r.comment_id = %d
+                    ORDER BY r.created_at ASC
+                ",
+					$comment->id
+				)
+			);
+
+			$comment->replies = $replies;
+			$comments_with_replies[] = $comment;
+		}
+
+		// Get all users who can comment
+		$users = get_users(
+			array(
+				'capability' => 'edit_posts',
+				'fields' => array( 'ID', 'display_name', 'user_email' ),
+			)
+		);
+
+		// Format users data
+		$users_formatted = array();
+		foreach ( $users as $user ) {
+			$users_formatted[] = array(
+				'id' => (int) $user->ID,
+				'name' => $user->display_name,
+				'email' => $user->user_email,
+				'avatar' => get_avatar_url( $user->ID, array( 'size' => 32 ) ),
+			);
+		}
+
+		// Get categories (unique page URLs as categories)
+		$categories = array_unique( array_column( $comments_with_replies, 'page_url' ) );
+
+		wp_send_json_success(
+			array(
+				'comments' => $comments_with_replies,
+				'users' => $users_formatted,
+				'categories' => array_filter( $categories ),
+			)
+		);
+	}
+
+	public function getPages() {
+		// Verify nonce
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'cht_nonce' ) ) {
+			wp_die( 'Security check failed' );
+		}
+
+		// Get all published pages and posts
+		$pages = get_posts(
+			array(
+				'post_type' => array( 'page', 'post' ),
+				'post_status' => 'publish',
+				'numberposts' => -1,
+				'orderby' => 'title',
+				'order' => 'ASC',
+			)
+		);
+
+		// Add special WordPress pages
+		$special_pages = array(
+			array(
+				'id' => 'home',
+				'title' => __( 'Home Page', 'client-handoff-toolkit' ),
+				'url' => home_url(),
+			),
+			array(
+				'id' => 'blog',
+				'title' => __( 'Blog Page', 'client-handoff-toolkit' ),
+				'url' => get_permalink( get_option( 'page_for_posts' ) ),
+			),
+			array(
+				'id' => '404',
+				'title' => __( '404 Error Page', 'client-handoff-toolkit' ),
+				'url' => home_url( '/404-test-page' ),
+			),
+			array(
+				'id' => 'search',
+				'title' => __( 'Search Results', 'client-handoff-toolkit' ),
+				'url' => home_url( '?s=test' ),
+			),
+		);
+
+		// Format regular pages/posts
+		$formatted_pages = array();
+		foreach ( $pages as $page ) {
+			$formatted_pages[] = array(
+				'id' => $page->ID,
+				'title' => $page->post_title,
+				'url' => get_permalink( $page->ID ),
+			);
+		}
+
+		// Merge special pages with regular pages
+		$all_pages = array_merge( $special_pages, $formatted_pages );
+
+		// Get archive pages for custom post types
+		$post_types = get_post_types(
+			array(
+				'public' => true,
+				'has_archive' => true,
+			),
+			'objects'
+		);
+		foreach ( $post_types as $post_type ) {
+			if ( $post_type->name !== 'post' ) {
+				$all_pages[] = array(
+					'id' => $post_type->name . '_archive',
+					'title' => sprintf( __( '%s Archive', 'client-handoff-toolkit' ), $post_type->labels->name ),
+					'url' => get_post_type_archive_link( $post_type->name ),
+				);
+			}
+		}
+
+		wp_send_json_success(
+			array(
+				'pages' => $all_pages,
+			)
+		);
+	}
+
+	public function addNewTask() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'cht_admin_nonce' ) ) {
+			wp_die( __( 'Unauthorized', 'client-handoff-toolkit' ) );
+		}
+
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'cht_comments';
+
+		$result = $wpdb->insert(
+			$table_name,
+			array(
+				'post_id' => intval( $_POST['post_id'] ),
+				'user_id' => intval( $_POST['user_id'] ),
+				'comment_text' => sanitize_textarea_field( $_POST['comment_text'] ),
+				'element_selector' => '',
+				'screenshot_url' => '',
+				'x_position' => 0,
+				'y_position' => 0,
+				'page_url' => get_permalink( intval( $_POST['post_id'] ) ),
+				'status' => sanitize_text_field( $_POST['status'] ),
+				'priority' => sanitize_text_field( $_POST['priority'] ),
+			)
+		);
+
+		if ( $result === false ) {
+			wp_send_json_error( __( 'Failed to save task', 'client-handoff-toolkit' ) );
+		}
+
+		wp_send_json_success(
+			array(
+				'id' => $wpdb->insert_id,
+				'message' => __( 'Task created successfully', 'client-handoff-toolkit' ),
 			)
 		);
 	}

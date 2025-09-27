@@ -6,13 +6,13 @@ import { render } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import AdminDashboard from './admin/AdminDashboard';
-import './styles/admin.scss';
+import AdminApp from './admin/AdminApp';
+import './styles/admin-new.scss';
 
-// Initialize admin dashboard
+// Initialize admin app
 document.addEventListener('DOMContentLoaded', function() {
-    const dashboardContainer = document.getElementById('cht-admin-dashboard');
-    if (dashboardContainer) {
-        render(<AdminDashboard />, dashboardContainer);
+    const adminContainer = document.getElementById('cht-admin-root');
+    if (adminContainer) {
+        render(<AdminApp />, adminContainer);
     }
 });

@@ -37,7 +37,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 99999;
+  z-index: 999999; // Higher than sidebar to stay on top
   display: flex;
   align-items: center;
   background: $background-color;
@@ -211,11 +211,38 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     align-items: center;
     padding: 16px 20px;
     border-bottom: 1px solid $border-color;
+    cursor: move; // Indicate drag handle
+    user-select: none; // Prevent text selection while dragging
+    position: relative;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #ccc;
+      box-shadow: 
+        0 -8px 0 #ccc,
+        0 8px 0 #ccc,
+        8px -8px 0 #ccc,
+        8px 0 0 #ccc,
+        8px 8px 0 #ccc;
+      opacity: 0.5;
+    }
     
     h4 {
       margin: 0;
       font-size: 16px;
       color: $text-color;
+      margin-left: 20px; // Space for drag handle
     }
     
     .cht-popup-close {
@@ -692,5 +719,492 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     margin: 0;
     color: #646970;
     font-style: italic;
+  }
+}
+
+/* Comment Sidebar Styles */
+.cht-sidebar-close {
+  position: fixed;
+  top: 20px;
+  right: 400px; // 380px sidebar width + 20px margin
+  width: 32px;
+  height: 32px;
+  background: $primary-color;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+
+  // Account for WordPress admin bar when present
+  body.admin-bar & {
+    top: 52px; // 32px admin bar + 20px margin
+    
+    @media screen and (max-width: 782px) {
+      top: 66px; // 46px admin bar + 20px margin
+    }
+  }
+  
+  &:hover {
+    background: darken($primary-color, 10%);
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.cht-comment-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  background: $background-color;
+  border-left: 1px solid $border-color;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+
+  // Account for WordPress admin bar when present
+  body.admin-bar & {
+    top: 32px;
+    height: calc(100vh - 32px);
+    
+    @media screen and (max-width: 782px) {
+      top: 46px;
+      height: calc(100vh - 46px);
+    }
+  }
+  
+  .cht-sidebar-header {
+    background: #f9f9f9;
+    padding: 20px;
+    border-bottom: 1px solid $border-color;
+    flex-shrink: 0;
+    
+    h3 {
+      margin: 0 0 5px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: $text-color;
+    }
+    
+    .cht-comments-count {
+      font-size: 14px;
+      color: #646970;
+      margin: 0;
+    }
+  }
+  
+  .cht-sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+  
+  .cht-no-comments-sidebar {
+    padding: 40px 20px;
+    text-align: center;
+    color: #646970;
+    
+    p {
+      margin: 0 0 15px 0;
+      
+      &.cht-instruction {
+        font-size: 14px;
+        font-style: italic;
+        opacity: 0.8;
+      }
+    }
+  }
+  
+  .cht-comments-list {
+    padding: 0;
+  }
+}
+
+/* Status Groups */
+.cht-status-group {
+  margin-bottom: 20px;
+  
+  .cht-status-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px 10px 20px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background: #f0f0f0;
+    }
+    
+    .cht-status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    h4 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: $text-color;
+      flex: 1;
+    }
+    
+    .cht-toggle-arrow {
+      background: none;
+      border: none;
+      font-size: 12px;
+      color: #646970;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 2px;
+      transition: color 0.2s ease, background-color 0.2s ease;
+      
+      &:hover {
+        color: $text-color;
+        background: rgba(0, 0, 0, 0.05);
+      }
+    }
+  }
+}
+
+/* Comment Tasks */
+.cht-comment-task {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background: #fafafa;
+  }
+  
+  &.selected {
+    background: #e7f3ff;
+    border-left: 3px solid $primary-color;
+  }
+  
+  .cht-task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    
+    .cht-task-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      
+      .cht-task-id {
+        background: $primary-color;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: bold;
+      }
+      
+      .cht-task-author {
+        font-weight: 500;
+        font-size: 13px;
+        color: $text-color;
+      }
+      
+      .cht-task-date {
+        font-size: 11px;
+        color: #646970;
+      }
+    }
+    
+    .cht-locate-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background: #e0e0e0;
+      }
+    }
+  }
+  
+  .cht-task-content {
+    margin-bottom: 12px;
+    
+    .cht-task-text {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      line-height: 1.4;
+      color: $text-color;
+    }
+    
+    .cht-task-selector {
+      margin-bottom: 8px;
+      
+      code {
+        background: #f1f1f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 11px;
+        color: #666;
+      }
+    }
+    
+    .cht-task-screenshot {
+      margin-bottom: 8px;
+      
+      img {
+        width: 100%;
+        max-width: 200px;
+        height: auto;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+        
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+  
+  .cht-task-status {
+    margin-bottom: 10px;
+    
+    .cht-status-select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid $border-color;
+      border-radius: 4px;
+      font-size: 13px;
+      background: $background-color;
+    }
+  }
+  
+  .cht-task-replies {
+    margin-bottom: 12px;
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 3px solid #ddd;
+    
+    .cht-replies-header {
+      margin-bottom: 8px;
+      
+      strong {
+        font-size: 12px;
+        color: $text-color;
+      }
+    }
+    
+    .cht-task-reply {
+      margin-bottom: 8px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .cht-reply-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+        
+        strong {
+          font-size: 12px;
+          color: $text-color;
+        }
+        
+        .cht-reply-date {
+          font-size: 10px;
+          color: #646970;
+        }
+      }
+      
+      .cht-reply-text {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.4;
+        color: #555;
+      }
+    }
+  }
+  
+  .cht-task-actions {
+    .cht-reply-btn {
+      background: $primary-color;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background: darken($primary-color, 10%);
+      }
+    }
+    
+    .cht-reply-form {
+      .cht-reply-textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        font-size: 13px;
+        line-height: 1.4;
+        resize: vertical;
+        min-height: 60px;
+        margin-bottom: 8px;
+      }
+      
+      .cht-reply-actions {
+        display: flex;
+        gap: 8px;
+        
+        .cht-reply-submit {
+          background: $primary-color;
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: 12px;
+          cursor: pointer;
+          
+          &:hover:not(:disabled) {
+            background: darken($primary-color, 10%);
+          }
+          
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+        
+        .cht-reply-cancel {
+          background: transparent;
+          color: #666;
+          border: 1px solid #ccc;
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: 12px;
+          cursor: pointer;
+          
+          &:hover {
+            background: #f0f0f0;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .cht-comment-sidebar {
+    width: 320px;
+  }
+  
+  .cht-sidebar-close {
+    right: 340px; // 320px sidebar width + 20px margin
+  }
+}
+
+@media (max-width: 768px) {
+  .cht-comment-sidebar {
+    width: 100%;
+    height: 50vh;
+    top: auto;
+    bottom: 0;
+    border-left: none;
+    border-top: 1px solid $border-color;
+    
+    .cht-sidebar-content {
+      max-height: calc(50vh - 70px);
+    }
+  }
+  
+  .cht-sidebar-close {
+    top: auto;
+    bottom: 52vh; // Just above the sidebar (50vh + 2vh margin)
+    right: 20px;
+  }
+}
+
+/* Priority Badges */
+.cht-priority-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &.cht-priority-low {
+    background: #f0f9ff;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+  }
+  
+  &.cht-priority-medium {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fde68a;
+  }
+  
+  &.cht-priority-high {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+  }
+}
+
+/* Priority Selector in Comment Popup */
+.cht-priority-selector {
+  margin-top: 10px;
+  
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+  }
+  
+  select {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+    background-color: white;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 1px $primary-color;
+    }
   }
 }
