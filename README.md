@@ -51,7 +51,7 @@ The Client Handoff Toolkit transforms how agencies and clients collaborate durin
 ### **Step 1: Installation**
 
 **Option A: Upload Plugin Files**
-1. Download/clone the plugin to `/wp-content/plugins/client-handoff-toolkit/`
+1. Download/clone the plugin to `/wp-content/plugins/analogwp-client-handoff/`
 2. Install dependencies: `npm install`
 3. Build assets: `npm run build`
 4. Activate in WordPress Admin > Plugins
@@ -59,8 +59,8 @@ The Client Handoff Toolkit transforms how agencies and clients collaborate durin
 **Option B: Development Setup**
 ```bash
 # Clone and setup for development
-git clone [repo-url] /path/to/wordpress/wp-content/plugins/client-handoff-toolkit/
-cd client-handoff-toolkit
+git clone [repo-url] /path/to/wordpress/wp-content/plugins/analogwp-client-handoff/
+cd analogwp-client-handoff
 npm install
 npm run start  # For development with hot reload
 ```
@@ -136,7 +136,7 @@ npm run start  # For development with hot reload
 
 ### **Database Structure**
 
-**Comments Table** (`wp_cht_comments`):
+**Comments Table** (`wp_agwp_cht_comments`):
 ```sql
 - id (Primary Key)
 - post_id (WordPress Post ID)
@@ -150,7 +150,7 @@ npm run start  # For development with hot reload
 - created_at, updated_at (Timestamps)
 ```
 
-**Replies Table** (`wp_cht_comment_replies`):
+**Replies Table** (`wp_agwp_cht_comment_replies`):
 ```sql
 - id (Primary Key)
 - comment_id (Parent Comment)
@@ -188,16 +188,16 @@ src/
 Control who can add comments:
 ```php
 // In WordPress functions.php or custom plugin
-update_option('cht_allowed_roles', ['administrator', 'editor', 'client']);
+update_option('agwp_cht_allowed_roles', ['administrator', 'editor', 'client']);
 ```
 
 ### **Screenshot Settings**
 ```php
 // Disable automatic screenshots
-update_option('cht_auto_screenshot', false);
+update_option('agwp_cht_auto_screenshot', false);
 
 // Change screenshot quality
-update_option('cht_screenshot_quality', 0.8);
+update_option('agwp_cht_screenshot_quality', 0.8);
 ```
 
 ### **Styling Customization**
@@ -222,7 +222,7 @@ npm run dev        # Development build
 ```
 
 ### **File Structure**
-- **PHP Backend**: `/client-handoff-toolkit.php` - Main plugin file
+- **PHP Backend**: `/analogwp-client-handoff.php` - Main plugin file
 - **React Frontend**: `/src/` - All JavaScript/React components  
 - **Admin Interface**: `/admin/` - WordPress admin pages and React admin app
 - **Styles**: `/src/styles/` - SCSS source files
@@ -385,7 +385,7 @@ The plugin uses two approaches for reliable element targeting:
 
 ### Database Structure
 
-**Comments Table** (`wp_cht_comments`):
+**Comments Table** (`wp_agwp_cht_comments`):
 - `id` - Unique comment ID
 - `post_id` - Associated WordPress post
 - `user_id` - Comment author
@@ -397,7 +397,7 @@ The plugin uses two approaches for reliable element targeting:
 - `status` - open, in_progress, resolved
 - Timestamps for created/updated
 
-**Replies Table** (`wp_cht_comment_replies`):
+**Replies Table** (`wp_agwp_cht_comment_replies`):
 - `id` - Unique reply ID
 - `comment_id` - Parent comment reference
 - `user_id` - Reply author
@@ -449,7 +449,7 @@ src/
 
 ### Key Files
 
-- `client-handoff-toolkit.php` - Main plugin file with WordPress hooks
+- `analogwp-client-handoff.php` - Main plugin file with WordPress hooks
 - `admin/admin-page.php` - Admin dashboard HTML
 - `admin/comments-page.php` - Comments management page
 - `src/components/VisualCommentsApp.js` - Main React application
@@ -481,7 +481,7 @@ Control screenshot capture:
 
 ```php
 // Disable auto-screenshots
-update_option('cht_auto_screenshot', 0);
+update_option('agwp_cht_auto_screenshot', 0);
 ```
 
 ## 🔒 Security Features
