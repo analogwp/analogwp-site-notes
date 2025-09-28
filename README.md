@@ -35,7 +35,7 @@ The Client Handoff Toolkit transforms how agencies and clients collaborate durin
 - ✅ **Status Tracking**: Open → In Progress → Resolved workflow
 - ✅ **Kanban Board View**: Drag-and-drop interface for task management
 - ✅ **Filter & Search**: Find comments by status, user, or priority
-- ✅ **Admin Dashboard**: Comprehensive overview with statistics and charts
+- ⚠️ **Admin Dashboard**: Basic statistics available (charts implementation planned for v1.2)
 - ⚠️ **User Assignment**: Basic user tracking (enhancement needed for team assignment)
 - ✅ **Page Integration**: Comments linked to specific WordPress pages/posts
 
