@@ -27,28 +27,28 @@ const CommentOverlay = () => {
                     <button 
                         className="cht-overlay-close"
                         onClick={() => setIsVisible(false)}
-                        aria-label={__('Close overlay', 'client-handoff-toolkit')}
+                        aria-label={__('Close overlay', 'analogwp-client-handoff')}
                     >
                         ×
                     </button>
-                    <h3>{__('Visual Comments Mode Active', 'client-handoff-toolkit')}</h3>
-                    <p>{__('Click on any element to add a comment', 'client-handoff-toolkit')}</p>
+                    <h3>{__('Visual Comments Mode Active', 'analogwp-client-handoff')}</h3>
+                    <p>{__('Click on any element to add a comment', 'analogwp-client-handoff')}</p>
                     <div className="cht-overlay-instructions">
                         <div className="cht-instruction-item">
                             <span className="cht-instruction-icon">👆</span>
-                            <span>{__('Click elements to comment', 'client-handoff-toolkit')}</span>
+                            <span>{__('Click elements to comment', 'analogwp-client-handoff')}</span>
                         </div>
                         <div className="cht-instruction-item">
                             <span className="cht-instruction-icon">📸</span>
-                            <span>{__('Screenshots auto-captured', 'client-handoff-toolkit')}</span>
+                            <span>{__('Screenshots auto-captured', 'analogwp-client-handoff')}</span>
                         </div>
                         <div className="cht-instruction-item">
                             <span className="cht-instruction-icon">💬</span>
-                            <span>{__('Reply and track progress', 'client-handoff-toolkit')}</span>
+                            <span>{__('Reply and track progress', 'analogwp-client-handoff')}</span>
                         </div>
                     </div>
                     <div className="cht-overlay-hint">
-                        <small>{__('This message will disappear in 3 seconds', 'client-handoff-toolkit')}</small>
+                        <small>{__('This message will disappear in 3 seconds', 'analogwp-client-handoff')}</small>
                     </div>
                 </div>
             </div>

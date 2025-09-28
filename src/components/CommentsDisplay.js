@@ -51,7 +51,7 @@ const CommentsDisplay = ({ comments, onAddReply, onUpdateStatus, canManageCommen
             
             {comments.length === 0 && (
                 <div className="cht-no-comments">
-                    <p>{__('No comments on this page yet.', 'client-handoff-toolkit')}</p>
+                    <p>{__('No comments on this page yet.', 'analogwp-client-handoff')}</p>
                 </div>
             )}
         </div>

@@ -51,7 +51,7 @@ const TaskCard = ({
                     <button 
                         onClick={() => onDelete(comment.id)}
                         className="cht-task-action-btn"
-                        title={__('Delete', 'client-handoff-toolkit')}
+                        title={__('Delete', 'analogwp-client-handoff')}
                     >
                         <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                             <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5zM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11z"/>
@@ -68,7 +68,7 @@ const TaskCard = ({
                             className="cht-expand-btn"
                             onClick={() => setIsExpanded(!isExpanded)}
                         >
-                            {isExpanded ? __('Show less', 'client-handoff-toolkit') : __('Show more', 'client-handoff-toolkit')}
+                            {isExpanded ? __('Show less', 'analogwp-client-handoff') : __('Show more', 'analogwp-client-handoff')}
                         </button>
                     )}
                 </div>
@@ -101,7 +101,7 @@ const TaskCard = ({
                         {!user?.avatar && getUserInitials(user?.name || 'Unknown')}
                     </div>
                     <span className="cht-user-name">
-                        {user?.name || __('Unknown User', 'client-handoff-toolkit')}
+                        {user?.name || __('Unknown User', 'analogwp-client-handoff')}
                     </span>
                 </div>
                 <div className="cht-task-date">

@@ -30,19 +30,19 @@ const TasksKanban = ({ comments, onStatusChange, onDelete, onAddTask, users, vie
     const statuses = [
         { 
             key: 'open', 
-            title: __('Todo', 'client-handoff-toolkit'),
+            title: __('Todo', 'analogwp-client-handoff'),
             color: '#f59e0b',
             icon: '📋'
         },
         { 
             key: 'in_progress', 
-            title: __('In Progress', 'client-handoff-toolkit'),
+            title: __('In Progress', 'analogwp-client-handoff'),
             color: '#3b82f6',
             icon: '⏳'
         },
         { 
             key: 'resolved', 
-            title: __('Completed', 'client-handoff-toolkit'),
+            title: __('Completed', 'analogwp-client-handoff'),
             color: '#10b981',
             icon: '✅'
         }
@@ -120,8 +120,8 @@ const TasksKanban = ({ comments, onStatusChange, onDelete, onAddTask, users, vie
         return (
             <div className="cht-tasks-list">
                 <div className="cht-list-header">
-                    <div className="cht-list-title">{__('All Tasks', 'client-handoff-toolkit')}</div>
-                    <div className="cht-list-count">{comments.length} {__('tasks', 'client-handoff-toolkit')}</div>
+                    <div className="cht-list-title">{__('All Tasks', 'analogwp-client-handoff')}</div>
+                    <div className="cht-list-count">{comments.length} {__('tasks', 'analogwp-client-handoff')}</div>
                 </div>
                 <div className="cht-list-content">
                     {comments.map(comment => (
@@ -140,7 +140,7 @@ const TasksKanban = ({ comments, onStatusChange, onDelete, onAddTask, users, vie
                                 <div className="cht-list-title">{comment.comment_text}</div>
                                 <div className="cht-list-meta">
                                     <span className="cht-list-user">
-                                        {getUserById(comment.user_id)?.name || __('Unknown User', 'client-handoff-toolkit')}
+                                        {getUserById(comment.user_id)?.name || __('Unknown User', 'analogwp-client-handoff')}
                                     </span>
                                     <span className="cht-list-date">{formatDate(comment.created_at)}</span>
                                     {comment.page_url && (
@@ -163,7 +163,7 @@ const TasksKanban = ({ comments, onStatusChange, onDelete, onAddTask, users, vie
                                 <button 
                                     onClick={() => onDelete(comment.id)}
                                     className="cht-delete-btn"
-                                    title={__('Delete', 'client-handoff-toolkit')}
+                                    title={__('Delete', 'analogwp-client-handoff')}
                                 >
                                     <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5zM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11z"/>
@@ -220,7 +220,7 @@ const TasksKanban = ({ comments, onStatusChange, onDelete, onAddTask, users, vie
                                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                 </svg>
-                                {__('Add new', 'client-handoff-toolkit')}
+                                {__('Add new', 'analogwp-client-handoff')}
                             </button>
                         )}
                     </div>

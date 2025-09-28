@@ -26,7 +26,7 @@ const AdminDashboard = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_get_dashboard_stats',
+                    action: 'agwp_cht_get_dashboard_stats',
                     nonce: chtAdmin.nonce
                 })
             });
@@ -44,7 +44,7 @@ const AdminDashboard = () => {
     };
 
     const deleteComment = async (commentId) => {
-        if (!confirm(__('Are you sure you want to delete this comment? This action cannot be undone.', 'client-handoff-toolkit'))) {
+        if (!confirm(__('Are you sure you want to delete this comment? This action cannot be undone.', 'analogwp-client-handoff'))) {
             return;
         }
 
@@ -55,7 +55,7 @@ const AdminDashboard = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_delete_comment',
+                    action: 'agwp_cht_delete_comment',
                     comment_id: commentId,
                     nonce: chtAdmin.nonce
                 })
@@ -70,16 +70,16 @@ const AdminDashboard = () => {
                 // Reload stats
                 loadDashboardData();
             } else {
-                alert(__('Error: ', 'client-handoff-toolkit') + data.data.message);
+                alert(__('Error: ', 'analogwp-client-handoff') + data.data.message);
             }
         } catch (error) {
             console.error('Error deleting comment:', error);
-            alert(__('An error occurred while deleting the comment.', 'client-handoff-toolkit'));
+            alert(__('An error occurred while deleting the comment.', 'analogwp-client-handoff'));
         }
     };
 
     if (isLoading) {
-        return <div className="cht-loading">{__('Loading...', 'client-handoff-toolkit')}</div>;
+        return <div className="cht-loading">{__('Loading...', 'analogwp-client-handoff')}</div>;
     }
 
     return (
@@ -90,7 +90,7 @@ const AdminDashboard = () => {
                     <div className="cht-stat-icon">🔴</div>
                     <div className="cht-stat-info">
                         <div className="cht-stat-number">{stats.open}</div>
-                        <div className="cht-stat-label">{__('Open Comments', 'client-handoff-toolkit')}</div>
+                        <div className="cht-stat-label">{__('Open Comments', 'analogwp-client-handoff')}</div>
                     </div>
                 </div>
 
@@ -98,7 +98,7 @@ const AdminDashboard = () => {
                     <div className="cht-stat-icon">✅</div>
                     <div className="cht-stat-info">
                         <div className="cht-stat-number">{stats.resolved}</div>
-                        <div className="cht-stat-label">{__('Resolved Comments', 'client-handoff-toolkit')}</div>
+                        <div className="cht-stat-label">{__('Resolved Comments', 'analogwp-client-handoff')}</div>
                     </div>
                 </div>
 
@@ -106,17 +106,17 @@ const AdminDashboard = () => {
                     <div className="cht-stat-icon">📊</div>
                     <div className="cht-stat-info">
                         <div className="cht-stat-number">{stats.total}</div>
-                        <div className="cht-stat-label">{__('Total Comments', 'client-handoff-toolkit')}</div>
+                        <div className="cht-stat-label">{__('Total Comments', 'analogwp-client-handoff')}</div>
                     </div>
                 </div>
             </div>
 
             {/* Recent Comments */}
             <div className="cht-recent-section">
-                <h3>{__('Recent Comments', 'client-handoff-toolkit')}</h3>
+                <h3>{__('Recent Comments', 'analogwp-client-handoff')}</h3>
                 {recentComments.length === 0 ? (
                     <div className="cht-no-comments">
-                        <p>{__('No comments yet. Enable visual comments on your pages to get started!', 'client-handoff-toolkit')}</p>
+                        <p>{__('No comments yet. Enable visual comments on your pages to get started!', 'analogwp-client-handoff')}</p>
                     </div>
                 ) : (
                     <div className="cht-recent-comments">
@@ -142,12 +142,12 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="cht-comment-meta">
                                         <a href={comment.page_url} target="_blank" rel="noopener noreferrer">
-                                            {comment.post_title || __('View Page', 'client-handoff-toolkit')}
+                                            {comment.post_title || __('View Page', 'analogwp-client-handoff')}
                                         </a>
                                         <button 
                                             className="cht-delete-btn"
                                             onClick={() => deleteComment(comment.id)}
-                                            title={__('Delete Comment', 'client-handoff-toolkit')}
+                                            title={__('Delete Comment', 'analogwp-client-handoff')}
                                         >
                                             ×
                                         </button>

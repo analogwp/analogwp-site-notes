@@ -29,9 +29,9 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
 
     const getStatusLabel = (status) => {
         switch (status) {
-            case 'open': return __('Open', 'client-handoff-toolkit');
-            case 'in_progress': return __('In Progress', 'client-handoff-toolkit');
-            case 'resolved': return __('Resolved', 'client-handoff-toolkit');
+            case 'open': return __('Open', 'analogwp-client-handoff');
+            case 'in_progress': return __('In Progress', 'analogwp-client-handoff');
+            case 'resolved': return __('Resolved', 'analogwp-client-handoff');
             default: return status;
         }
     };
@@ -96,24 +96,24 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
             <button 
                 className="cht-sidebar-close"
                 onClick={onClose}
-                title={__('Toggle Sidebar', 'client-handoff-toolkit')}
+                title={__('Toggle Sidebar', 'analogwp-client-handoff')}
             >
                 {isVisible ? '‹' : '›'}
             </button>
             
             <div className="cht-comment-sidebar">
             <div className="cht-sidebar-header">
-                <h3>{__('Page Tasks & Comments', 'client-handoff-toolkit')}</h3>
+                <h3>{__('Page Tasks & Comments', 'analogwp-client-handoff')}</h3>
                 <div className="cht-comments-count">
-                    {comments.length} {comments.length === 1 ? __('comment', 'client-handoff-toolkit') : __('comments', 'client-handoff-toolkit')}
+                    {comments.length} {comments.length === 1 ? __('comment', 'analogwp-client-handoff') : __('comments', 'analogwp-client-handoff')}
                 </div>
             </div>
 
             <div className="cht-sidebar-content">
                 {comments.length === 0 ? (
                     <div className="cht-no-comments-sidebar">
-                        <p>{__('No comments on this page yet.', 'client-handoff-toolkit')}</p>
-                        <p className="cht-instruction">{__('Click on any element to add a comment.', 'client-handoff-toolkit')}</p>
+                        <p>{__('No comments on this page yet.', 'analogwp-client-handoff')}</p>
+                        <p className="cht-instruction">{__('Click on any element to add a comment.', 'analogwp-client-handoff')}</p>
                     </div>
                 ) : (
                     <div className="cht-comments-list">
@@ -151,7 +151,7 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
                                                 <button
                                                     className="cht-locate-btn"
                                                     onClick={() => scrollToElement(comment)}
-                                                    title={__('Locate element', 'client-handoff-toolkit')}
+                                                    title={__('Locate element', 'analogwp-client-handoff')}
                                                 >
                                                     🎯
                                                 </button>
@@ -170,7 +170,7 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
                                                     <div className="cht-task-screenshot">
                                                         <img 
                                                             src={comment.screenshot_url} 
-                                                            alt={__('Comment screenshot', 'client-handoff-toolkit')}
+                                                            alt={__('Comment screenshot', 'analogwp-client-handoff')}
                                                             onClick={() => window.open(comment.screenshot_url, '_blank')}
                                                         />
                                                     </div>
@@ -184,9 +184,9 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
                                                         onChange={(e) => onUpdateStatus(comment.id, e.target.value)}
                                                         className="cht-status-select"
                                                     >
-                                                        <option value="open">{__('Open', 'client-handoff-toolkit')}</option>
-                                                        <option value="in_progress">{__('In Progress', 'client-handoff-toolkit')}</option>
-                                                        <option value="resolved">{__('Resolved', 'client-handoff-toolkit')}</option>
+                                                        <option value="open">{__('Open', 'analogwp-client-handoff')}</option>
+                                                        <option value="in_progress">{__('In Progress', 'analogwp-client-handoff')}</option>
+                                                        <option value="resolved">{__('Resolved', 'analogwp-client-handoff')}</option>
                                                     </select>
                                                 </div>
                                             )}
@@ -194,7 +194,7 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
                                             {comment.replies && comment.replies.length > 0 && (
                                                 <div className="cht-task-replies">
                                                     <div className="cht-replies-header">
-                                                        <strong>{__('Replies:', 'client-handoff-toolkit')}</strong>
+                                                        <strong>{__('Replies:', 'analogwp-client-handoff')}</strong>
                                                     </div>
                                                     {comment.replies.map(reply => (
                                                         <div key={reply.id} className="cht-task-reply">
@@ -214,14 +214,14 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
                                                         className="cht-reply-btn"
                                                         onClick={() => setShowReplyForms(prev => ({ ...prev, [comment.id]: true }))}
                                                     >
-                                                        {__('Reply', 'client-handoff-toolkit')}
+                                                        {__('Reply', 'analogwp-client-handoff')}
                                                     </button>
                                                 ) : (
                                                     <form onSubmit={(e) => handleReplySubmit(comment.id, e)} className="cht-reply-form">
                                                         <textarea
                                                             value={replyTexts[comment.id] || ''}
                                                             onChange={(e) => setReplyTexts(prev => ({ ...prev, [comment.id]: e.target.value }))}
-                                                            placeholder={__('Add a reply...', 'client-handoff-toolkit')}
+                                                            placeholder={__('Add a reply...', 'analogwp-client-handoff')}
                                                             className="cht-reply-textarea"
                                                             rows="3"
                                                         />
@@ -231,7 +231,7 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
                                                                 disabled={isSubmittingReply[comment.id]}
                                                                 className="cht-reply-submit"
                                                             >
-                                                                {isSubmittingReply[comment.id] ? __('Submitting...', 'client-handoff-toolkit') : __('Reply', 'client-handoff-toolkit')}
+                                                                {isSubmittingReply[comment.id] ? __('Submitting...', 'analogwp-client-handoff') : __('Reply', 'analogwp-client-handoff')}
                                                             </button>
                                                             <button
                                                                 type="button"
@@ -241,7 +241,7 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
                                                                 }}
                                                                 className="cht-reply-cancel"
                                                             >
-                                                                {__('Cancel', 'client-handoff-toolkit')}
+                                                                {__('Cancel', 'analogwp-client-handoff')}
                                                             </button>
                                                         </div>
                                                     </form>

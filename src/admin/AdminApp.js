@@ -37,7 +37,7 @@ const AdminApp = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_get_pages',
+                    action: 'agwp_cht_get_pages',
                     nonce: chtAdmin.nonce
                 })
             });
@@ -59,7 +59,7 @@ const AdminApp = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_get_admin_data',
+                    action: 'agwp_cht_get_admin_data',
                     nonce: chtAdmin.nonce
                 })
             });
@@ -85,7 +85,7 @@ const AdminApp = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_update_comment_status',
+                    action: 'agwp_cht_update_comment_status',
                     nonce: chtAdmin.nonce,
                     comment_id: commentId,
                     status: newStatus
@@ -108,7 +108,7 @@ const AdminApp = () => {
     };
 
     const deleteComment = async (commentId) => {
-        if (!confirm(__('Are you sure you want to delete this comment? This action cannot be undone.', 'client-handoff-toolkit'))) {
+        if (!confirm(__('Are you sure you want to delete this comment? This action cannot be undone.', 'analogwp-client-handoff'))) {
             return;
         }
 
@@ -119,7 +119,7 @@ const AdminApp = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_delete_comment',
+                    action: 'agwp_cht_delete_comment',
                     nonce: chtAdmin.nonce,
                     comment_id: commentId
                 })
@@ -144,7 +144,7 @@ const AdminApp = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_save_comment',
+                    action: 'agwp_cht_save_comment',
                     nonce: chtAdmin.nonce,
                     ...taskData
                 })
@@ -205,7 +205,7 @@ const AdminApp = () => {
         return (
             <div className="cht-admin-loading">
                 <div className="cht-spinner"></div>
-                <p>{__('Loading...', 'client-handoff-toolkit')}</p>
+                <p>{__('Loading...', 'analogwp-client-handoff')}</p>
             </div>
         );
     }

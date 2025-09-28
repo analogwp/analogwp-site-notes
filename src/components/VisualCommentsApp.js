@@ -137,7 +137,7 @@ const VisualCommentsApp = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_get_comments',
+                    action: 'agwp_cht_get_comments',
                     nonce: chtAjax.nonce,
                     page_url: window.location.href
                 })
@@ -163,7 +163,7 @@ const VisualCommentsApp = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_save_comment',
+                    action: 'agwp_cht_save_comment',
                     nonce: chtAjax.nonce,
                     post_id: chtAjax.postId || 0,
                     comment_text: commentText,
@@ -183,13 +183,13 @@ const VisualCommentsApp = () => {
                 setSelectedElement(null);
                 
                 // Show success message
-                showNotification(__('Comment saved successfully!', 'client-handoff-toolkit'), 'success');
+                showNotification(__('Comment saved successfully!', 'analogwp-client-handoff'), 'success');
             } else {
-                showNotification(__('Error saving comment', 'client-handoff-toolkit'), 'error');
+                showNotification(__('Error saving comment', 'analogwp-client-handoff'), 'error');
             }
         } catch (error) {
             console.error('Error saving comment:', error);
-            showNotification(__('Error saving comment', 'client-handoff-toolkit'), 'error');
+            showNotification(__('Error saving comment', 'analogwp-client-handoff'), 'error');
         }
     };
 
@@ -202,7 +202,7 @@ const VisualCommentsApp = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_add_reply',
+                    action: 'agwp_cht_add_reply',
                     nonce: chtAjax.nonce,
                     comment_id: commentId,
                     reply_text: replyText
@@ -212,13 +212,13 @@ const VisualCommentsApp = () => {
             const data = await response.json();
             if (data.success) {
                 await loadComments(); // Reload comments
-                showNotification(__('Reply added successfully!', 'client-handoff-toolkit'), 'success');
+                showNotification(__('Reply added successfully!', 'analogwp-client-handoff'), 'success');
             } else {
-                showNotification(__('Error adding reply', 'client-handoff-toolkit'), 'error');
+                showNotification(__('Error adding reply', 'analogwp-client-handoff'), 'error');
             }
         } catch (error) {
             console.error('Error adding reply:', error);
-            showNotification(__('Error adding reply', 'client-handoff-toolkit'), 'error');
+            showNotification(__('Error adding reply', 'analogwp-client-handoff'), 'error');
         }
     };
 
@@ -233,7 +233,7 @@ const VisualCommentsApp = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    action: 'cht_update_comment_status',
+                    action: 'agwp_cht_update_comment_status',
                     nonce: chtAjax.nonce,
                     comment_id: commentId,
                     status: status
@@ -243,13 +243,13 @@ const VisualCommentsApp = () => {
             const data = await response.json();
             if (data.success) {
                 await loadComments(); // Reload comments
-                showNotification(__('Status updated successfully!', 'client-handoff-toolkit'), 'success');
+                showNotification(__('Status updated successfully!', 'analogwp-client-handoff'), 'success');
             } else {
-                showNotification(__('Error updating status', 'client-handoff-toolkit'), 'error');
+                showNotification(__('Error updating status', 'analogwp-client-handoff'), 'error');
             }
         } catch (error) {
             console.error('Error updating status:', error);
-            showNotification(__('Error updating status', 'client-handoff-toolkit'), 'error');
+            showNotification(__('Error updating status', 'analogwp-client-handoff'), 'error');
         }
     };
 

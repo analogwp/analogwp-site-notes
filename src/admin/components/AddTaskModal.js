@@ -27,13 +27,13 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages }) => {
 
     const handleSave = async () => {
         if (!formData.taskName.trim()) {
-            alert(__('Please enter a task name', 'client-handoff-toolkit'));
+            alert(__('Please enter a task name', 'analogwp-client-handoff'));
             return;
         }
 
         const taskData = {
-            action: 'cht_add_new_task', 
-            nonce: window.cht_admin_ajax.nonce,
+            action: 'agwp_cht_add_new_task', 
+            nonce: window.chtAdmin.nonce,
             comment_text: description,
             post_id: selectedPage,
             user_id: assignedUser,
@@ -60,7 +60,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages }) => {
             onClose();
         } catch (error) {
             console.error('Error saving task:', error);
-            alert(__('Error saving task. Please try again.', 'client-handoff-toolkit'));
+            alert(__('Error saving task. Please try again.', 'analogwp-client-handoff'));
         }
     };
 
@@ -91,14 +91,14 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages }) => {
                         type="text"
                         value={formData.taskName}
                         onChange={(e) => handleInputChange('taskName', e.target.value)}
-                        placeholder={__('Add task Name', 'client-handoff-toolkit')}
+                        placeholder={__('Add task Name', 'analogwp-client-handoff')}
                         className="cht-task-name-input"
                     />
                     <div className="cht-modal-header-actions">
                         <button 
                             className="cht-modal-action-btn"
                             onClick={handleCancel}
-                            title={__('Delete', 'client-handoff-toolkit')}
+                            title={__('Delete', 'analogwp-client-handoff')}
                         >
                             <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5zM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11z"/>
@@ -106,7 +106,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages }) => {
                         </button>
                         <button 
                             className="cht-modal-action-btn"
-                            title={__('Edit', 'client-handoff-toolkit')}
+                            title={__('Edit', 'analogwp-client-handoff')}
                         >
                             <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708L4.5 15.207l-4 1a.5.5 0 0 1-.606-.606l1-4L12.146.146zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175l-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
@@ -117,31 +117,31 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages }) => {
 
                 <div className="cht-modal-tabs">
                     <button className="cht-modal-tab active">
-                        {__('Details', 'client-handoff-toolkit')}
+                        {__('Details', 'analogwp-client-handoff')}
                     </button>
                     <button className="cht-modal-tab">
-                        {__('Timesheet', 'client-handoff-toolkit')}
+                        {__('Timesheet', 'analogwp-client-handoff')}
                     </button>
                 </div>
 
                 <div className="cht-modal-form">
                     <div className="cht-form-row">
-                        <label>{__('Status', 'client-handoff-toolkit')}</label>
+                        <label>{__('Status', 'analogwp-client-handoff')}</label>
                         <div className="cht-status-selector">
                             <span className={`cht-status-pill ${formData.status === 'open' ? 'active' : ''}`}>
-                                {__('Todo', 'client-handoff-toolkit')}
+                                {__('Todo', 'analogwp-client-handoff')}
                             </span>
                         </div>
                     </div>
 
                     <div className="cht-form-row">
-                        <label>{__('Assign', 'client-handoff-toolkit')}</label>
+                        <label>{__('Assign', 'analogwp-client-handoff')}</label>
                         <select
                             value={formData.assignedUser}
                             onChange={(e) => handleInputChange('assignedUser', e.target.value)}
                             className="cht-form-select"
                         >
-                            <option value="">{__('Select User', 'client-handoff-toolkit')}</option>
+                            <option value="">{__('Select User', 'analogwp-client-handoff')}</option>
                             {users.map(user => (
                                 <option key={user.id} value={user.id}>{user.name}</option>
                             ))}
@@ -149,13 +149,13 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages }) => {
                     </div>
 
                     <div className="cht-form-row">
-                        <label>{__('Page', 'client-handoff-toolkit')}</label>
+                        <label>{__('Page', 'analogwp-client-handoff')}</label>
                         <select
                             value={formData.pageId}
                             onChange={(e) => handleInputChange('pageId', e.target.value)}
                             className="cht-form-select"
                         >
-                            <option value="">{__('Select Page', 'client-handoff-toolkit')}</option>
+                            <option value="">{__('Select Page', 'analogwp-client-handoff')}</option>
                             {pages.map(page => (
                                 <option key={page.id} value={page.id}>{page.title}</option>
                             ))}
@@ -163,42 +163,42 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages }) => {
                     </div>
 
                     <div className="cht-form-row">
-                        <label>{__('Priority', 'client-handoff-toolkit')}</label>
+                        <label>{__('Priority', 'analogwp-client-handoff')}</label>
                         <select
                             value={formData.priority}
                             onChange={(e) => handleInputChange('priority', e.target.value)}
                             className="cht-form-select"
                         >
-                            <option value="low">{__('Low', 'client-handoff-toolkit')}</option>
-                            <option value="medium">{__('Medium', 'client-handoff-toolkit')}</option>
-                            <option value="high">{__('High', 'client-handoff-toolkit')}</option>
+                            <option value="low">{__('Low', 'analogwp-client-handoff')}</option>
+                            <option value="medium">{__('Medium', 'analogwp-client-handoff')}</option>
+                            <option value="high">{__('High', 'analogwp-client-handoff')}</option>
                         </select>
                     </div>
 
                     <div className="cht-form-row">
-                        <label>{__('Category', 'client-handoff-toolkit')}</label>
+                        <label>{__('Category', 'analogwp-client-handoff')}</label>
                         <select
                             value={formData.category}
                             onChange={(e) => handleInputChange('category', e.target.value)}
                             className="cht-form-select"
                         >
-                            <option value="">{__('Select Category', 'client-handoff-toolkit')}</option>
-                            <option value="bug">{__('Bug', 'client-handoff-toolkit')}</option>
-                            <option value="feature">{__('Feature', 'client-handoff-toolkit')}</option>
-                            <option value="improvement">{__('Improvement', 'client-handoff-toolkit')}</option>
-                            <option value="content">{__('Content', 'client-handoff-toolkit')}</option>
+                            <option value="">{__('Select Category', 'analogwp-client-handoff')}</option>
+                            <option value="bug">{__('Bug', 'analogwp-client-handoff')}</option>
+                            <option value="feature">{__('Feature', 'analogwp-client-handoff')}</option>
+                            <option value="improvement">{__('Improvement', 'analogwp-client-handoff')}</option>
+                            <option value="content">{__('Content', 'analogwp-client-handoff')}</option>
                         </select>
                     </div>
 
                     <div className="cht-form-row">
-                        <label>{__('Due Date', 'client-handoff-toolkit')}</label>
+                        <label>{__('Due Date', 'analogwp-client-handoff')}</label>
                         <div className="cht-date-input-container">
                             <input
                                 type="date"
                                 value={formData.dueDate}
                                 onChange={(e) => handleInputChange('dueDate', e.target.value)}
                                 className="cht-form-date"
-                                placeholder={__('Select Due Date', 'client-handoff-toolkit')}
+                                placeholder={__('Select Due Date', 'analogwp-client-handoff')}
                             />
                             <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="cht-calendar-icon">
                                 <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
@@ -207,7 +207,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages }) => {
                     </div>
 
                     <div className="cht-form-row">
-                        <label>{__('Add time', 'client-handoff-toolkit')}</label>
+                        <label>{__('Add time', 'analogwp-client-handoff')}</label>
                         <div className="cht-time-input-container">
                             <input
                                 type="number"
@@ -233,17 +233,17 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages }) => {
                                 <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
                             </svg>
                             <button type="button" className="cht-add-time-btn">
-                                {__('Add', 'client-handoff-toolkit')}
+                                {__('Add', 'analogwp-client-handoff')}
                             </button>
                         </div>
                     </div>
 
                     <div className="cht-form-row">
-                        <label>{__('Description', 'client-handoff-toolkit')}</label>
+                        <label>{__('Description', 'analogwp-client-handoff')}</label>
                         <textarea
                             value={formData.description}
                             onChange={(e) => handleInputChange('description', e.target.value)}
-                            placeholder={__('Add a task description here (optional)', 'client-handoff-toolkit')}
+                            placeholder={__('Add a task description here (optional)', 'analogwp-client-handoff')}
                             className="cht-form-textarea"
                             rows="6"
                         />
@@ -255,13 +255,13 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages }) => {
                         className="cht-btn cht-btn-primary cht-btn-save"
                         onClick={handleSave}
                     >
-                        {__('Save Task', 'client-handoff-toolkit')}
+                        {__('Save Task', 'analogwp-client-handoff')}
                     </button>
                     <button 
                         className="cht-btn cht-btn-text"
                         onClick={handleCancel}
                     >
-                        {__('Cancel', 'client-handoff-toolkit')}
+                        {__('Cancel', 'analogwp-client-handoff')}
                     </button>
                 </div>
             </div>

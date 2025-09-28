@@ -47,8 +47,8 @@ const CommentToggle = ({ isActive, onToggle, commentsCount }) => {
                 className="cht-toggle-btn"
                 data-cht-ignore="true"
                 aria-label={isActive ? 
-                    __('Disable Visual Comments', 'client-handoff-toolkit') : 
-                    __('Enable Visual Comments', 'client-handoff-toolkit')
+                    __('Disable Visual Comments', 'analogwp-client-handoff') : 
+                    __('Enable Visual Comments', 'analogwp-client-handoff')
                 }
             >
                 <span className="cht-toggle-icon">
@@ -66,8 +66,8 @@ const CommentToggle = ({ isActive, onToggle, commentsCount }) => {
                 
                 <span className="cht-toggle-text">
                     {isActive ? 
-                        __('Comments ON', 'client-handoff-toolkit') : 
-                        __('Comments OFF', 'client-handoff-toolkit')
+                        __('Comments ON', 'analogwp-client-handoff') : 
+                        __('Comments OFF', 'analogwp-client-handoff')
                     }
                     {commentsCount > 0 && (
                         <span className="cht-comments-count">
@@ -81,7 +81,7 @@ const CommentToggle = ({ isActive, onToggle, commentsCount }) => {
                 onClick={() => setIsVisible(false)}
                 className="cht-toggle-hide"
                 data-cht-ignore="true"
-                aria-label={__('Hide toggle button', 'client-handoff-toolkit')}
+                aria-label={__('Hide toggle button', 'analogwp-client-handoff')}
             >
                 ×
             </button>

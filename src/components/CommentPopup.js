@@ -394,7 +394,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                     data-dragging={isDragging}
                 >
                     <div className="cht-popup-header">
-                        <h4>{__('Add Comment', 'client-handoff-toolkit')}</h4>
+                        <h4>{__('Add Comment', 'analogwp-client-handoff')}</h4>
                         <button 
                             onClick={onCancel}
                             className="cht-popup-close"
@@ -409,7 +409,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                         <textarea
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
-                            placeholder={__('Describe the issue or feedback...', 'client-handoff-toolkit')}
+                            placeholder={__('Describe the issue or feedback...', 'analogwp-client-handoff')}
                             className="cht-comment-textarea"
                             rows="4"
                             disabled={isLoading}
@@ -417,16 +417,16 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                         />
                         
                         <div className="cht-priority-selector">
-                            <label htmlFor="priority">{__('Priority:', 'client-handoff-toolkit')}</label>
+                            <label htmlFor="priority">{__('Priority:', 'analogwp-client-handoff')}</label>
                             <select
                                 id="priority"
                                 value={priority}
                                 onChange={(e) => setPriority(e.target.value)}
                                 disabled={isLoading}
                             >
-                                <option value="low">{__('Low', 'client-handoff-toolkit')}</option>
-                                <option value="medium">{__('Medium', 'client-handoff-toolkit')}</option>
-                                <option value="high">{__('High', 'client-handoff-toolkit')}</option>
+                                <option value="low">{__('Low', 'analogwp-client-handoff')}</option>
+                                <option value="medium">{__('Medium', 'analogwp-client-handoff')}</option>
+                                <option value="high">{__('High', 'analogwp-client-handoff')}</option>
                             </select>
                         </div>
                     </div>
@@ -438,7 +438,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                             className="cht-btn cht-btn-secondary"
                             disabled={isLoading}
                         >
-                            {__('Cancel', 'client-handoff-toolkit')}
+                            {__('Cancel', 'analogwp-client-handoff')}
                         </button>
                         
                         <button 
@@ -449,10 +449,10 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                             {isLoading ? (
                                 <>
                                     <span className="cht-spinner"></span>
-                                    {__('Saving...', 'client-handoff-toolkit')}
+                                    {__('Saving...', 'analogwp-client-handoff')}
                                 </>
                             ) : (
-                                __('Save Comment', 'client-handoff-toolkit')
+                                __('Save Comment', 'analogwp-client-handoff')
                             )}
                         </button>
                     </div>

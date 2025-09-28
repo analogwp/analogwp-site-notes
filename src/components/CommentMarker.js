@@ -96,9 +96,9 @@ const CommentMarker = ({
 
     const getStatusLabel = (status) => {
         switch (status) {
-            case 'open': return __('Open', 'client-handoff-toolkit');
-            case 'in_progress': return __('In Progress', 'client-handoff-toolkit');
-            case 'resolved': return __('Resolved', 'client-handoff-toolkit');
+            case 'open': return __('Open', 'analogwp-client-handoff');
+            case 'in_progress': return __('In Progress', 'analogwp-client-handoff');
+            case 'resolved': return __('Resolved', 'analogwp-client-handoff');
             default: return status;
         }
     };
@@ -148,7 +148,7 @@ const CommentMarker = ({
                     >
                         <div className="cht-popup-header">
                             <div className="cht-popup-title">
-                                <strong>{__('Comment', 'client-handoff-toolkit')} #{comment.id}</strong>
+                                <strong>{__('Comment', 'analogwp-client-handoff')} #{comment.id}</strong>
                                 <span 
                                     className="cht-status-badge"
                                     style={{ backgroundColor: getStatusColor(comment.status) }}
@@ -165,7 +165,7 @@ const CommentMarker = ({
                                 <div className="cht-comment-screenshot">
                                     <img 
                                         src={comment.screenshot_url} 
-                                        alt={__('Comment Screenshot', 'client-handoff-toolkit')}
+                                        alt={__('Comment Screenshot', 'analogwp-client-handoff')}
                                         onClick={() => window.open(comment.screenshot_url, '_blank')}
                                     />
                                 </div>
@@ -184,13 +184,13 @@ const CommentMarker = ({
                                 {comment.element_selector && (
                                     <div className="cht-element-info">
                                         <small>
-                                            {__('Element:', 'client-handoff-toolkit')} 
+                                            {__('Element:', 'analogwp-client-handoff')} 
                                             <code>{comment.element_selector}</code>
                                             <button 
                                                 onClick={scrollToElement}
                                                 className="cht-goto-element"
                                             >
-                                                {__('Go to', 'client-handoff-toolkit')}
+                                                {__('Go to', 'analogwp-client-handoff')}
                                             </button>
                                         </small>
                                     </div>
@@ -201,15 +201,15 @@ const CommentMarker = ({
                             {canManageComments && (
                                 <div className="cht-status-controls">
                                     <label>
-                                        {__('Status:', 'client-handoff-toolkit')}
+                                        {__('Status:', 'analogwp-client-handoff')}
                                         <select 
                                             value={comment.status} 
                                             onChange={handleStatusChange}
                                             className="cht-status-select"
                                         >
-                                            <option value="open">{__('Open', 'client-handoff-toolkit')}</option>
-                                            <option value="in_progress">{__('In Progress', 'client-handoff-toolkit')}</option>
-                                            <option value="resolved">{__('Resolved', 'client-handoff-toolkit')}</option>
+                                            <option value="open">{__('Open', 'analogwp-client-handoff')}</option>
+                                            <option value="in_progress">{__('In Progress', 'analogwp-client-handoff')}</option>
+                                            <option value="resolved">{__('Resolved', 'analogwp-client-handoff')}</option>
                                         </select>
                                     </label>
                                 </div>
@@ -218,7 +218,7 @@ const CommentMarker = ({
                             {/* Replies */}
                             {comment.replies && comment.replies.length > 0 && (
                                 <div className="cht-replies">
-                                    <h5>{__('Replies:', 'client-handoff-toolkit')}</h5>
+                                    <h5>{__('Replies:', 'analogwp-client-handoff')}</h5>
                                     {comment.replies.map((reply) => (
                                         <div key={reply.id} className="cht-reply">
                                             <div className="cht-reply-meta">
@@ -239,7 +239,7 @@ const CommentMarker = ({
                                     <textarea
                                         value={replyText}
                                         onChange={(e) => setReplyText(e.target.value)}
-                                        placeholder={__('Type your reply...', 'client-handoff-toolkit')}
+                                        placeholder={__('Type your reply...', 'analogwp-client-handoff')}
                                         rows="3"
                                         disabled={isSubmittingReply}
                                     />
@@ -253,7 +253,7 @@ const CommentMarker = ({
                                             disabled={isSubmittingReply}
                                             className="cht-btn cht-btn-secondary"
                                         >
-                                            {__('Cancel', 'client-handoff-toolkit')}
+                                            {__('Cancel', 'analogwp-client-handoff')}
                                         </button>
                                         <button 
                                             type="submit"
@@ -261,8 +261,8 @@ const CommentMarker = ({
                                             className="cht-btn cht-btn-primary"
                                         >
                                             {isSubmittingReply ? 
-                                                __('Replying...', 'client-handoff-toolkit') : 
-                                                __('Reply', 'client-handoff-toolkit')
+                                                __('Replying...', 'analogwp-client-handoff') : 
+                                                __('Reply', 'analogwp-client-handoff')
                                             }
                                         </button>
                                     </div>
@@ -273,7 +273,7 @@ const CommentMarker = ({
                                         onClick={() => setShowReplyForm(true)}
                                         className="cht-btn cht-btn-secondary"
                                     >
-                                        {__('Reply', 'client-handoff-toolkit')}
+                                        {__('Reply', 'analogwp-client-handoff')}
                                     </button>
                                 </div>
                             )}
