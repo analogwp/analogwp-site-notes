@@ -57,7 +57,6 @@ class AGWP_CHT_Ajax {
 		// Settings AJAX actions.
 		add_action( 'wp_ajax_agwp_cht_get_settings', array( $this, 'get_settings' ) );
 		add_action( 'wp_ajax_agwp_cht_save_settings', array( $this, 'save_settings' ) );
-		add_action( 'wp_ajax_agwp_cht_send_feedback', array( $this, 'send_feedback' ) );
 
 		// AJAX actions for non-logged-in users.
 		add_action( 'wp_ajax_nopriv_agwp_cht_save_comment', array( $this, 'save_comment' ) );
@@ -108,12 +107,8 @@ class AGWP_CHT_Ajax {
 	 * @since 1.0.0
 	 */
 	public function save_comment() {
-		// Add debugging for frontend comment saving.
-		error_log( 'AGWP CHT: save_comment called' );
-
 		// Verify nonce.
 		if ( ! $this->verify_nonce() ) {
-			error_log( 'AGWP CHT: Nonce verification failed' );
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -144,14 +139,9 @@ class AGWP_CHT_Ajax {
 		);
 
 		// Save comment.
-		error_log( 'AGWP CHT: Attempting to save comment with data: ' . print_r( $comment_data, true ) );
 		$comment_id = $this->database->save_comment( $comment_data );
-		error_log( 'AGWP CHT: Save result: ' . ( $comment_id ? 'ID=' . $comment_id : 'false' ) );
 
 		if ( ! $comment_id ) {
-			global $wpdb;
-			$last_error = $wpdb->last_error;
-			error_log( 'AGWP CHT: Database error: ' . ( $last_error ? $last_error : 'No specific error' ) );
 			$this->send_error( __( 'Failed to save comment', 'analogwp-client-handoff' ) );
 		}
 
@@ -196,26 +186,29 @@ class AGWP_CHT_Ajax {
 	 * @since 1.0.0
 	 */
 	public function update_comment() {
-		// Verify nonce.
-		if ( ! $this->verify_nonce() ) {
-			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
-		}
-
 		$post_data  = wp_unslash( $_POST );
 		$comment_id = isset( $post_data['comment_id'] ) ? intval( $post_data['comment_id'] ) : 0;
-		$updates    = isset( $post_data['updates'] ) ? json_decode( $post_data['updates'], true ) : array();
+
+		$updates = array();
+
+		// Get data from the 'updates' field (JSON format - main app)
+		if ( isset( $post_data['updates'] ) && ! empty( $post_data['updates'] ) ) {
+			$updates = json_decode( $post_data['updates'], true );
+		}
 
 		if ( empty( $comment_id ) || empty( $updates ) || ! is_array( $updates ) ) {
-			$this->send_error( __( 'Comment ID and updates are required', 'analogwp-client-handoff' ) );
+			wp_send_json_error( array( 'message' => 'Comment ID and updates are required' ) );
+			return;
 		}
 
 		$result = $this->database->update_comment( $comment_id, $updates );
 
 		if ( ! $result ) {
-			$this->send_error( __( 'Failed to update comment', 'analogwp-client-handoff' ) );
+			wp_send_json_error( array( 'message' => 'Failed to update comment' ) );
+			return;
 		}
 
-		$this->send_success( __( 'Comment updated successfully', 'analogwp-client-handoff' ) );
+		wp_send_json_success( array( 'message' => 'Comment updated successfully' ) );
 	}
 
 	/**
@@ -716,15 +709,18 @@ class AGWP_CHT_Ajax {
 		// Get default settings.
 		$default_settings = array(
 			'general' => array(
-				'allowed_roles'       => array( 'administrator', 'editor' ),
-				'auto_screenshot'     => true,
-				'screenshot_quality'  => 0.8,
-				'comments_per_page'   => 20,
+				'allowed_roles'             => array( 'administrator', 'editor' ),
+				'enable_frontend_comments'  => true,
+				'require_approval'          => false,
+				'auto_screenshot'           => true,
+				'screenshot_quality'        => 0.8,
+				'comments_per_page'         => 20,
+				'theme_mode'                => 'auto',
+				'auto_save_drafts'          => true,
 			),
-			'users' => array(
-				'notification_emails' => false,
-				'user_assignment'     => false,
-				'guest_comments'      => false,
+			'advanced' => array(
+				'enable_debug_mode'         => false,
+				'log_level'                 => 'error',
 			),
 		);
 
@@ -793,95 +789,51 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Invalid settings data.', 'analogwp-client-handoff' ) );
 		}
 
-		// Sanitize settings.
+		// Sanitize general settings.
 		if ( isset( $settings['general'] ) ) {
-			$settings['general']['allowed_roles']      = isset( $settings['general']['allowed_roles'] ) ? array_map( 'sanitize_text_field', (array) $settings['general']['allowed_roles'] ) : array();
-			$settings['general']['auto_screenshot']    = isset( $settings['general']['auto_screenshot'] ) ? (bool) $settings['general']['auto_screenshot'] : false;
-			$settings['general']['screenshot_quality'] = isset( $settings['general']['screenshot_quality'] ) ? floatval( $settings['general']['screenshot_quality'] ) : 0.8;
-			$settings['general']['comments_per_page']  = isset( $settings['general']['comments_per_page'] ) ? intval( $settings['general']['comments_per_page'] ) : 20;
+			$settings['general']['allowed_roles']              = isset( $settings['general']['allowed_roles'] ) ? array_map( 'sanitize_text_field', (array) $settings['general']['allowed_roles'] ) : array();
+			$settings['general']['enable_frontend_comments']   = isset( $settings['general']['enable_frontend_comments'] ) ? (bool) $settings['general']['enable_frontend_comments'] : true;
+			$settings['general']['require_approval']           = isset( $settings['general']['require_approval'] ) ? (bool) $settings['general']['require_approval'] : false;
+			$settings['general']['auto_screenshot']            = isset( $settings['general']['auto_screenshot'] ) ? (bool) $settings['general']['auto_screenshot'] : false;
+			$settings['general']['screenshot_quality']         = isset( $settings['general']['screenshot_quality'] ) ? floatval( $settings['general']['screenshot_quality'] ) : 0.8;
+			$settings['general']['comments_per_page']          = isset( $settings['general']['comments_per_page'] ) ? intval( $settings['general']['comments_per_page'] ) : 20;
+			$settings['general']['theme_mode']                 = isset( $settings['general']['theme_mode'] ) ? sanitize_text_field( $settings['general']['theme_mode'] ) : 'auto';
+			$settings['general']['auto_save_drafts']           = isset( $settings['general']['auto_save_drafts'] ) ? (bool) $settings['general']['auto_save_drafts'] : true;
 		}
 
-		if ( isset( $settings['users'] ) ) {
-			$settings['users']['notification_emails'] = isset( $settings['users']['notification_emails'] ) ? (bool) $settings['users']['notification_emails'] : false;
-			$settings['users']['user_assignment']     = isset( $settings['users']['user_assignment'] ) ? (bool) $settings['users']['user_assignment'] : false;
-			$settings['users']['guest_comments']      = isset( $settings['users']['guest_comments'] ) ? (bool) $settings['users']['guest_comments'] : false;
+		// Sanitize advanced settings.
+		if ( isset( $settings['advanced'] ) ) {
+			$settings['advanced']['enable_debug_mode'] = isset( $settings['advanced']['enable_debug_mode'] ) ? (bool) $settings['advanced']['enable_debug_mode'] : false;
+			$settings['advanced']['log_level']         = isset( $settings['advanced']['log_level'] ) ? sanitize_text_field( $settings['advanced']['log_level'] ) : 'error';
 		}
 
 		// Sanitize categories.
 		if ( is_array( $categories ) ) {
-			$sanitized_categories = array();
-			foreach ( $categories as $category ) {
-				if ( isset( $category['id'], $category['name'] ) ) {
-					$sanitized_categories[] = array(
-						'id'    => intval( $category['id'] ),
-						'name'  => sanitize_text_field( $category['name'] ),
-						'color' => isset( $category['color'] ) ? sanitize_hex_color( $category['color'] ) : '#3498db',
-					);
+			foreach ( $categories as $key => $category ) {
+				if ( isset( $category['name'] ) ) {
+					$categories[ $key ]['name'] = sanitize_text_field( $category['name'] );
+				}
+				if ( isset( $category['color'] ) ) {
+					$categories[ $key ]['color'] = sanitize_hex_color( $category['color'] );
+				}
+				if ( isset( $category['id'] ) ) {
+					$categories[ $key ]['id'] = intval( $category['id'] );
 				}
 			}
-			$categories = $sanitized_categories;
 		}
 
-		// Save settings.
-		update_option( 'agwp_cht_settings', $settings );
-		update_option( 'agwp_cht_categories', $categories );
+		// Save settings and categories.
+		$settings_saved   = update_option( 'agwp_cht_settings', $settings );
+		$categories_saved = update_option( 'agwp_cht_categories', $categories );
 
-		$this->send_success(
-			array(
-				'message' => __( 'Settings saved successfully.', 'analogwp-client-handoff' ),
-			)
-		);
-	}
-
-	/**
-	 * Handle send feedback AJAX request.
-	 *
-	 * @since 1.0.0
-	 */
-	public function send_feedback() {
-		// Verify nonce.
-		if ( ! $this->verify_nonce() ) {
-			$this->send_error( __( 'Security check failed.', 'analogwp-client-handoff' ) );
-		}
-
-		// Get and sanitize form data.
-		$post_data = wp_unslash( $_POST );
-		$email     = isset( $post_data['email'] ) ? sanitize_email( $post_data['email'] ) : '';
-		$message   = isset( $post_data['message'] ) ? sanitize_textarea_field( $post_data['message'] ) : '';
-
-		// Validate required fields.
-		if ( empty( $email ) || empty( $message ) ) {
-			$this->send_error( __( 'Email and message are required.', 'analogwp-client-handoff' ) );
-		}
-
-		if ( ! is_email( $email ) ) {
-			$this->send_error( __( 'Please enter a valid email address.', 'analogwp-client-handoff' ) );
-		}
-
-		// Prepare email data.
-		$admin_email = get_option( 'admin_email' );
-		$site_name   = get_option( 'blogname' );
-		$subject     = sprintf( __( 'Client Handoff Feedback from %s', 'analogwp-client-handoff' ), $site_name );
-
-		$email_body = sprintf(
-			__( 'New feedback received from Client Handoff plugin:%1$s%1$sFrom: %2$s%1$sMessage:%1$s%3$s%1$s%1$sSite: %4$s', 'analogwp-client-handoff' ),
-			"\n",
-			$email,
-			$message,
-			home_url()
-		);
-
-		// Send email.
-		$sent = wp_mail( $admin_email, $subject, $email_body );
-
-		if ( $sent ) {
+		if ( $settings_saved || $categories_saved ) {
 			$this->send_success(
 				array(
-					'message' => __( 'Thank you for your feedback! Your message has been sent.', 'analogwp-client-handoff' ),
+					'message' => __( 'Settings saved successfully.', 'analogwp-client-handoff' ),
 				)
 			);
 		} else {
-			$this->send_error( __( 'Failed to send feedback. Please try again.', 'analogwp-client-handoff' ) );
+			$this->send_error( __( 'Failed to save settings. Please try again.', 'analogwp-client-handoff' ) );
 		}
 	}
 }

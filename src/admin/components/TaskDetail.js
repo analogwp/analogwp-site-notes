@@ -17,7 +17,7 @@ const TaskDetail = ({
     onBack,
     onPriorityChange,
     onUpdateComment,
-    formatDate 
+    formatDate
 }) => {
     const [status, setStatus] = useState(comment.status);
     const [priority, setPriority] = useState(comment.priority || 'medium');
@@ -168,26 +168,27 @@ const TaskDetail = ({
         const minutes = totalMinutes % 60;
         
         return { hours, minutes, totalMinutes };
-    };    return (
-        <div className="cht-task-detail">
-            <div className="cht-task-detail-header">
+    };
+
+    return (
+        <div className="bg-white min-h-screen">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm z-10">
                 <button 
                     onClick={onBack}
-                    className="cht-back-button"
-                    title={__('Back to list', 'analogwp-client-handoff')}
+                    className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
                 >
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                         <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
                     </svg>
                     {__('Back', 'analogwp-client-handoff')}
                 </button>
                 
-                <div className="cht-task-detail-actions">
+                <div className="flex items-center space-x-3">
                     <select 
                         value={status}
                         onChange={(e) => handleStatusChange(e.target.value)}
                         disabled={isUpdating}
-                        className="cht-status-select"
+                        className="border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white disabled:opacity-50"
                     >
                         <option value="open">{__('Open', 'analogwp-client-handoff')}</option>
                         <option value="in_progress">{__('In Progress', 'analogwp-client-handoff')}</option>
@@ -198,7 +199,7 @@ const TaskDetail = ({
                         value={priority}
                         onChange={(e) => handlePriorityChange(e.target.value)}
                         disabled={isUpdating}
-                        className="cht-priority-select"
+                        className="border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white disabled:opacity-50"
                     >
                         <option value="low">{__('Low Priority', 'analogwp-client-handoff')}</option>
                         <option value="medium">{__('Medium Priority', 'analogwp-client-handoff')}</option>
@@ -207,7 +208,7 @@ const TaskDetail = ({
                     
                     <button 
                         onClick={handleDelete}
-                        className="cht-delete-button"
+                        className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200"
                         title={__('Delete comment', 'analogwp-client-handoff')}
                     >
                         <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -218,34 +219,38 @@ const TaskDetail = ({
                 </div>
             </div>
 
-            <div className="cht-task-detail-content">
-                <div className="cht-task-detail-main">
-                    <div className="cht-task-detail-info">
-                        <div className="cht-task-meta">
-                            <div className="cht-task-priority">
+            <div className="max-w-4xl mx-auto p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 space-y-6">
+                        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                            <div className="flex items-center space-x-3 mb-4">
                                 <div 
-                                    className="cht-priority-dot"
+                                    className="w-3 h-3 rounded-full"
                                     style={{ backgroundColor: getPriorityColor(priority) }}
                                 />
-                                <span className="cht-priority-label">
+                                <span className="text-sm font-medium text-gray-700">
                                     {priority ? priority.charAt(0).toUpperCase() + priority.slice(1) : __('Normal', 'analogwp-client-handoff')}
                                 </span>
                             </div>
                             
-                            <div className={`cht-status-badge cht-status-${status}`}>
+                            <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-4 ${
+                                status === 'open' ? 'bg-amber-100 text-amber-800' :
+                                status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                'bg-green-100 text-green-800'
+                            }`}>
                                 {getStatusLabel(status)}
                             </div>
                         </div>
                         
-                        <div className="cht-task-text">
-                            <h2>{__('Comment', 'analogwp-client-handoff')}</h2>
-                            <p>{comment.comment_text}</p>
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-semibold text-gray-900 mb-2">{__('Comment', 'analogwp-client-handoff')}</h2>
+                            <p className="text-gray-700 leading-relaxed">{comment.comment_text}</p>
                         </div>
                         
                         {comment.page_url && (
-                            <div className="cht-task-page">
-                                <h3>{__('Page URL', 'analogwp-client-handoff')}</h3>
-                                <a href={comment.page_url} target="_blank" rel="noopener noreferrer">
+                            <div className="border-t border-gray-100 pt-4">
+                                <h3 className="text-sm font-medium text-gray-900 mb-2">{__('Page URL', 'analogwp-client-handoff')}</h3>
+                                <a href={comment.page_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-2 text-indigo-600 hover:text-indigo-500 transition-colors duration-200 text-sm">
                                     <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855A7.97 7.97 0 0 0 5.145 4H7.5V1.077zM4.09 4a9.267 9.267 0 0 1 .64-1.539 6.7 6.7 0 0 1 .597-.933A7.025 7.025 0 0 0 2.255 4H4.09zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a6.958 6.958 0 0 0-.656 2.5h2.49zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5H4.847zM8.5 5v2.5h2.99a12.495 12.495 0 0 0-.337-2.5H8.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5H4.51zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5H8.5zM5.145 12c.138.386.295.744.468 1.068.552 1.035 1.218 1.65 1.887 1.855V12H5.145zm.182 2.472a6.696 6.696 0 0 1-.597-.933A9.268 9.268 0 0 1 4.09 12H2.255a7.024 7.024 0 0 0 3.072 2.472zM3.82 11a13.652 13.652 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5H3.82zm6.853 3.472A7.024 7.024 0 0 0 13.745 12H11.91a9.27 9.27 0 0 1-.64 1.539 6.688 6.688 0 0 1-.597.933zM8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855.173-.324.33-.682.468-1.068H8.5zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.65 13.65 0 0 1-.312 2.5zm.312-3.5h2.49c-.062-.89-.291-1.733-.656-2.5H12.18c.174.782.282 1.623.312 2.5zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7.024 7.024 0 0 0-3.072-2.472c.218.284.418.598.597.933zM10.855 4a7.966 7.966 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4h2.355z"/>
                                     </svg>
@@ -253,17 +258,30 @@ const TaskDetail = ({
                                 </a>
                             </div>
                         )}
+
+                        {/* Screenshot section */}
+                        {comment.screenshot_url && (
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3">{__('Screenshot', 'analogwp-client-handoff')}</h3>
+                                <img 
+                                    src={comment.screenshot_url} 
+                                    alt={__('Task screenshot', 'analogwp-client-handoff')}
+                                    className="w-full rounded-lg border border-gray-200"
+                                />
+                            </div>
+                        )}
                     </div>
                     
-                    {/* Screenshot in main area */}
+                    {/* Time tracking and metadata for non-sidebar view */}
                     {comment.screenshot_url && (
-                        <div className="cht-task-screenshot-main">
-                            <h3>{__('Screenshot', 'analogwp-client-handoff')}</h3>
-                            <div className="cht-screenshot-container-main">
+                        <div className="cht-bg-gray-50 cht-rounded-lg cht-p-6">
+                            <h3 className="cht-text-lg cht-font-semibold cht-text-gray-900 cht-mb-4">{__('Screenshot', 'analogwp-client-handoff')}</h3>
+                            <div className="cht-bg-white cht-rounded-lg cht-border cht-border-gray-200 cht-overflow-hidden cht-cursor-pointer hover:cht-shadow-md cht-transition-shadow cht-duration-200">
                                 <img 
                                     src={comment.screenshot_url} 
                                     alt={__('Task screenshot', 'analogwp-client-handoff')}
                                     onClick={() => window.open(comment.screenshot_url, '_blank')}
+                                    className="cht-w-full cht-h-auto"
                                 />
                             </div>
                         </div>
@@ -271,9 +289,9 @@ const TaskDetail = ({
                     
                     {/* Replies Section */}
                     {comment.replies && comment.replies.length > 0 && (
-                        <div className="cht-task-replies">
-                            <h3>{__('Replies', 'analogwp-client-handoff')} ({comment.replies.length})</h3>
-                            <div className="cht-replies-list">
+                        <div className="cht-space-y-4">
+                            <h3 className="cht-text-lg cht-font-semibold cht-text-gray-900">{__('Replies', 'analogwp-client-handoff')} ({comment.replies.length})</h3>
+                            <div className="cht-space-y-3">
                                 {comment.replies.map((reply, index) => (
                                     <div key={reply.id || index} className="cht-reply-item">
                                         <div className="cht-reply-header">
@@ -302,15 +320,15 @@ const TaskDetail = ({
                     )}
                 </div>
                 
-                <div className="cht-task-detail-sidebar">
-                    <div className="cht-task-detail-meta">
-                        <h3>{__('Details', 'analogwp-client-handoff')}</h3>
+                <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm h-fit">
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">{__('Details', 'analogwp-client-handoff')}</h3>
                         
-                        <div className="cht-task-user-detail">
-                            <label>{__('Created by:', 'analogwp-client-handoff')}</label>
-                            <div className="cht-user-info">
+                        <div className="space-y-1">
+                            <label className="block text-sm font-medium text-gray-700">{__('Created by:', 'analogwp-client-handoff')}</label>
+                            <div className="flex items-center space-x-2">
                                 <div 
-                                    className="cht-user-avatar"
+                                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white bg-gray-500"
                                     style={{ 
                                         backgroundImage: user?.avatar ? `url(${user.avatar})` : 'none',
                                         backgroundColor: user?.avatar ? 'transparent' : '#6b7280'
@@ -318,49 +336,51 @@ const TaskDetail = ({
                                 >
                                     {!user?.avatar && getUserInitials(user?.name || 'Unknown')}
                                 </div>
-                                <span className="cht-user-name">
+                                <span className="text-sm text-gray-900">
                                     {user?.name || __('Unknown User', 'analogwp-client-handoff')}
                                 </span>
                             </div>
                         </div>
                         
-                        <div className="cht-task-date-detail">
-                            <label>{__('Created:', 'analogwp-client-handoff')}</label>
-                            <span>{formatDate(comment.created_at)}</span>
+                        <div className="space-y-1">
+                            <label className="block text-sm font-medium text-gray-700">{__('Created:', 'analogwp-client-handoff')}</label>
+                            <span className="text-sm text-gray-900">{formatDate(comment.created_at)}</span>
                         </div>
                         
-                        <div className="cht-task-id">
-                            <label>{__('Comment ID:', 'analogwp-client-handoff')}</label>
-                            <span>#{comment.id}</span>
+                        <div className="space-y-1">
+                            <label className="block text-sm font-medium text-gray-700">{__('Comment ID:', 'analogwp-client-handoff')}</label>
+                            <span className="text-sm text-gray-900">#{comment.id}</span>
                         </div>
                     </div>
                     
                     {/* Timesheet Section */}
-                    <div className="cht-task-timesheet">
-                        <h3>{__('Timesheet', 'analogwp-client-handoff')}</h3>
+                    <div className="bg-gray-50 rounded-lg p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">{__('Timesheet', 'analogwp-client-handoff')}</h3>
                         
                         {/* Add Time Entry */}
-                        <div className="cht-add-time-entry">
-                            <div className="cht-time-inputs">
-                                <div className="cht-time-input-group">
-                                    <input
-                                        type="number"
-                                        value={newTimeEntry.hours}
-                                        onChange={(e) => setNewTimeEntry(prev => ({...prev, hours: e.target.value}))}
-                                        placeholder="0"
-                                        className="cht-time-input"
-                                        min="0"
-                                        max="23"
-                                    />
-                                    <label>{__('h', 'analogwp-client-handoff')}</label>
+                        <div className="space-y-4">
+                            <div className="flex items-end space-x-4">
+                                <div className="flex items-center space-x-2">
+                                    <div className="flex items-center space-x-1">
+                                        <input
+                                            type="number"
+                                            value={newTimeEntry.hours}
+                                            onChange={(e) => setNewTimeEntry(prev => ({...prev, hours: e.target.value}))}
+                                            placeholder="0"
+                                            className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500"
+                                            min="0"
+                                            max="23"
+                                        />
+                                        <label className="text-sm text-gray-600">{__('h', 'analogwp-client-handoff')}</label>
+                                    </div>
                                 </div>
-                                <div className="cht-time-input-group">
+                                <div className="time-input-group">
                                     <input
                                         type="number"
                                         value={newTimeEntry.minutes}
                                         onChange={(e) => setNewTimeEntry(prev => ({...prev, minutes: e.target.value}))}
                                         placeholder="0"
-                                        className="cht-time-input"
+                                        className="time-input"
                                         min="0"
                                         max="59"
                                     />
@@ -372,11 +392,11 @@ const TaskDetail = ({
                                 value={newTimeEntry.description}
                                 onChange={(e) => setNewTimeEntry(prev => ({...prev, description: e.target.value}))}
                                 placeholder={__('Description (optional)', 'analogwp-client-handoff')}
-                                className="cht-time-description"
+                                className="time-description"
                             />
                             <button 
                                 onClick={addTimeEntry}
-                                className="cht-add-time-btn"
+                                className="add-time-btn"
                             >
                                 <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
@@ -387,31 +407,31 @@ const TaskDetail = ({
                         
                         {/* Time Entries List */}
                         {timeEntries.length > 0 && (
-                            <div className="cht-time-entries">
-                                <div className="cht-time-total">
+                            <div className="time-entries">
+                                <div className="time-total">
                                     <strong>
                                         {__('Total: ', 'analogwp-client-handoff')}
                                         {getTotalTime().hours}h {getTotalTime().minutes}m
                                     </strong>
                                 </div>
                                 
-                                <div className="cht-time-entries-list">
+                                <div className="time-entries-list">
                                     {timeEntries.map(entry => (
-                                        <div key={entry.id} className="cht-time-entry-item">
-                                            <div className="cht-time-entry-info">
-                                                <div className="cht-time-entry-duration">
+                                        <div key={entry.id} className="time-entry-item">
+                                            <div className="time-entry-info">
+                                                <div className="time-entry-duration">
                                                     {entry.hours}h {entry.minutes}m
                                                 </div>
-                                                <div className="cht-time-entry-desc">
+                                                <div className="time-entry-desc">
                                                     {entry.description}
                                                 </div>
-                                                <div className="cht-time-entry-date">
+                                                <div className="time-entry-date">
                                                     {formatDate(entry.date)}
                                                 </div>
                                             </div>
                                             <button 
                                                 onClick={() => removeTimeEntry(entry.id)}
-                                                className="cht-remove-time-btn"
+                                                className="remove-time-btn"
                                                 title={__('Remove time entry', 'analogwp-client-handoff')}
                                             >
                                                 <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">

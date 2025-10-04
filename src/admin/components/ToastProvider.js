@@ -10,7 +10,7 @@ export const ToastProvider = ({ children }) => {
                 position="top-right"
                 reverseOrder={false}
                 gutter={8}
-                containerClassName="cht-toast-container"
+                containerClassName="cht-fixed cht-top-16 cht-right-4 cht-z-50"
                 containerStyle={{
                     top: '52px', // Account for WP admin bar (32px) + extra margin (20px)
                     zIndex: 999999,

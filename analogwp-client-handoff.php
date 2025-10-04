@@ -124,6 +124,7 @@ final class AGWP_CHT_Client_Handoff_Toolkit {
 		require_once AGWP_CHT_INCLUDES_PATH . 'class-assets.php';
 		require_once AGWP_CHT_INCLUDES_PATH . 'admin/class-admin.php';
 		require_once AGWP_CHT_INCLUDES_PATH . 'ajax/class-ajax.php';
+		require_once AGWP_CHT_INCLUDES_PATH . 'class-pro-extensions.php';
 	}
 
 	/**

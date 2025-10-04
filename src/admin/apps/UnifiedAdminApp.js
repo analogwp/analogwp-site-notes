@@ -179,6 +179,8 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
     };
 
     const handleUpdateComment = async (commentId, updates) => {
+        console.log('Updating comment with ID:', commentId);
+        console.log('Updates to apply:', updates);
         try {
             const response = await fetch(agwpChtAjax.ajaxUrl, {
                 method: 'POST',
@@ -194,6 +196,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
             });
 
             const data = await response.json();
+            console.log('Server response:', data);
             if (data.success) {
                 setComments(comments.map(comment => 
                     comment.id === commentId 
@@ -202,7 +205,9 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                 ));
                 showToast.success(__('Task updated successfully!', 'analogwp-client-handoff'));
             } else {
-                console.error('Error updating comment:', data.message);
+                const errorMessage = data.data?.message || data.message || 'Unknown error';
+                console.error('Error updating comment:', errorMessage);
+                console.error('Full response:', data);
                 showToast.error(__('Error updating task. Please try again.', 'analogwp-client-handoff'));
             }
         } catch (err) {

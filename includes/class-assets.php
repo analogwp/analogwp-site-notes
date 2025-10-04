@@ -172,10 +172,13 @@ class AGWP_CHT_Assets {
 	 */
 	private function get_admin_localized_data() {
 		return array(
-			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
-			'nonce'       => wp_create_nonce( 'agwp_cht_nonce' ),
-			'currentUser' => $this->get_current_user_data(),
-			'strings'     => $this->get_admin_strings(),
+			'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+			'nonce'         => wp_create_nonce( 'agwp_cht_nonce' ),
+			'currentUser'   => $this->get_current_user_data(),
+			'strings'       => $this->get_admin_strings(),
+			'pluginVersion' => AGWP_CHT_VERSION,
+			'wpVersion'     => get_bloginfo( 'version' ),
+			'phpVersion'    => phpversion(),
 		);
 	}
 
