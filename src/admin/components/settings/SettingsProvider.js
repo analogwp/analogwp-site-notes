@@ -21,7 +21,7 @@ export const useSettings = () => {
     return context;
 };
 
-// Default settings structure
+// Default settings structure - only includes settings available in UI
 const defaultSettings = {
     general: {
         allowed_roles: ['administrator', 'editor'],
@@ -33,59 +33,13 @@ const defaultSettings = {
         auto_save_drafts: true,
         theme_mode: 'auto' // light, dark, auto
     },
-    notifications: {
-        email_notifications: true,
-        notification_frequency: 'immediate', // immediate, daily, weekly
-        notify_admins: true,
-        notify_assigned_users: true,
-        email_template: 'default',
-        custom_email_from: '',
-        webhook_url: ''
-    },
-    users: {
-        user_assignment: true,
-        guest_comments: false,
-        require_login: false,
-        default_user_role: 'subscriber',
-        user_permissions: {
-            can_edit_own: true,
-            can_delete_own: false,
-            can_assign_tasks: false,
-            can_change_status: true
-        }
-    },
-    security: {
-        enable_nonce_verification: true,
-        enable_rate_limiting: true,
-        rate_limit_per_minute: 10,
-        allowed_file_types: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-        max_file_size: 5, // MB
-        enable_sanitization: true,
-        block_spam: true
-    },
-    appearance: {
-        theme_style: 'modern', // modern, classic, minimal
-        primary_color: '#3498db',
-        secondary_color: '#2ecc71',
-        accent_color: '#e74c3c',
-        border_radius: 8,
-        font_size: 'medium', // small, medium, large
-        show_avatars: true,
-        compact_mode: false
-    },
     advanced: {
         enable_debug_mode: false,
-        log_level: 'error', // error, warning, info, debug
-        cache_comments: true,
-        cache_duration: 3600, // seconds
-        enable_rest_api: true,
-        api_rate_limit: 100,
-        custom_css: '',
-        custom_js: ''
+        log_level: 'error' // error, warning, info, debug
     }
 };
 
-// Settings validation schema
+// Settings validation schema - only for available settings
 const settingsSchema = {
     general: {
         allowed_roles: { type: 'array', required: true },
@@ -97,35 +51,9 @@ const settingsSchema = {
         auto_save_drafts: { type: 'boolean', required: true },
         theme_mode: { type: 'string', enum: ['light', 'dark', 'auto'], required: true }
     },
-    notifications: {
-        email_notifications: { type: 'boolean', required: true },
-        notification_frequency: { type: 'string', enum: ['immediate', 'daily', 'weekly'], required: true },
-        notify_admins: { type: 'boolean', required: true },
-        notify_assigned_users: { type: 'boolean', required: true },
-        email_template: { type: 'string', required: true },
-        custom_email_from: { type: 'email', required: false },
-        webhook_url: { type: 'url', required: false }
-    },
-    users: {
-        user_assignment: { type: 'boolean', required: true },
-        guest_comments: { type: 'boolean', required: true },
-        require_login: { type: 'boolean', required: true },
-        default_user_role: { type: 'string', required: true }
-    },
-    security: {
-        enable_nonce_verification: { type: 'boolean', required: true },
-        enable_rate_limiting: { type: 'boolean', required: true },
-        rate_limit_per_minute: { type: 'number', min: 1, max: 100, required: true },
-        allowed_file_types: { type: 'array', required: true },
-        max_file_size: { type: 'number', min: 1, max: 50, required: true }
-    },
-    appearance: {
-        theme_style: { type: 'string', enum: ['modern', 'classic', 'minimal'], required: true },
-        primary_color: { type: 'color', required: true },
-        secondary_color: { type: 'color', required: true },
-        accent_color: { type: 'color', required: true },
-        border_radius: { type: 'number', min: 0, max: 20, required: true },
-        font_size: { type: 'string', enum: ['small', 'medium', 'large'], required: true }
+    advanced: {
+        enable_debug_mode: { type: 'boolean', required: true },
+        log_level: { type: 'string', enum: ['error', 'warning', 'info', 'debug'], required: true }
     }
 };
 
@@ -345,8 +273,26 @@ export const SettingsProvider = ({ children }) => {
     };
 
     const exportSettings = () => {
+        // Only export settings that are actually available in the UI
+        const filteredSettings = {
+            general: {
+                allowed_roles: settings.general?.allowed_roles || defaultSettings.general.allowed_roles,
+                enable_frontend_comments: settings.general?.enable_frontend_comments ?? defaultSettings.general.enable_frontend_comments,
+                require_approval: settings.general?.require_approval ?? defaultSettings.general.require_approval,
+                auto_screenshot: settings.general?.auto_screenshot ?? defaultSettings.general.auto_screenshot,
+                screenshot_quality: settings.general?.screenshot_quality ?? defaultSettings.general.screenshot_quality,
+                comments_per_page: settings.general?.comments_per_page ?? defaultSettings.general.comments_per_page,
+                theme_mode: settings.general?.theme_mode ?? defaultSettings.general.theme_mode,
+                auto_save_drafts: settings.general?.auto_save_drafts ?? defaultSettings.general.auto_save_drafts
+            },
+            advanced: {
+                enable_debug_mode: settings.advanced?.enable_debug_mode ?? defaultSettings.advanced.enable_debug_mode,
+                log_level: settings.advanced?.log_level ?? defaultSettings.advanced.log_level
+            }
+        };
+
         const exportData = {
-            settings,
+            settings: filteredSettings,
             categories,
             version: '1.1.0',
             exported_at: new Date().toISOString()
