@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { showConfirmation, showToast } from './ToastProvider';
+import { Button, IconButton } from './ui';
 
 const TaskDetail = ({ 
     comment, 
@@ -127,6 +128,10 @@ const TaskDetail = ({
         
         // Persist to database
         try {
+            if (!onUpdateComment) {
+                throw new Error('Update function not available');
+            }
+            
             await onUpdateComment(comment.id, { 
                 timesheet: JSON.stringify(updatedEntries) 
             });
@@ -136,7 +141,7 @@ const TaskDetail = ({
             console.error('Error saving time entry:', error);
             // Revert the local state if saving failed
             setTimeEntries(timeEntries);
-            showToast.error(__('Failed to save time entry', 'analogwp-client-handoff'));
+            showToast.error(__('Failed to save time entry. Please try again.', 'analogwp-client-handoff'));
         }
     };
 
@@ -147,6 +152,10 @@ const TaskDetail = ({
         
         // Persist to database
         try {
+            if (!onUpdateComment) {
+                throw new Error('Update function not available');
+            }
+            
             await onUpdateComment(comment.id, { 
                 timesheet: JSON.stringify(updatedEntries) 
             });
@@ -155,7 +164,7 @@ const TaskDetail = ({
             console.error('Error removing time entry:', error);
             // Revert the local state if saving failed
             setTimeEntries(originalEntries);
-            showToast.error(__('Failed to remove time entry', 'analogwp-client-handoff'));
+            showToast.error(__('Failed to remove time entry. Please try again.', 'analogwp-client-handoff'));
         }
     };
 
@@ -173,15 +182,18 @@ const TaskDetail = ({
     return (
         <div className="bg-white min-h-screen">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm z-10">
-                <button 
+                <Button 
                     onClick={onBack}
-                    className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                    variant="ghost"
+                    size="medium"
+                    icon={
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                        </svg>
+                    }
                 >
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-                    </svg>
                     {__('Back', 'analogwp-client-handoff')}
-                </button>
+                </Button>
                 
                 <div className="flex items-center space-x-3">
                     <select 
@@ -206,16 +218,19 @@ const TaskDetail = ({
                         <option value="high">{__('High Priority', 'analogwp-client-handoff')}</option>
                     </select>
                     
-                    <button 
+                    <Button 
                         onClick={handleDelete}
-                        className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200"
+                        variant="danger"
+                        size="medium"
+                        icon={
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5zM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11z"/>
+                            </svg>
+                        }
                         title={__('Delete comment', 'analogwp-client-handoff')}
                     >
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5zM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11z"/>
-                        </svg>
                         {__('Delete', 'analogwp-client-handoff')}
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -385,15 +400,19 @@ const TaskDetail = ({
                                         placeholder={__('Description (optional)', 'analogwp-client-handoff')}
                                         className="time-description"
                                     />
-                                    <button 
+                                    <Button 
                                         onClick={addTimeEntry}
-                                        className="add-time-btn"
+                                        variant="primary"
+                                        size="medium"
+                                        icon={
+                                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                            </svg>
+                                        }
+                                        disabled={!newTimeEntry.hours && !newTimeEntry.minutes}
                                     >
-                                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
-                                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                        </svg>
                                         {__('Add Time', 'analogwp-client-handoff')}
-                                    </button>
+                                    </Button>
                                 </div>
                                 
                                 {/* Time Entries List */}
@@ -420,15 +439,16 @@ const TaskDetail = ({
                                                             {formatDate(entry.date)}
                                                         </div>
                                                     </div>
-                                                    <button 
+                                                    <IconButton 
                                                         onClick={() => removeTimeEntry(entry.id)}
-                                                        className="remove-time-btn"
+                                                        variant="danger"
+                                                        size="small"
                                                         title={__('Remove time entry', 'analogwp-client-handoff')}
                                                     >
                                                         <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                                             <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                                         </svg>
-                                                    </button>
+                                                    </IconButton>
                                                 </div>
                                             ))}
                                         </div>

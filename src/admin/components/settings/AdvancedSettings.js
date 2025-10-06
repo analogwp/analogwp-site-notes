@@ -17,6 +17,7 @@ import {
     FileUpload,
     FieldDescription 
 } from './FieldComponents';
+import { Button } from '../ui';
 
 const AdvancedSettings = () => {
     const { settings, updateSetting, exportSettings, importSettings } = useSettings();
@@ -80,12 +81,13 @@ const AdvancedSettings = () => {
                             <div className="border-l-4 border-blue-500 pl-4">
                                 <h4 className="text-lg font-medium text-gray-900 mb-2">{__('Export Settings', 'analogwp-client-handoff')}</h4>
                                 <p className="text-sm text-gray-600 mb-4">{__('Download all your settings as a JSON file for backup or transfer to another site.', 'analogwp-client-handoff')}</p>
-                                <button
-                                    className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                                <Button
                                     onClick={exportSettings}
+                                    variant="secondary"
+                                    size="medium"
                                 >
                                     {__('Download Settings', 'analogwp-client-handoff')}
-                                </button>
+                                </Button>
                             </div>
                         </div>
 

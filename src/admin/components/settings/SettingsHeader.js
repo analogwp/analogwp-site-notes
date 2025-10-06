@@ -25,6 +25,7 @@ import {
  */
 import { useSettings } from './SettingsProvider';
 import { useExtensions } from '../extensions/ExtensionsProvider';
+import { Button } from '../ui';
 
 const SettingsHeader = ({ activeTab, onTabChange }) => {
     const { saving, hasUnsavedChanges, lastSaved, saveSettings } = useSettings();
@@ -103,27 +104,16 @@ const SettingsHeader = ({ activeTab, onTabChange }) => {
                 </div>
                 
                 <div className="flex">
-                    <button
-                        className={`inline-flex items-center px-4 py-2 text-sm font-medium border rounded-md transition-all duration-200 ${
-                            saving || !hasUnsavedChanges 
-                                ? 'text-gray-400 bg-gray-100 border-gray-200 cursor-not-allowed' 
-                                : 'text-white bg-indigo-600 border-indigo-600 hover:bg-indigo-700 cursor-pointer'
-                        }`}
+                    <Button
                         onClick={handleSave}
                         disabled={saving || !hasUnsavedChanges}
+                        loading={saving}
+                        variant="primary"
+                        size="medium"
+                        icon={saving ? null : <CheckCircleIcon className="w-4 h-4" />}
                     >
-                        {saving ? (
-                            <>
-                                <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
-                                {__('Saving...', 'analogwp-client-handoff')}
-                            </>
-                        ) : (
-                            <>
-                                <CheckCircleIcon className="w-4 h-4 mr-2" />
-                                {__('Save Changes', 'analogwp-client-handoff')}
-                            </>
-                        )}
-                    </button>
+                        {saving ? __('Saving...', 'analogwp-client-handoff') : __('Save Changes', 'analogwp-client-handoff')}
+                    </Button>
                 </div>
             </div>
 

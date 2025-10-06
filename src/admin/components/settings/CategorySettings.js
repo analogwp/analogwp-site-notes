@@ -27,6 +27,7 @@ import {
     FieldDescription 
 } from './FieldComponents';
 import { showToast } from '../ToastProvider';
+import { Button, IconButton } from '../ui';
 
 const CategorySettings = () => {
     const { categories, setCategories, saveSettings } = useSettings();
@@ -156,14 +157,15 @@ const CategorySettings = () => {
                             </div>
                         </div>
 
-                        <button
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        <Button
                             onClick={addCategory}
                             disabled={!newCategory.name.trim()}
+                            variant="primary"
+                            size="medium"
+                            icon={<PlusIcon className="w-4 h-4" />}
                         >
-                            <PlusIcon className="w-4 h-4 mr-2" />
                             {__('Add Category', 'analogwp-client-handoff')}
-                        </button>
+                        </Button>
                     </div>
                 </SettingsCard>
 
@@ -190,22 +192,24 @@ const CategorySettings = () => {
                                                 />
                                             </div>
                                             <div className="flex gap-2">
-                                                <button
-                                                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                                                <Button
                                                     onClick={saveEdit}
+                                                    variant="success"
+                                                    size="small"
+                                                    icon={<CheckIcon className="w-4 h-4" />}
                                                     title={__('Save changes', 'analogwp-client-handoff')}
                                                 >
-                                                    <CheckIcon className="w-4 h-4 mr-1" />
                                                     {__('Save', 'analogwp-client-handoff')}
-                                                </button>
-                                                <button
-                                                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                                                </Button>
+                                                <Button
                                                     onClick={cancelEdit}
+                                                    variant="secondary"
+                                                    size="small"
+                                                    icon={<XMarkIcon className="w-4 h-4" />}
                                                     title={__('Cancel editing', 'analogwp-client-handoff')}
                                                 >
-                                                    <XMarkIcon className="w-4 h-4 mr-1" />
                                                     {__('Cancel', 'analogwp-client-handoff')}
-                                                </button>
+                                                </Button>
                                             </div>
                                         </div>
                                     ) : (
@@ -218,24 +222,26 @@ const CategorySettings = () => {
                                                 <span className="font-medium text-gray-900">{category.name}</span>
                                             </div>
                                             <div className="flex gap-2">
-                                                <button
-                                                    className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                                                <IconButton
                                                     onClick={() => startEdit(category)}
+                                                    variant="ghost"
+                                                    size="small"
                                                     title={__('Edit category', 'analogwp-client-handoff')}
                                                 >
                                                     <PencilIcon className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    className="inline-flex items-center px-2 py-1 border border-red-300 text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                                                </IconButton>
+                                                <IconButton
                                                     onClick={() => {
                                                         if (confirm(__('Are you sure you want to delete this category?', 'analogwp-client-handoff'))) {
                                                             deleteCategory(category.id);
                                                         }
                                                     }}
+                                                    variant="danger"
+                                                    size="small"
                                                     title={__('Delete category', 'analogwp-client-handoff')}
                                                 >
                                                     <TrashIcon className="w-4 h-4" />
-                                                </button>
+                                                </IconButton>
                                             </div>
                                         </div>
                                     )}
