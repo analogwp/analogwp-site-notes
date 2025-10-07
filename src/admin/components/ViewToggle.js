@@ -2,23 +2,21 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import Button from './ui/Button';
+import { Button } from '@wordpress/components';
 
 const ViewToggle = ({ activeView, onViewChange }) => {
     return (
         <div className="flex rounded-lg gap-2">
 						<Button 
-								variant={activeView === 'kanban' ? 'primary' : 'secondary'}
+								isPrimary={activeView === 'kanban'}
+								isSecondary={activeView !== 'kanban'}
 								onClick={() => onViewChange('kanban')}
 						>
 								{__('Kanban', 'analogwp-client-handoff')}
 						</Button>
 						<Button 
-								variant={activeView === 'list' ? 'primary' : 'secondary'}
+								isPrimary={activeView === 'list'}
+								isSecondary={activeView !== 'list'}
 								onClick={() => onViewChange('list')}
 						>
 								{__('List', 'analogwp-client-handoff')}

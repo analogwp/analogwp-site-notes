@@ -3,6 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 
 /**
  * External dependencies
@@ -27,7 +28,6 @@ import {
     FieldDescription 
 } from './FieldComponents';
 import { showToast } from '../ToastProvider';
-import { Button, IconButton } from '../ui';
 
 const CategorySettings = () => {
     const { categories, setCategories, saveSettings } = useSettings();
@@ -160,7 +160,7 @@ const CategorySettings = () => {
                         <Button
                             onClick={addCategory}
                             disabled={!newCategory.name.trim()}
-                            variant="primary"
+                            isPrimary
                             size="medium"
                             icon={<PlusIcon className="w-4 h-4" />}
                         >
@@ -194,8 +194,8 @@ const CategorySettings = () => {
                                             <div className="flex gap-2">
                                                 <Button
                                                     onClick={saveEdit}
-                                                    variant="success"
-                                                    size="small"
+                                                    isPrimary
+                                                    isSmall
                                                     icon={<CheckIcon className="w-4 h-4" />}
                                                     title={__('Save changes', 'analogwp-client-handoff')}
                                                 >
@@ -203,8 +203,8 @@ const CategorySettings = () => {
                                                 </Button>
                                                 <Button
                                                     onClick={cancelEdit}
-                                                    variant="secondary"
-                                                    size="small"
+                                                    isSecondary
+                                                    isSmall
                                                     icon={<XMarkIcon className="w-4 h-4" />}
                                                     title={__('Cancel editing', 'analogwp-client-handoff')}
                                                 >
@@ -222,26 +222,26 @@ const CategorySettings = () => {
                                                 <span className="font-medium text-gray-900">{category.name}</span>
                                             </div>
                                             <div className="flex gap-2">
-                                                <IconButton
+                                                <Button
                                                     onClick={() => startEdit(category)}
-                                                    variant="ghost"
-                                                    size="small"
+                                                    variant="tertiary"
+                                                    isSmall
                                                     title={__('Edit category', 'analogwp-client-handoff')}
                                                 >
                                                     <PencilIcon className="w-4 h-4" />
-                                                </IconButton>
-                                                <IconButton
+                                                </Button>
+                                                <Button
                                                     onClick={() => {
                                                         if (confirm(__('Are you sure you want to delete this category?', 'analogwp-client-handoff'))) {
                                                             deleteCategory(category.id);
                                                         }
                                                     }}
-                                                    variant="danger"
-                                                    size="small"
+                                                    isDestructive
+                                                    isSmall
                                                     title={__('Delete category', 'analogwp-client-handoff')}
                                                 >
                                                     <TrashIcon className="w-4 h-4" />
-                                                </IconButton>
+                                                </Button>
                                             </div>
                                         </div>
                                     )}

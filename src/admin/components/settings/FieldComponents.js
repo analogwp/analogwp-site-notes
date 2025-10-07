@@ -2,6 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { 
+    TextControl, 
+    TextareaControl, 
+    SelectControl, 
+    RangeControl, 
+    ColorPicker,
+    ToggleControl
+} from '@wordpress/components';
 
 /**
  * External dependencies
@@ -66,39 +74,13 @@ export const Toggle = ({
     className = '' 
 }) => (
     <FieldGroup className={className}>
-        <div className="flex items-start gap-3">
-            <div className="flex items-center">
-                <input
-                    type="checkbox"
-                    id={id}
-                    className="sr-only"
-                    checked={checked}
-                    onChange={(e) => onChange(e.target.checked)}
-                    disabled={disabled}
-                />
-                <label 
-                    htmlFor={id} 
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
-                        checked ? 'bg-blue-600' : 'bg-gray-200'
-                    } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                    <span
-                        aria-hidden="true"
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                            checked ? 'translate-x-5' : 'translate-x-0'
-                        }`}
-                    />
-                </label>
-            </div>
-            <div className="flex-1">
-                <label htmlFor={id} className="text-sm font-medium text-gray-900 cursor-pointer">
-                    {label}
-                </label>
-                {description && (
-                    <p className="mt-1 text-sm text-gray-500">{description}</p>
-                )}
-            </div>
-        </div>
+        <ToggleControl
+            label={label}
+            help={description}
+            checked={checked}
+            onChange={onChange}
+            disabled={disabled}
+        />
     </FieldGroup>
 );
 
@@ -113,23 +95,14 @@ export const Select = ({
     className = '' 
 }) => (
     <FieldGroup className={className}>
-        {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
-        <select
-            id={id}
-            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500 sm:text-sm"
+        <SelectControl
+            label={label}
+            help={description}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={onChange}
+            options={options}
             disabled={disabled}
-        >
-            {options.map(option => (
-                <option key={option.value} value={option.value}>
-                    {option.label}
-                </option>
-            ))}
-        </select>
-        {description && (
-            <FieldDescription>{description}</FieldDescription>
-        )}
+        />
     </FieldGroup>
 );
 
@@ -180,19 +153,15 @@ export const TextInput = ({
     className = '' 
 }) => (
     <FieldGroup className={className}>
-        {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
-        <input
-            type={type}
-            id={id}
-            className="block w-full rounded-md border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500"
+        <TextControl
+            label={label}
+            help={description}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={onChange}
             placeholder={placeholder}
             disabled={disabled}
+            type={type}
         />
-        {description && (
-            <FieldDescription>{description}</FieldDescription>
-        )}
     </FieldGroup>
 );
 
@@ -208,19 +177,15 @@ export const TextAreaInput = ({
     className = '' 
 }) => (
     <FieldGroup className={className}>
-        {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
-        <textarea
-            id={id}
-            className="cht-textarea"
+        <TextareaControl
+            label={label}
+            help={description}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={onChange}
             placeholder={placeholder}
             rows={rows}
             disabled={disabled}
         />
-        {description && (
-            <FieldDescription>{description}</FieldDescription>
-        )}
     </FieldGroup>
 );
 
@@ -275,28 +240,17 @@ export const RangeInput = ({
     className = '' 
 }) => (
     <FieldGroup className={className}>
-        {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
-        <div className="cht-range-input-wrapper">
-            <input
-                type="range"
-                id={id}
-                className="cht-range-input"
-                value={value}
-                onChange={(e) => onChange(parseFloat(e.target.value))}
-                min={min}
-                max={max}
-                step={step}
-                disabled={disabled}
-            />
-            {showValue && (
-                <span className="cht-range-value">
-                    {formatValue ? formatValue(value) : value}
-                </span>
-            )}
-        </div>
-        {description && (
-            <FieldDescription>{description}</FieldDescription>
-        )}
+        <RangeControl
+            label={label}
+            help={description}
+            value={value}
+            onChange={onChange}
+            min={min}
+            max={max}
+            step={step}
+            disabled={disabled}
+            withInputField={showValue}
+        />
     </FieldGroup>
 );
 

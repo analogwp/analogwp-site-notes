@@ -3,12 +3,12 @@
  */
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { showConfirmation, showToast } from './ToastProvider';
-import { Button, IconButton } from './ui';
 
 const TaskDetail = ({ 
     comment, 
@@ -184,10 +184,10 @@ const TaskDetail = ({
             <div className="sticky top-0 bg-white border-b border-gray-200 rounded-t-lg px-6 py-4 flex items-center justify-between shadow-sm z-10">
                 <Button 
                     onClick={onBack}
-                    variant="ghost"
+                    variant="tertiary"
                     size="medium"
                     icon={
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <svg className="fill-current! w-4!" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                             <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
                         </svg>
                     }
@@ -220,7 +220,7 @@ const TaskDetail = ({
                     
                     <Button 
                         onClick={handleDelete}
-                        variant="danger"
+                        isDestructive
                         size="medium"
                         icon={
                             <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -405,7 +405,7 @@ const TaskDetail = ({
                                     />
                                     <Button 
                                         onClick={addTimeEntry}
-                                        variant="primary"
+                                        isPrimary
                                         size="medium"
                                         icon={
                                             <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -442,16 +442,16 @@ const TaskDetail = ({
                                                             {formatDate(entry.date)}
                                                         </div>
                                                     </div>
-                                                    <IconButton 
+                                                    <Button 
                                                         onClick={() => removeTimeEntry(entry.id)}
-                                                        variant="danger"
-                                                        size="small"
+                                                        isDestructive
+                                                        isSmall
                                                         title={__('Remove time entry', 'analogwp-client-handoff')}
                                                     >
                                                         <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                                             <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                                         </svg>
-                                                    </IconButton>
+                                                    </Button>
                                                 </div>
                                             ))}
                                         </div>

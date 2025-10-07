@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { SelectControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -13,54 +14,53 @@ const TaskFilters = ({ filters, onFilterChange, sortBy, onSortChange, users }) =
 
     return (
         <div className="flex gap-3 items-center">
-            <select 
+            <SelectControl
                 value={filters.status}
-                onChange={(e) => onFilterChange({status: e.target.value})}
-                className="px-3! py-1.5! border border-gray-200! rounded-md! text-sm focus:ring-2 focus:ring-gray-500! focus:border-gray-500! min-w-40!"
-            >
-                <option value="">{__('Filter by Status', 'analogwp-client-handoff')}</option>
-                <option value="open">{__('Todo', 'analogwp-client-handoff')}</option>
-                <option value="in_progress">{__('In Progress', 'analogwp-client-handoff')}</option>
-                <option value="resolved">{__('Completed', 'analogwp-client-handoff')}</option>
-            </select>
+                onChange={(value) => onFilterChange({status: value})}
+                options={[
+                    { value: '', label: __('Filter by Status', 'analogwp-client-handoff') },
+                    { value: 'open', label: __('Todo', 'analogwp-client-handoff') },
+                    { value: 'in_progress', label: __('In Progress', 'analogwp-client-handoff') },
+                    { value: 'resolved', label: __('Completed', 'analogwp-client-handoff') }
+                ]}
+            />
             
-            <select 
+            <SelectControl
                 value={filters.user}
-                onChange={(e) => onFilterChange({user: e.target.value})}
-                className="px-3! py-1.5! border border-gray-200! rounded-md! text-sm focus:ring-2 focus:ring-gray-500! focus:border-gray-500! min-w-40!"
-            >
-                <option value="">{__('Filter by User', 'analogwp-client-handoff')}</option>
-                {users.map(user => (
-                    <option key={user.id} value={user.id}>{user.name}</option>
-                ))}
-            </select>
+                onChange={(value) => onFilterChange({user: value})}
+                options={[
+                    { value: '', label: __('Filter by User', 'analogwp-client-handoff') },
+                    ...users.map(user => ({
+                        value: user.id.toString(),
+                        label: user.name
+                    }))
+                ]}
+            />
             
-            <select 
+            <SelectControl
                 value={sortBy}
-                onChange={(e) => onSortChange(e.target.value)}
-                className="px-3! py-1.5! border border-gray-200! rounded-md! text-sm focus:ring-2 focus:ring-gray-500! focus:border-gray-500! min-w-40!"
-            >
-                <option value="created_at">{__('Sort by Date', 'analogwp-client-handoff')}</option>
-                <option value="updated_at">{__('Sort by Updated', 'analogwp-client-handoff')}</option>
-                <option value="priority">{__('Sort by Priority', 'analogwp-client-handoff')}</option>
-            </select>
+                onChange={(value) => onSortChange(value)}
+                options={[
+                    { value: 'created_at', label: __('Sort by Date', 'analogwp-client-handoff') },
+                    { value: 'updated_at', label: __('Sort by Updated', 'analogwp-client-handoff') },
+                    { value: 'priority', label: __('Sort by Priority', 'analogwp-client-handoff') }
+                ]}
+            />
             
-            <select 
+            <SelectControl
                 value={filters.category}
-                onChange={(e) => onFilterChange({category: e.target.value})}
-                className="px-3! py-1.5! border border-gray-200! rounded-md! text-sm focus:ring-2 focus:ring-gray-500! focus:border-gray-500! min-w-40!"
-            >
-                <option value="">{__('Filter by Category', 'analogwp-client-handoff')}</option>
-                {categories && categories.length > 0 ? (
-                    categories.map(category => (
-                        <option key={category.id} value={category.name}>
-                            {category.name}
-                        </option>
-                    ))
-                ) : (
-                    <option disabled>{__('No categories available', 'analogwp-client-handoff')}</option>
-                )}
-            </select>
+                onChange={(value) => onFilterChange({category: value})}
+                options={[
+                    { value: '', label: __('Filter by Category', 'analogwp-client-handoff') },
+                    ...(categories && categories.length > 0 
+                        ? categories.map(category => ({
+                            value: category.name,
+                            label: category.name
+                        }))
+                        : [{ value: '', label: __('No categories available', 'analogwp-client-handoff'), disabled: true }]
+                    )
+                ]}
+            />
         </div>
     );
 };
