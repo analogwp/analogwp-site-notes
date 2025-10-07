@@ -27,7 +27,7 @@ const Button = ({
         primary: 'text-white bg-blue-700 border border-blue-600 shadow-sm hover:bg-blue-700 focus:ring-blue-500',
         secondary: 'bg-white border border-transparent shadow-sm hover:bg-white focus:ring-blue-500',
         success: 'text-white bg-green-600 border border-green-600 hover:bg-green-700 focus:ring-green-500',
-        danger: 'text-white bg-red-600 border border-red-600 hover:bg-red-700 focus:ring-red-500',
+        danger: 'text-white bg-red-700 border border-red-700 hover:bg-red-600 focus:ring-red-600',
         warning: 'text-white bg-yellow-600 border border-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500',
         ghost: 'text-gray-600 bg-transparent border border-gray-300 hover:bg-gray-50 focus:ring-gray-500',
         link: 'text-indigo-600 bg-transparent border-none hover:text-indigo-500 focus:ring-indigo-500 underline-offset-4 hover:underline'
