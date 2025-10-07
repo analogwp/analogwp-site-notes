@@ -41,17 +41,23 @@ const TaskCard = ({
             onClick={() => onCardClick && onCardClick(comment)}
         >
             <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center">
+                <div className="flex items-center gap-1">
                     <div 
                         className="w-3 h-3 rounded-full mr-2"
                         style={{ backgroundColor: getPriorityColor(comment.priority) }}
                     />
-										{/* Title - prominently displayed */}
-										{comment.comment_title && (
-												<h4 className="text-gray-900 text-base font-medium my-0!">
-														{comment.comment_title}
-												</h4>
-										)}
+					{/* ID - prominently displayed */}
+					{comment.id && (
+						<h4 className="text-gray-900 text-base font-medium my-0!">
+							#{comment.id}
+						</h4>
+					)}
+					{/* Title - prominently displayed */}
+					{comment.comment_title && (
+						<h4 className="text-gray-900 text-base font-medium my-0!">
+							{comment.comment_title}
+						</h4>
+					)}
                 </div>
                 <div className="flex gap-1">
                     <button 
@@ -82,6 +88,14 @@ const TaskCard = ({
             </div>
             
             <div className="mb-4">
+				{/* Comment Text - secondary display */}
+				{comment.comment_text && (
+					<div className="text-gray-600 text-sm my-2">
+						{comment.comment_text.length > 100 
+							? comment.comment_text.substring(0, 100) + '...' 
+							: comment.comment_text}
+					</div>
+				)}
                 
                 {/* Hiding selector details as requested */}
                 {/* {comment.element_selector && (
@@ -103,7 +117,7 @@ const TaskCard = ({
             <div className="border-t border-gray-100 pt-3">
                 <div className="space-y-3">
                     <div className="flex flex-col">
-                        <small className="text-xs text-gray-500 mb-1">{__('Created by', 'analogwp-client-handoff')}</small>
+                        <small className="text-xs text-gray-500 mb-1">{__('Added by', 'analogwp-client-handoff')}</small>
                         <div className="flex items-center">
                             <div 
                                 className="w-6 h-6 rounded-full mr-2 flex items-center justify-center text-xs font-medium text-white"

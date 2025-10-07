@@ -275,7 +275,7 @@ const TaskDetail = ({
                 </div>
             </div>
 
-            <div className="max-w-4xl mx-auto p-6">
+            <div className="max-w-6xl mx-auto p-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 space-y-6">
                         <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
@@ -451,140 +451,203 @@ const TaskDetail = ({
                         )}
                     </div>
                     
-                    {/* Right Column - Details and Timesheet only */}
-                    <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm h-fit">
-                        <div className="space-y-6">
+                    {/* Right Column - Details only */}
+                    <div className="space-y-6">
+                        {/* Details Card */}
+                        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                             <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">{__('Details', 'analogwp-client-handoff')}</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex! items-center">
+                                    <svg className="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    {__('Details', 'analogwp-client-handoff')}
+                                </h3>
                                 
-                                <div className="space-y-1">
-                                    <label className="block text-sm font-medium text-gray-700">{__('Created by:', 'analogwp-client-handoff')}</label>
-                                    <div className="flex items-center space-x-2">
-                                        <div 
-                                            className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white bg-gray-500"
-                                            style={{ 
-                                                backgroundImage: user?.avatar ? `url(${user.avatar})` : 'none',
-                                                backgroundColor: user?.avatar ? 'transparent' : '#6b7280',
-																								backgroundSize: 'contain',
-																								backgroundPosition: 'center',
-																								backgroundRepeat: 'no-repeat'
-                                            }}
-                                        >
-                                            {!user?.avatar && getUserInitials(user?.name || 'Unknown')}
-                                        </div>
-                                        <span className="text-sm text-gray-900">
-                                            {user?.name || __('Unknown User', 'analogwp-client-handoff')}
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <div className="space-y-1">
-                                    <label className="block text-sm font-medium text-gray-700">{__('Created:', 'analogwp-client-handoff')}</label>
-                                    <span className="text-sm text-gray-900">{formatDate(comment.created_at)}</span>
-                                </div>
-                                
-                                <div className="space-y-1">
-                                    <label className="block text-sm font-medium text-gray-700">{__('Comment ID:', 'analogwp-client-handoff')}</label>
-                                    <span className="text-sm text-gray-900">#{comment.id}</span>
-                                </div>
-                            </div>
-                            
-                            {/* Timesheet Section */}
-                            <div className="bg-gray-50 rounded-lg p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">{__('Timesheet', 'analogwp-client-handoff')}</h3>
-                                
-                                {/* Add Time Entry */}
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex items-end space-x-4">
-                                        <div className="flex items-center space-x-2">
-                                            <div className="flex items-center space-x-1">
-                                                <input
-                                                    type="number"
-                                                    value={newTimeEntry.hours}
-                                                    onChange={(e) => setNewTimeEntry(prev => ({...prev, hours: e.target.value}))}
-                                                    placeholder="0"
-                                                    className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500"
-                                                    min="0"
-                                                    max="23"
-                                                />
-                                                <label className="text-sm text-gray-600">{__('HH', 'analogwp-client-handoff')}</label>
+                                <div className="space-y-4">
+                                    <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                                        <div className="flex-shrink-0">
+                                            <div 
+                                                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium text-white bg-gray-500 border-2 border-white shadow-sm"
+                                                style={{ 
+                                                    backgroundImage: user?.avatar ? `url(${user.avatar})` : 'none',
+                                                    backgroundColor: user?.avatar ? 'transparent' : '#6b7280',
+                                                    backgroundSize: 'cover',
+                                                    backgroundPosition: 'center',
+                                                    backgroundRepeat: 'no-repeat'
+                                                }}
+                                            >
+                                                {!user?.avatar && getUserInitials(user?.name || 'Unknown')}
                                             </div>
                                         </div>
-                                        <div className="time-input-group">
-                                            <input
-                                                type="number"
-                                                value={newTimeEntry.minutes}
-                                                onChange={(e) => setNewTimeEntry(prev => ({...prev, minutes: e.target.value}))}
-                                                placeholder="0"
-                                                className="time-input"
-                                                min="0"
-                                                max="59"
-                                            />
-                                            <label>{__('MM', 'analogwp-client-handoff')}</label>
+                                        <div className="ml-3">
+                                            <div className="text-sm font-medium text-gray-900">
+                                                {user?.name || __('Unknown User', 'analogwp-client-handoff')}
+                                            </div>
+                                            <div className="text-xs text-gray-500">{__('Added by', 'analogwp-client-handoff')}</div>
                                         </div>
                                     </div>
-                                    <div>
-																			<input
-                                        type="text"
-                                        value={newTimeEntry.description}
-                                        onChange={(e) => setNewTimeEntry(prev => ({...prev, description: e.target.value}))}
-                                        placeholder={__('Description (optional)', 'analogwp-client-handoff')}
-                                        className="time-description"
-                                    />
-																		</div>
-                                    <div>
-																			<Button 
-                                        onClick={addTimeEntry}
-                                        variant="primary"
-                                        icon={
-                                            <svg className="fill-current!" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                            </svg>
-                                        }
-                                        disabled={!newTimeEntry.hours && !newTimeEntry.minutes}
-                                    >
-                                        {__('Add Time', 'analogwp-client-handoff')}
-                                    </Button>
-																		</div>
-                                </div>
-                                
-                                {/* Time Entries List */}
-                                {timeEntries.length > 0 && (
-                                    <div className="time-entries">
-                                        <div className="time-total">
-                                            <strong>
-                                                {__('Total: ', 'analogwp-client-handoff')}
-                                                {getTotalTime().hours}h {getTotalTime().minutes}m
-                                            </strong>
+                                    
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div className="bg-white border border-gray-100 rounded-lg p-3">
+                                            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{__('Created', 'analogwp-client-handoff')}</label>
+                                            <span className="text-sm text-gray-900 font-medium">{formatDate(comment.created_at)}</span>
                                         </div>
                                         
-                                        <div className="time-entries-list">
-                                            {timeEntries.map(entry => (
-                                                <div key={entry.id} className="time-entry-item">
-                                                    <div className="time-entry-info">
-                                                        <div className="time-entry-duration">
-                                                            {entry.hours}h {entry.minutes}m
+                                        <div className="bg-white border border-gray-100 rounded-lg p-3">
+                                            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{__('Task ID', 'analogwp-client-handoff')}</label>
+                                            <span className="text-sm text-gray-900 font-medium">#{comment.id}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Timesheet Card */}
+                        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                                <h3 className="text-lg font-semibold text-gray-900 flex! items-center">
+                                    <svg className="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    {__('Timesheet', 'analogwp-client-handoff')}
+                                    {timeEntries.length > 0 && (
+                                        <span className="ml-2 px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full font-medium">
+                                            {getTotalTime().hours}h {getTotalTime().minutes}m
+                                        </span>
+                                    )}
+                                </h3>
+                            </div>
+                            
+                                {/* Add Time Entry Form */}
+                                <div className="space-y-4">
+                                    <div className="rounded-lg p-4">
+                                        <h4 className="text-sm font-medium text-gray-900 mb-3 flex! items-center">
+                                            <svg className="w-4 h-4 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            </svg>
+                                            {__('Add Time Entry', 'analogwp-client-handoff')}
+                                        </h4>
+                                        
+                                        <div className="space-y-3!">
+                                            <div className="flex items-center space-x-3">
+                                                <div className="flex items-center bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
+                                                    <input
+                                                        type="number"
+                                                        value={newTimeEntry.hours}
+                                                        onChange={(e) => setNewTimeEntry(prev => ({...prev, hours: e.target.value}))}
+                                                        placeholder="0"
+                                                        className="w-16 text-center border-0 outline-none text-sm font-medium"
+                                                        min="0"
+                                                        max="23"
+                                                    />
+                                                    <span className="text-xs text-gray-500 ml-1">{__('HH', 'analogwp-client-handoff')}</span>
+                                                </div>
+                                                
+                                                <span className="text-gray-400 font-medium">:</span>
+                                                
+                                                <div className="flex items-center bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
+                                                    <input
+                                                        type="number"
+                                                        value={newTimeEntry.minutes}
+                                                        onChange={(e) => setNewTimeEntry(prev => ({...prev, minutes: e.target.value}))}
+                                                        placeholder="00"
+                                                        className="w-16 text-center border-0 outline-none text-sm font-medium"
+                                                        min="0"
+                                                        max="59"
+                                                    />
+                                                    <span className="text-xs text-gray-500 ml-1">{__('MM', 'analogwp-client-handoff')}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <input
+                                                type="text"
+                                                value={newTimeEntry.description}
+                                                onChange={(e) => setNewTimeEntry(prev => ({...prev, description: e.target.value}))}
+                                                placeholder={__('What did you work on? (optional)', 'analogwp-client-handoff')}
+                                                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm"
+                                            />
+                                            
+                                            <div>
+																							<Button 
+                                                onClick={addTimeEntry}
+                                                variant="primary"
+                                                icon={
+                                                    <svg className="fill-current! w-4! h-4" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                                    </svg>
+                                                }
+                                                disabled={!newTimeEntry.hours && !newTimeEntry.minutes}
+                                            >
+                                                {__('Add Time Entry', 'analogwp-client-handoff')}
+                                            </Button>
+																						</div>
+                                        </div>
+                                    </div>
+                                
+                                {/* Time Entries List */}
+                                {timeEntries.length > 0 ? (
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                                            <h4 className="text-sm font-medium text-gray-900 flex items-center">
+                                                <svg className="w-4 h-4 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                </svg>
+                                                {__('Time Entries', 'analogwp-client-handoff')} ({timeEntries.length})
+                                            </h4>
+                                            <div className="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm font-medium rounded-full">
+                                                {__('Total: ', 'analogwp-client-handoff')}
+                                                {getTotalTime().hours}h {getTotalTime().minutes}m
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="space-y-3">
+                                            {timeEntries.map((entry, index) => (
+                                                <div key={entry.id} className="group bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300">
+                                                    <div className="flex items-start justify-between">
+                                                        <div className="flex-1 space-y-2">
+                                                            <div className="flex items-center space-x-3">
+                                                                <div className="flex items-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg px-3 py-1">
+                                                                    <svg className="w-4 h-4 text-blue-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                    </svg>
+                                                                    <span className="text-sm font-medium text-blue-800">
+                                                                        {entry.hours}h {entry.minutes}m
+                                                                    </span>
+                                                                </div>
+                                                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                                                    {formatDate(entry.date)}
+                                                                </span>
+                                                            </div>
+                                                            
+                                                            {entry.description && (
+                                                                <div className="text-sm text-gray-700 bg-gray-50 rounded-lg p-2">
+                                                                    {entry.description}
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                        <div className="time-entry-desc">
-                                                            {entry.description}
-                                                        </div>
-                                                        <div className="time-entry-date">
-                                                            {formatDate(entry.date)}
-                                                        </div>
+                                                        
+                                                        <Button 
+                                                            onClick={() => removeTimeEntry(entry.id)}
+                                                            variant="destructive"
+                                                            size="small"
+                                                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-3 flex-shrink-0"
+                                                            title={__('Remove time entry', 'analogwp-client-handoff')}
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </Button>
                                                     </div>
-                                                    <Button 
-                                                        onClick={() => removeTimeEntry(entry.id)}
-                                                        variant="destructive"
-                                                        size="small"
-                                                        title={__('Remove time entry', 'analogwp-client-handoff')}
-                                                    >
-                                                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                                                        </svg>
-                                                    </Button>
                                                 </div>
                                             ))}
                                         </div>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8 border-t border-gray-100">
+                                        <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <p className="text-sm text-gray-500">{__('No time entries yet. Add your first entry above.', 'analogwp-client-handoff')}</p>
                                     </div>
                                 )}
                             </div>
