@@ -232,6 +232,7 @@ class AGWP_CHT_Database {
 			'category'         => isset( $data['category'] ) ? sanitize_text_field( wp_unslash( $data['category'] ) ) : '',
 			'due_date'         => isset( $data['due_date'] ) && ! empty( $data['due_date'] ) ? sanitize_text_field( wp_unslash( $data['due_date'] ) ) : null,
 			'time_estimation'  => isset( $data['time_estimation'] ) ? sanitize_text_field( wp_unslash( $data['time_estimation'] ) ) : '',
+			'timesheet'        => isset( $data['timesheet'] ) ? wp_unslash( $data['timesheet'] ) : '',
 		);
 
 		$result = $wpdb->insert( $table_name, $insert_data );

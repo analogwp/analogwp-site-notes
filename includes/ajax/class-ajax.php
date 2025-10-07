@@ -639,6 +639,7 @@ class AGWP_CHT_Ajax {
 			'category'        => isset( $post_data['category'] ) ? $post_data['category'] : '',
 			'due_date'        => isset( $post_data['due_date'] ) ? $post_data['due_date'] : '',
 			'time_estimation' => isset( $post_data['time_estimation'] ) ? $post_data['time_estimation'] : '',
+			'timesheet'       => isset( $post_data['timesheet'] ) ? $post_data['timesheet'] : '',
 		);
 
 		$task_id = $this->database->save_comment( $task_data );

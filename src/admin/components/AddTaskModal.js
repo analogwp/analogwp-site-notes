@@ -122,6 +122,41 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
             // For string IDs like 'blog', we keep post_id as 0 and rely on page_url
         }
 
+        // Create timesheet entry if time is provided
+        let timesheetData = null;
+        if ((formData.timeHours && parseInt(formData.timeHours) > 0) || 
+            (formData.timeMinutes && parseInt(formData.timeMinutes) > 0)) {
+            
+            const hours = parseInt(formData.timeHours) || 0;
+            const minutes = parseInt(formData.timeMinutes) || 0;
+            
+            // Validate time values
+            if (hours >= 0 && minutes >= 0 && minutes < 60) {
+                const timeEntry = {
+                    id: Date.now(),
+                    hours,
+                    minutes,
+                    description: editTask ? 
+                        __('Updated time entry', 'analogwp-client-handoff') : 
+                        __('Initial time entry', 'analogwp-client-handoff'),
+                    date: new Date().toISOString().split('T')[0]
+                };
+                
+                // If editing and the task has existing timesheet, add to it
+                // If creating new task, create new timesheet
+                if (editTask && editTask.timesheet) {
+                    try {
+                        const existingEntries = JSON.parse(editTask.timesheet);
+                        timesheetData = JSON.stringify([...existingEntries, timeEntry]);
+                    } catch {
+                        timesheetData = JSON.stringify([timeEntry]);
+                    }
+                } else {
+                    timesheetData = JSON.stringify([timeEntry]);
+                }
+            }
+        }
+
         const taskData = {
             comment_title: formData.taskTitle || formData.description,
             comment_text: formData.description,
@@ -135,6 +170,11 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
             time_estimation: formData.timeHours && formData.timeMinutes ? 
                 `${formData.timeHours}:${String(formData.timeMinutes).padStart(2, '0')}` : ''
         };
+
+        // Add timesheet data if available
+        if (timesheetData) {
+            taskData.timesheet = timesheetData;
+        }
 
         console.log('Task data being saved:', taskData);
         console.log('Is editing task?', !!editTask);
@@ -156,6 +196,19 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                 description: ''
             });
             onClose();
+            
+            // Show success message
+            if (timesheetData) {
+                showToast.success(editTask ? 
+                    __('Task updated and time entry added to timesheet', 'analogwp-client-handoff') : 
+                    __('Task created and time entry added to timesheet', 'analogwp-client-handoff')
+                );
+            } else {
+                showToast.success(editTask ? 
+                    __('Task updated successfully', 'analogwp-client-handoff') : 
+                    __('Task created successfully', 'analogwp-client-handoff')
+                );
+            }
         } catch (err) {
             console.error('Error saving task:', err);
             showToast.error(__('Error saving task. Please try again.', 'analogwp-client-handoff'));
@@ -320,7 +373,8 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Add time', 'analogwp-client-handoff')}</label>
+                        <label className="block text-sm font-medium text-gray-700">{__('Add time to timesheet', 'analogwp-client-handoff')}</label>
+                        <p className="text-xs text-gray-500 mb-2">{__('Time will be added as an entry to the task timesheet', 'analogwp-client-handoff')}</p>
                         <div className="flex items-center gap-3">
 														<span className="flex items-center space-x-2">
 															<svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" className="text-gray-400 ml-1">
@@ -530,7 +584,8 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Add time', 'analogwp-client-handoff')}</label>
+                        <label className="block text-sm font-medium text-gray-700">{__('Add time to timesheet', 'analogwp-client-handoff')}</label>
+                        <p className="text-sm text-gray-500 mb-2">{__('Time will be added as an entry to the task timesheet', 'analogwp-client-handoff')}</p>
                         <div className="flex items-center space-x-2">
                             <input
                                 type="number"
