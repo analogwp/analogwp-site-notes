@@ -19,9 +19,9 @@ const TaskFilters = ({ filters, onFilterChange, sortBy, onSortChange, users }) =
                 onChange={(value) => onFilterChange({status: value})}
                 options={[
                     { value: '', label: __('Filter by Status', 'analogwp-client-handoff') },
-                    { value: 'open', label: __('Todo', 'analogwp-client-handoff') },
+                    { value: 'open', label: __('Open', 'analogwp-client-handoff') },
                     { value: 'in_progress', label: __('In Progress', 'analogwp-client-handoff') },
-                    { value: 'resolved', label: __('Completed', 'analogwp-client-handoff') }
+                    { value: 'resolved', label: __('Resolved', 'analogwp-client-handoff') }
                 ]}
             />
             

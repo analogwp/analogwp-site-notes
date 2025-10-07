@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import { Button } from '../ui';
 import { useSettings } from './SettingsProvider';
 import { useExtensions } from '../extensions/ExtensionsProvider';
 import { 
@@ -83,8 +83,8 @@ const AdvancedSettings = () => {
                                 <p className="text-sm text-gray-600 mb-4">{__('Download all your settings as a JSON file for backup or transfer to another site.', 'analogwp-client-handoff')}</p>
                                 <Button
                                     onClick={exportSettings}
-                                    isSecondary
-                                    size="medium"
+                                    variant="secondary"
+                                    size="default"
                                 >
                                     {__('Download Settings', 'analogwp-client-handoff')}
                                 </Button>

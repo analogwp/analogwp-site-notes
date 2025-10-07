@@ -74,7 +74,7 @@ const TasksKanban = ({
     const statuses = [
         { 
             key: 'open', 
-            title: __('Todo', 'analogwp-client-handoff'),
+            title: __('Open', 'analogwp-client-handoff'),
             color: '#f59e0b',
             icon: '📋'
         },
@@ -86,7 +86,7 @@ const TasksKanban = ({
         },
         { 
             key: 'resolved', 
-            title: __('Completed', 'analogwp-client-handoff'),
+            title: __('Resolved', 'analogwp-client-handoff'),
             color: '#10b981',
             icon: '✅'
         }

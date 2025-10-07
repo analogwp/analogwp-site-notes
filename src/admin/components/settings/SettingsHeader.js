@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
 
 /**
  * External dependencies
@@ -24,6 +23,7 @@ import {
 /**
  * Internal dependencies
  */
+import { Button } from '../ui';
 import { useSettings } from './SettingsProvider';
 import { useExtensions } from '../extensions/ExtensionsProvider';
 
@@ -107,10 +107,10 @@ const SettingsHeader = ({ activeTab, onTabChange }) => {
                     <Button
                         onClick={handleSave}
                         disabled={saving || !hasUnsavedChanges}
-                        isBusy={saving}
-                        isPrimary
-                        size="medium"
-                        icon={saving ? null : <CheckCircleIcon className="w-4 h-4" />}
+                        loading={saving}
+                        variant="primary"
+                        size="default"
+                        icon={saving ? null : <CheckCircleIcon className="w-6!" />}
                     >
                         {saving ? __('Saving...', 'analogwp-client-handoff') : __('Save Changes', 'analogwp-client-handoff')}
                     </Button>

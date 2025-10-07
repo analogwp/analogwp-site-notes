@@ -184,7 +184,7 @@ const TaskDetail = ({
             <div className="sticky top-0 bg-white border-b border-gray-200 rounded-t-lg px-6 py-4 flex items-center justify-between shadow-sm z-10">
                 <Button 
                     onClick={onBack}
-                    variant="tertiary"
+                    variant="link"
                     size="medium"
                     icon={
                         <svg className="fill-current! w-4!" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
@@ -220,9 +220,9 @@ const TaskDetail = ({
                     
                     <Button 
                         onClick={handleDelete}
-												variant='danger'
-                        isDestructive
-                        size="medium"
+                        variant="link"
+                        size="default"
+												className="hover:text-red-600! focus:text-red-600!"
                         icon={
                             <svg className="w-4! fill-current!" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5zM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11z"/>
@@ -368,7 +368,7 @@ const TaskDetail = ({
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">{__('Timesheet', 'analogwp-client-handoff')}</h3>
                                 
                                 {/* Add Time Entry */}
-                                <div className="space-y-4">
+                                <div className="flex flex-col gap-4">
                                     <div className="flex items-end space-x-4">
                                         <div className="flex items-center space-x-2">
                                             <div className="flex items-center space-x-1">
@@ -381,7 +381,7 @@ const TaskDetail = ({
                                                     min="0"
                                                     max="23"
                                                 />
-                                                <label className="text-sm text-gray-600">{__('h', 'analogwp-client-handoff')}</label>
+                                                <label className="text-sm text-gray-600">{__('HH', 'analogwp-client-handoff')}</label>
                                             </div>
                                         </div>
                                         <div className="time-input-group">
@@ -394,22 +394,24 @@ const TaskDetail = ({
                                                 min="0"
                                                 max="59"
                                             />
-                                            <label>{__('m', 'analogwp-client-handoff')}</label>
+                                            <label>{__('MM', 'analogwp-client-handoff')}</label>
                                         </div>
                                     </div>
-                                    <input
+                                    <div>
+																			<input
                                         type="text"
                                         value={newTimeEntry.description}
                                         onChange={(e) => setNewTimeEntry(prev => ({...prev, description: e.target.value}))}
                                         placeholder={__('Description (optional)', 'analogwp-client-handoff')}
                                         className="time-description"
                                     />
-                                    <Button 
+																		</div>
+                                    <div>
+																			<Button 
                                         onClick={addTimeEntry}
-                                        isPrimary
-                                        size="medium"
+                                        variant="primary"
                                         icon={
-                                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                            <svg className="fill-current!" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                             </svg>
                                         }
@@ -417,6 +419,7 @@ const TaskDetail = ({
                                     >
                                         {__('Add Time', 'analogwp-client-handoff')}
                                     </Button>
+																		</div>
                                 </div>
                                 
                                 {/* Time Entries List */}
@@ -445,8 +448,8 @@ const TaskDetail = ({
                                                     </div>
                                                     <Button 
                                                         onClick={() => removeTimeEntry(entry.id)}
-                                                        isDestructive
-                                                        isSmall
+                                                        variant="destructive"
+                                                        size="small"
                                                         title={__('Remove time entry', 'analogwp-client-handoff')}
                                                     >
                                                         <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
