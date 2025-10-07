@@ -195,12 +195,12 @@ const TaskDetail = ({
                     {__('Back', 'analogwp-client-handoff')}
                 </Button>
                 
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3!">
                     <select 
                         value={status}
                         onChange={(e) => handleStatusChange(e.target.value)}
                         disabled={isUpdating}
-                        className="border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white disabled:opacity-50"
+                        className="px-3! py-1.5! border border-gray-200! rounded-md! text-sm focus:ring-2 focus:ring-gray-500! focus:border-gray-500! min-w-40!"
                     >
                         <option value="open">{__('Open', 'analogwp-client-handoff')}</option>
                         <option value="in_progress">{__('In Progress', 'analogwp-client-handoff')}</option>
@@ -211,7 +211,7 @@ const TaskDetail = ({
                         value={priority}
                         onChange={(e) => handlePriorityChange(e.target.value)}
                         disabled={isUpdating}
-                        className="border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white disabled:opacity-50"
+                        className="px-3! py-1.5! border border-gray-200! rounded-md! text-sm focus:ring-2 focus:ring-gray-500! focus:border-gray-500! min-w-40!"
                     >
                         <option value="low">{__('Low Priority', 'analogwp-client-handoff')}</option>
                         <option value="medium">{__('Medium Priority', 'analogwp-client-handoff')}</option>
