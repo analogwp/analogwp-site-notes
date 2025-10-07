@@ -144,7 +144,10 @@ const TaskCard = ({
                                     className="w-6 h-6 rounded-full mr-2 flex items-center justify-center text-xs font-medium text-white"
                                     style={{ 
                                         backgroundImage: comment.assignee?.avatar ? `url(${comment.assignee.avatar})` : 'none',
-                                        backgroundColor: comment.assignee?.avatar ? 'transparent' : '#6b7280'
+                                        backgroundColor: comment.assignee?.avatar ? 'transparent' : '#6b7280',
+																				backgroundSize: 'contain',
+																				backgroundPosition: 'center',
+																				backgroundRepeat: 'no-repeat'
                                     }}
                                 >
                                     {!comment.assignee?.avatar && getUserInitials(comment.assignee?.name || 'Unknown')}

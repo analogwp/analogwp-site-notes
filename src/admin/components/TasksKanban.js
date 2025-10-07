@@ -151,6 +151,7 @@ const TasksKanban = ({
                     <TaskDetail
                         comment={selectedTask}
                         user={selectedTask.user || getUserById(selectedTask.user_id)}
+                        users={users}
                         onStatusChange={(id, status) => onUpdateComment(id, { status })}
                         onPriorityChange={(id, priority) => onUpdateComment(id, { priority })}
                         onUpdateComment={onUpdateComment}
@@ -289,6 +290,7 @@ const TasksKanban = ({
                 <TaskDetail
                     comment={selectedTask}
                     user={selectedTask.user || getUserById(selectedTask.user_id)}
+                    users={users}
                     onStatusChange={(id, status) => onUpdateComment(id, { status })}
                     onPriorityChange={(id, priority) => onUpdateComment(id, { priority })}
                     onUpdateComment={onUpdateComment}

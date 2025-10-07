@@ -28,15 +28,6 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
     // Populate form data when editing a task
     useEffect(() => {
         if (editTask && isOpen) {
-            // Handle time estimation parsing more safely
-            let timeHours = '';
-            let timeMinutes = '';
-            if (editTask.time_estimation) {
-                const timeParts = editTask.time_estimation.split(':');
-                timeHours = timeParts[0] || '';
-                timeMinutes = timeParts[1] || '';
-            }
-
             // Handle different possible field names for assignee
             let assignedUserId = '';
             if (editTask.assigned_to) {
@@ -66,8 +57,8 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                 category: editTask.category || '',
                 pageId: pageId,
                 dueDate: editTask.due_date || '',
-                timeHours: timeHours,
-                timeMinutes: timeMinutes,
+                timeHours: '', // Always reset time fields for new entries
+                timeMinutes: '', // Always reset time fields for new entries
                 priority: editTask.priority || 'medium',
                 description: editTask.comment_text || ''
             });
@@ -137,7 +128,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                     hours,
                     minutes,
                     description: editTask ? 
-                        __('Updated time entry', 'analogwp-client-handoff') : 
+                        __('Time entry from task update', 'analogwp-client-handoff') : 
                         __('Initial time entry', 'analogwp-client-handoff'),
                     date: new Date().toISOString().split('T')[0]
                 };
@@ -182,7 +173,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
         try {
             await onSave(taskData);
             
-            // Reset form
+            // Reset form - always clear time fields after successful save
             setFormData({
                 taskTitle: '',
                 status: 'open',
@@ -216,7 +207,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
     };
 
     const handleCancel = () => {
-        // Reset form
+        // Reset form - always clear all fields including time entries
         setFormData({
             taskTitle: '',
             status: 'open',

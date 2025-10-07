@@ -13,6 +13,7 @@ import { showConfirmation, showToast } from './ToastProvider';
 const TaskDetail = ({ 
     comment, 
     user, 
+    users = [],
     onStatusChange, 
     onDelete, 
     onBack,
@@ -394,6 +395,70 @@ const TaskDetail = ({
                                     </div>
                                 )}
                             </div>
+
+                            {/* Task Details Section - moved from Details card */}
+                            <div className="border-t border-gray-100 pt-4 space-y-4">
+                                <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                                    <div className="flex-shrink-0">
+                                        <div 
+                                            className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium text-white bg-gray-500 border-2 border-white shadow-sm"
+                                            style={{ 
+                                                backgroundImage: user?.avatar ? `url(${user.avatar})` : 'none',
+                                                backgroundColor: user?.avatar ? 'transparent' : '#6b7280',
+                                                backgroundSize: 'cover',
+                                                backgroundPosition: 'center',
+                                                backgroundRepeat: 'no-repeat'
+                                            }}
+                                        >
+                                            {!user?.avatar && getUserInitials(user?.name || 'Unknown')}
+                                        </div>
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-medium text-gray-900">
+                                            {user?.name || __('Unknown User', 'analogwp-client-handoff')}
+                                        </div>
+                                        <div className="text-xs text-gray-500">{__('Added by', 'analogwp-client-handoff')}</div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-xs text-gray-500 uppercase tracking-wide">{__('Added on', 'analogwp-client-handoff')}</div>
+                                        <div className="text-sm text-gray-900 font-medium">{formatDate(comment.created_at)}</div>
+                                    </div>
+                                </div>
+                                
+                                {/* Assigned To Section */}
+                                {comment.assignee && (
+                                    <div className="flex items-center space-x-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                        <div className="flex-shrink-0">
+                                            <div 
+                                                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium text-white bg-blue-500 border-2 border-white shadow-sm"
+                                                style={{ 
+                                                    backgroundImage: comment.assignee?.avatar ? `url(${comment.assignee.avatar})` : 'none',
+                                                    backgroundColor: comment.assignee?.avatar ? 'transparent' : '#3b82f6',
+                                                    backgroundSize: 'cover',
+                                                    backgroundPosition: 'center',
+                                                    backgroundRepeat: 'no-repeat'
+                                                }}
+                                            >
+                                                {!comment.assignee?.avatar && getUserInitials(comment.assignee?.name || 'Unknown')}
+                                            </div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-medium text-blue-900">
+                                                {comment.assignee?.name || __('Unknown User', 'analogwp-client-handoff')}
+                                            </div>
+                                            <div className="text-xs text-blue-600">{__('Assigned to', 'analogwp-client-handoff')}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-xs text-blue-600 uppercase tracking-wide">{__('Assignee', 'analogwp-client-handoff')}</div>
+                                            <div className="text-sm text-blue-900 font-medium">
+                                                <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         
                         {comment.page_url && (
@@ -458,54 +523,8 @@ const TaskDetail = ({
                         )}
                     </div>
                     
-                    {/* Right Column - Details only */}
+                    {/* Right Column - Timesheet only */}
                     <div className="space-y-6">
-                        {/* Details Card */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex! items-center">
-                                    <svg className="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    {__('Details', 'analogwp-client-handoff')}
-                                </h3>
-                                
-                                <div className="space-y-4">
-                                    <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                        <div className="flex-shrink-0">
-                                            <div 
-                                                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium text-white bg-gray-500 border-2 border-white shadow-sm"
-                                                style={{ 
-                                                    backgroundImage: user?.avatar ? `url(${user.avatar})` : 'none',
-                                                    backgroundColor: user?.avatar ? 'transparent' : '#6b7280',
-                                                    backgroundSize: 'cover',
-                                                    backgroundPosition: 'center',
-                                                    backgroundRepeat: 'no-repeat'
-                                                }}
-                                            >
-                                                {!user?.avatar && getUserInitials(user?.name || 'Unknown')}
-                                            </div>
-                                        </div>
-                                        <div className="ml-3">
-                                            <div className="text-sm font-medium text-gray-900">
-                                                {user?.name || __('Unknown User', 'analogwp-client-handoff')}
-                                            </div>
-                                            <div className="text-xs text-gray-500">{__('Added by', 'analogwp-client-handoff')}</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="grid grid-cols-1 gap-4">
-                                        <div className="bg-white border border-gray-100 rounded-lg p-3">
-                                            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{__('Created', 'analogwp-client-handoff')}</label>
-                                            <span className="text-sm text-gray-900 font-medium">{formatDate(comment.created_at)}</span>
-                                        </div>
-                                        
-                                      
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         {/* Timesheet Card */}
                         <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                             <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">

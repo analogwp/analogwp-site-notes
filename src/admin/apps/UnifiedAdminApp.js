@@ -201,11 +201,24 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
             const data = await response.json();
             console.log('Server response:', data);
             if (data.success) {
-                setComments(comments.map(comment => 
-                    comment.id === commentId 
-                        ? { ...comment, ...updates }
-                        : comment
-                ));
+                setComments(comments.map(comment => {
+                    if (comment.id === commentId) {
+                        const updatedComment = { ...comment, ...updates };
+                        
+                        // If assigned_to is being updated, we need to resolve the assignee object
+                        if (updates.assigned_to !== undefined) {
+                            if (updates.assigned_to && updates.assigned_to !== '0' && updates.assigned_to !== 0) {
+                                const assignedUser = users.find(user => String(user.id) === String(updates.assigned_to));
+                                updatedComment.assignee = assignedUser || null;
+                            } else {
+                                updatedComment.assignee = null;
+                            }
+                        }
+                        
+                        return updatedComment;
+                    }
+                    return comment;
+                }));
                 showToast.success(__('Task updated successfully!', 'analogwp-client-handoff'));
             } else {
                 const errorMessage = data.data?.message || data.message || 'Unknown error';
