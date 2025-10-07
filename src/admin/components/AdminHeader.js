@@ -15,7 +15,10 @@ const AdminHeader = ({
     return (
         <div className="mb-5 border-b border-b-gray-300">
             <div className="flex items-center justify-between py-6">
-                <h1 className="text-3xl font-semibold! text-gray-900 m-0 tracking-tight">
+                <h1 
+								className="text-3xl font-semibold! text-gray-900 m-0 tracking-tight cursor-pointer"
+								onClick={() => onNavigate && onNavigate('dashboard')}
+								>
                     {__('Client Handoff', 'analogwp-client-handoff')}
                 </h1>
                 <div className="flex gap-3">
