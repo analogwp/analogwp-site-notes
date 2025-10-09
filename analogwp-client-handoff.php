@@ -8,7 +8,6 @@
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: analogwp-client-handoff
- * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
@@ -140,7 +139,6 @@ final class AGWP_CHT_Client_Handoff_Toolkit {
 
 		// Hook into WordPress
 		add_action( 'init', array( $this, 'init_plugin' ) );
-		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 
 		// Multisite: Create tables when a new site is created
 		if ( is_multisite() ) {
@@ -161,19 +159,6 @@ final class AGWP_CHT_Client_Handoff_Toolkit {
 	public function init_plugin() {
 		// Plugin initialization logic
 		do_action( 'agwp_cht_init' );
-	}
-
-	/**
-	 * Load plugin textdomain.
-	 *
-	 * @since 1.0.0
-	 */
-	public function load_textdomain() {
-		load_plugin_textdomain(
-			'analogwp-client-handoff',
-			false,
-			dirname( plugin_basename( __FILE__ ) ) . '/languages/'
-		);
 	}
 
 	/**
