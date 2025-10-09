@@ -125,6 +125,34 @@ else
     exit 1
 fi
 
+# Copy source files - REQUIRED by WordPress.org for plugins with build processes
+if [ -d "src" ]; then
+    mkdir -p "$PACKAGE_PATH/src"
+    rsync -av --exclude='*.log' --exclude='*.tmp' src/ "$PACKAGE_PATH/src/"
+    print_success "Source files copied (required for WordPress.org review)"
+fi
+
+# Copy build configuration files - REQUIRED to allow rebuilding from source
+if [ -f "package.json" ]; then
+    cp package.json "$PACKAGE_PATH/"
+    print_success "package.json copied"
+fi
+
+if [ -f "webpack.config.js" ]; then
+    cp webpack.config.js "$PACKAGE_PATH/"
+    print_success "webpack.config.js copied"
+fi
+
+if [ -f "postcss.config.js" ]; then
+    cp postcss.config.js "$PACKAGE_PATH/"
+    print_success "postcss.config.js copied"
+fi
+
+if [ -f "tailwind.config.js" ]; then
+    cp tailwind.config.js "$PACKAGE_PATH/"
+    print_success "tailwind.config.js copied"
+fi
+
 # Copy languages directory if exists
 if [ -d "languages" ]; then
     mkdir -p "$PACKAGE_PATH/languages"
