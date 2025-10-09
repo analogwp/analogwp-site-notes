@@ -510,28 +510,66 @@ class AGWP_CHT_Ajax {
 			'type'  => 'special',
 		);
 
-		// Add archive pages
-		$items[] = array(
-			'id'    => 'category-archive',
-			'title' => __( 'Category Archive', 'analogwp-client-handoff' ),
-			'url'   => home_url( '/category/' ),
-			'type'  => 'archive',
+		// Add taxonomy archives.
+		// Get all public taxonomies.
+		$taxonomies = get_taxonomies(
+			array(
+				'public' => true,
+			),
+			'objects'
 		);
 
-		$items[] = array(
-			'id'    => 'tag-archive',
-			'title' => __( 'Tag Archive', 'analogwp-client-handoff' ),
-			'url'   => home_url( '/tag/' ),
-			'type'  => 'archive',
+		foreach ( $taxonomies as $taxonomy ) {
+			// Get all terms for this taxonomy.
+			$terms = get_terms(
+				array(
+					'taxonomy'   => $taxonomy->name,
+					'hide_empty' => false,
+				)
+			);
+
+			if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+				foreach ( $terms as $term ) {
+					$term_link = get_term_link( $term );
+					if ( ! is_wp_error( $term_link ) ) {
+						$items[] = array(
+							'id'    => 'term-' . $term->term_id,
+							'title' => sprintf(
+								/* translators: 1: Taxonomy name, 2: Term name */
+								__( '%1$s: %2$s', 'analogwp-client-handoff' ),
+								$taxonomy->label,
+								$term->name
+							),
+							'url'   => $term_link,
+							'type'  => 'taxonomy',
+						);
+					}
+				}
+			}
+		}
+
+		// Add author archives.
+		$authors = get_users(
+			array(
+				'who'     => 'authors',
+				'orderby' => 'display_name',
+			)
 		);
 
-		$items[] = array(
-			'id'    => 'author-archive',
-			'title' => __( 'Author Archive', 'analogwp-client-handoff' ),
-			'url'   => home_url( '/author/' ),
-			'type'  => 'archive',
-		);
+		foreach ( $authors as $author ) {
+			$items[] = array(
+				'id'    => 'author-' . $author->ID,
+				'title' => sprintf(
+					/* translators: %s: Author name */
+					__( 'Author: %s', 'analogwp-client-handoff' ),
+					$author->display_name
+				),
+				'url'   => get_author_posts_url( $author->ID ),
+				'type'  => 'archive',
+			);
+		}
 
+		// Add date archive (example).
 		$items[] = array(
 			'id'    => 'date-archive',
 			'title' => __( 'Date Archive', 'analogwp-client-handoff' ),
@@ -539,7 +577,7 @@ class AGWP_CHT_Ajax {
 			'type'  => 'archive',
 		);
 
-		// Add search and 404 pages
+		// Add search and 404 pages.
 		$items[] = array(
 			'id'    => 'search',
 			'title' => __( 'Search Results', 'analogwp-client-handoff' ),
@@ -571,7 +609,7 @@ class AGWP_CHT_Ajax {
 			)
 		);
 
-		// Get custom post types
+		// Get custom post types.
 		$post_types = get_post_types(
 			array(
 				'public' => true,
@@ -583,17 +621,18 @@ class AGWP_CHT_Ajax {
 		foreach ( $post_types as $post_type ) {
 			$type_posts = get_posts(
 				array(
-					'numberposts' => 20, // Limit custom post types to avoid too many entries
+					'numberposts' => 20, // Limit custom post types to avoid too many entries.
 					'post_status' => 'publish',
 					'post_type'   => $post_type->name,
 				)
 			);
 			$custom_posts = array_merge( $custom_posts, $type_posts );
 
-			// Add post type archive if it has one
+			// Add post type archive if it has one.
 			if ( $post_type->has_archive ) {
 				$items[] = array(
 					'id'    => $post_type->name . '-archive',
+					/* translators: %s: Post type label */
 					'title' => sprintf( __( '%s Archive', 'analogwp-client-handoff' ), $post_type->label ),
 					'url'   => get_post_type_archive_link( $post_type->name ),
 					'type'  => 'archive',

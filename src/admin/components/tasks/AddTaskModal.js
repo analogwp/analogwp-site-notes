@@ -40,14 +40,35 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
 
             // Handle page ID - could be string or number, or derive from page_url
             let pageId = '';
-            if (editTask.post_id && editTask.post_id !== '0' && editTask.post_id !== 0) {
-                pageId = String(editTask.post_id);
-            } else if (editTask.page_url && pages.length > 0) {
-                // Try to find page by URL if post_id is 0
-                const matchingPage = pages.find(page => page.url === editTask.page_url);
+            
+            // First, try to match by URL if available (most reliable for archives/taxonomies)
+            if (editTask.page_url && pages.length > 0) {
+                // Normalize URLs by removing protocol, trailing slashes, and converting to lowercase
+                const normalizeUrl = (url) => {
+                    if (!url) return '';
+                    // Remove protocol and www
+                    let normalized = url.replace(/^https?:\/\/(www\.)?/, '');
+                    // Remove trailing slashes
+                    normalized = normalized.replace(/\/$/, '');
+                    // Convert to lowercase for case-insensitive comparison
+                    return normalized.toLowerCase();
+                };
+                
+                const normalizedTaskUrl = normalizeUrl(editTask.page_url);
+                
+                const matchingPage = pages.find(page => {
+                    const normalizedPageUrl = normalizeUrl(page.url);
+                    return normalizedPageUrl === normalizedTaskUrl;
+                });
+                
                 if (matchingPage) {
                     pageId = String(matchingPage.id);
                 }
+            }
+            
+            // Fallback to post_id if no URL match found and post_id is valid
+            if (!pageId && editTask.post_id && editTask.post_id !== '0' && editTask.post_id !== 0) {
+                pageId = String(editTask.post_id);
             }
 
             setFormData({
