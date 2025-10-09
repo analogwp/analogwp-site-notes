@@ -12,7 +12,7 @@
  * Requires at least: 5.0
  * Tested up to: 6.8.3
  * Requires PHP: 7.4
- * Network: true
+ * Network: false
  *
  * @package AnalogWP_Client_Handoff
  */
