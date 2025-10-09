@@ -1,10 +1,10 @@
 /* Visual Comments Frontend Styles */
 
 // Variables
-$primary-color: #2271b1;
+$primary-color: #3858e9;
 $danger-color: #d63638;
 $warning-color: #dba617;
-$success-color: #00a32a;
+$success-color: #3858e9;
 $text-color: #1d2327;
 $border-color: #c3c4c7;
 $background-color: #fff;
@@ -57,65 +57,132 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 999999; // Higher than sidebar to stay on top
+  z-index: 999999;
   display: flex;
   align-items: center;
-  background: $background-color;
-  border-radius: 25px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 30px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
   
-  &.active {
-    background: $primary-color;
-    color: white;
-    
-    .cht-toggle-btn {
-      background: transparent;
-      color: inherit;
-    }
-
-		.cht-toggle-hide {
-			color: inherit;
-		}
+  &:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
   }
   
   .cht-toggle-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     padding: 12px 20px;
     background: transparent;
     border: none;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     color: $text-color;
     transition: all 0.3s ease;
+    letter-spacing: 0.3px;
     
     &:hover {
       background: rgba(0, 0, 0, 0.05);
     }
+    
+    .cht-toggle-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      transition: transform 0.3s ease;
+      
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+    
+    &:hover .cht-toggle-icon {
+      transform: scale(1.1);
+    }
+  }
+  
+  .cht-toggle-text {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
   }
   
   .cht-toggle-hide {
-    padding: 12px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 48px;
     background: transparent;
     border: none;
-    border-left: 1px solid $border-color;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
     cursor: pointer;
     color: #646970;
-    font-size: 16px;
+    font-size: 20px;
+    transition: all 0.2s ease;
     
     &:hover {
-      background: rgba(0, 0, 0, 0.05);
+      background: rgba(0, 0, 0, 0.08);
+      color: $text-color;
     }
   }
   
   .cht-comments-count {
-    margin-left: 4px;
-    font-size: 12px;
-    opacity: 0.8;
+    margin-left: 6px;
+    padding: 2px 8px;
+    background: rgba(56, 88, 233, 0.1);
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #3858e9;
+  }
+  
+  // Inactive state (Comments OFF) - Clean white/gray
+  &:not(.active) {
+    background: rgba(255, 255, 255, 0.95);
+    
+    .cht-toggle-btn {
+      color: #1d2327;
+    }
+    
+    .cht-toggle-icon {
+      color: #646970;
+    }
+  }
+  
+  // Active state (Comments ON) - Vibrant primary color
+  &.active {
+    background: linear-gradient(135deg, #3858e9 0%, #4f6bff 100%);
+    
+    .cht-toggle-btn {
+      color: white;
+    }
+    
+    .cht-toggle-icon {
+      color: white;
+    }
+    
+    .cht-toggle-hide {
+      color: rgba(255, 255, 255, 0.8);
+      border-left-color: rgba(255, 255, 255, 0.2);
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+      }
+    }
+    
+    .cht-comments-count {
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+    }
   }
 }
 
@@ -758,23 +825,22 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
 }
 
 /* Comment Sidebar Styles */
-.cht-sidebar-close {
+.cht-sidebar-close.cht-button {
   position: fixed;
   top: 20px;
   right: 400px; // 380px sidebar width + 20px margin
-  width: 32px;
-  height: 32px;
-  background: $primary-color;
-  color: white;
-  border: none;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
   border-radius: 50%;
-  cursor: pointer;
   z-index: 100000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
+
+  .cht-button__icon {
+    margin: 0;
+  }
 
   .cht-icon {
     width: 18px;
@@ -791,12 +857,17 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   }
   
   &:hover {
-    background: darken($primary-color, 10%);
     transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
   
   &:active {
     transform: scale(0.95);
+  }
+  
+  // When sidebar is hidden
+  &.cht-sidebar-hidden {
+    right: 20px;
   }
   
   // When sidebar is hidden, position button at right edge
@@ -1020,6 +1091,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     }
     
     .cht-task-screenshot {
+			margin-top: 8px;
       margin-bottom: 8px;
       
       img {
@@ -1176,7 +1248,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     width: 320px;
   }
   
-  .cht-sidebar-close {
+  .cht-sidebar-close.cht-button {
     right: 340px; // 320px sidebar width + 20px margin
   }
 }
@@ -1195,7 +1267,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     }
   }
   
-  .cht-sidebar-close {
+  .cht-sidebar-close.cht-button {
     top: auto;
     bottom: 52vh; // Just above the sidebar (50vh + 2vh margin)
     right: 20px;
@@ -1295,3 +1367,6 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     color: #9ca3af;
   }
 }
+
+// UI Components
+@import '../components/ui/Button.scss';

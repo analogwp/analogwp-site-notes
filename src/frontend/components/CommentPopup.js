@@ -6,6 +6,11 @@ import { __ } from '@wordpress/i18n';
 import html2canvas from 'html2canvas';
 import Draggable from 'react-draggable';
 
+/**
+ * Internal dependencies
+ */
+import { Button } from './ui';
+
 const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
     const [title, setTitle] = useState('');
     const [comment, setComment] = useState('');
@@ -512,29 +517,22 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                     </div>
                     
                     <div className="cht-popup-footer">
-                        <button 
-                            type="button" 
+                        <Button 
+                            variant="secondary"
                             onClick={onCancel}
-                            className="cht-btn cht-btn-secondary"
                             disabled={isLoading}
                         >
                             {__('Cancel', 'analogwp-client-handoff')}
-                        </button>
+                        </Button>
                         
-                        <button 
+                        <Button 
                             type="submit" 
-                            className="cht-btn cht-btn-primary"
+                            variant="primary"
                             disabled={isLoading || !comment.trim()}
+                            loading={isLoading}
                         >
-                            {isLoading ? (
-                                <>
-                                    <span className="cht-spinner"></span>
-                                    {__('Saving...', 'analogwp-client-handoff')}
-                                </>
-                            ) : (
-                                __('Save Comment', 'analogwp-client-handoff')
-                            )}
-                        </button>
+                            {isLoading ? __('Saving...', 'analogwp-client-handoff') : __('Save Comment', 'analogwp-client-handoff')}
+                        </Button>
                     </div>
                 </form>
                 </div>

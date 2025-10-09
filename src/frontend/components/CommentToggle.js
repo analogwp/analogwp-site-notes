@@ -4,6 +4,11 @@
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { Button } from './ui';
+
 const CommentToggle = ({ isActive, onToggle, commentsCount }) => {
     const [isVisible, setIsVisible] = useState(true);
 

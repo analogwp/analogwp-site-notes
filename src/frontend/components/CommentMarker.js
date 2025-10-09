@@ -9,6 +9,7 @@ import Draggable from 'react-draggable';
  * Internal dependencies
  */
 import { getStatusByKey } from '../constants/taskStatuses';
+import { Button } from './ui';
 
 const CommentMarker = ({ 
     comment, 
@@ -240,37 +241,37 @@ const CommentMarker = ({
                                         disabled={isSubmittingReply}
                                     />
                                     <div className="cht-reply-actions">
-                                        <button 
-                                            type="button" 
+                                        <Button 
+                                            variant="secondary"
                                             onClick={() => {
                                                 setShowReplyForm(false);
                                                 setReplyText('');
                                             }}
                                             disabled={isSubmittingReply}
-                                            className="cht-btn cht-btn-secondary"
                                         >
                                             {__('Cancel', 'analogwp-client-handoff')}
-                                        </button>
-                                        <button 
+                                        </Button>
+                                        <Button 
                                             type="submit"
+                                            variant="primary"
                                             disabled={isSubmittingReply || !replyText.trim()}
-                                            className="cht-btn cht-btn-primary"
+                                            loading={isSubmittingReply}
                                         >
                                             {isSubmittingReply ? 
                                                 __('Replying...', 'analogwp-client-handoff') : 
                                                 __('Reply', 'analogwp-client-handoff')
                                             }
-                                        </button>
+                                        </Button>
                                     </div>
                                 </form>
                             ) : (
                                 <div className="cht-comment-actions">
-                                    <button 
+                                    <Button 
+                                        variant="secondary"
                                         onClick={() => setShowReplyForm(true)}
-                                        className="cht-btn cht-btn-secondary"
                                     >
                                         {__('Reply', 'analogwp-client-handoff')}
-                                    </button>
+                                    </Button>
                                 </div>
                             )}
                         </div>

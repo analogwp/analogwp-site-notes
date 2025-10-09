@@ -13,6 +13,7 @@ import { ChevronRightIcon, ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon } fro
  * Internal dependencies
  */
 import { TASK_STATUSES, getStatusByKey } from '../constants/taskStatuses';
+import { Button } from './ui';
 
 const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComments, isVisible, onClose }) => {
     const [selectedComment, setSelectedComment] = useState(null);
@@ -94,13 +95,14 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
     return (
         <>
             {/* Toggle button always visible when commenting is active */}
-            <button 
+            <Button
+                variant={isVisible ? 'primary' : 'secondary'}
                 className={`cht-sidebar-close ${!isVisible ? 'cht-sidebar-hidden' : ''}`}
                 onClick={onClose}
-                title={__('Toggle Sidebar', 'analogwp-client-handoff')}
-            >
-                {isVisible ? <ChevronRightIcon className="cht-icon" /> : <ChevronLeftIcon className="cht-icon" />}
-            </button>
+                ariaLabel={__('Toggle Sidebar', 'analogwp-client-handoff')}
+                icon={isVisible ? <ChevronRightIcon className="cht-icon" /> : <ChevronLeftIcon className="cht-icon" />}
+                iconPosition="left"
+            />
             
             {/* Sidebar content - only visible when isVisible is true */}
             {isVisible && (
@@ -213,12 +215,13 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
 
                                             <div className="cht-task-actions">
                                                 {!showReplyForms[comment.id] ? (
-                                                    <button
-                                                        className="cht-reply-btn"
+                                                    <Button
+                                                        variant="secondary"
+                                                        size="sm"
                                                         onClick={() => setShowReplyForms(prev => ({ ...prev, [comment.id]: true }))}
                                                     >
                                                         {__('Reply', 'analogwp-client-handoff')}
-                                                    </button>
+                                                    </Button>
                                                 ) : (
                                                     <form onSubmit={(e) => handleReplySubmit(comment.id, e)} className="cht-reply-form">
                                                         <textarea
@@ -229,23 +232,25 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
                                                             rows="3"
                                                         />
                                                         <div className="cht-reply-actions">
-                                                            <button
+                                                            <Button
                                                                 type="submit"
+                                                                variant="primary"
                                                                 disabled={isSubmittingReply[comment.id]}
-                                                                className="cht-reply-submit"
+                                                                loading={isSubmittingReply[comment.id]}
+                                                                size="sm"
                                                             >
                                                                 {isSubmittingReply[comment.id] ? __('Submitting...', 'analogwp-client-handoff') : __('Reply', 'analogwp-client-handoff')}
-                                                            </button>
-                                                            <button
-                                                                type="button"
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
                                                                 onClick={() => {
                                                                     setShowReplyForms(prev => ({ ...prev, [comment.id]: false }));
                                                                     setReplyTexts(prev => ({ ...prev, [comment.id]: '' }));
                                                                 }}
-                                                                className="cht-reply-cancel"
                                                             >
                                                                 {__('Cancel', 'analogwp-client-handoff')}
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                     </form>
                                                 )}

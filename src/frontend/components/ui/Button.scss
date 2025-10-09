@@ -1,0 +1,229 @@
+/* Button Component Styles */
+
+// Button Variables
+$accent-color: #3858e9;
+$accent-hover: #2d46ba;
+$accent-active: #243a94;
+
+// Base Button Styles
+.cht-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  white-space: nowrap;
+  
+  // Focus styles
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(56, 88, 233, 0.2);
+  }
+
+  // Disabled state
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // Full width
+  &--full-width {
+    width: 100%;
+  }
+
+  // Loading state
+  &--loading {
+    position: relative;
+    pointer-events: none;
+  }
+}
+
+// Button Content
+.cht-button__content {
+  display: inline-flex;
+  align-items: center;
+}
+
+// Button Icons
+.cht-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &--left {
+    margin-right: 8px;
+  }
+
+  &--right {
+    margin-left: 8px;
+  }
+}
+
+// Loading Spinner
+.cht-button__spinner {
+  width: 16px;
+  height: 16px;
+  animation: cht-spin 1s linear infinite;
+}
+
+.cht-button__spinner-track {
+  opacity: 0.25;
+}
+
+.cht-button__spinner-path {
+  opacity: 0.75;
+}
+
+@keyframes cht-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Button Sizes
+.cht-button--sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+
+  .cht-button__icon {
+    &--left {
+      margin-right: 6px;
+    }
+    &--right {
+      margin-left: 6px;
+    }
+  }
+
+  .cht-button__spinner {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.cht-button--md {
+  padding: 8px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.cht-button--lg {
+  padding: 12px 24px;
+  font-size: 16px;
+  line-height: 1.5;
+
+  .cht-button__icon {
+    &--left {
+      margin-right: 10px;
+    }
+    &--right {
+      margin-left: 10px;
+    }
+  }
+
+  .cht-button__spinner {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Button Variants
+.cht-button--primary {
+  background: $accent-color;
+  color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  &:hover:not(:disabled) {
+    background: $accent-hover;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  &:active:not(:disabled) {
+    background: $accent-active;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+}
+
+.cht-button--secondary {
+  background: #f3f4f6;
+  color: #1d2327;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  &:hover:not(:disabled) {
+    background: #e5e7eb;
+  }
+
+  &:active:not(:disabled) {
+    background: #d1d5db;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.2);
+  }
+}
+
+.cht-button--danger {
+  background: #d63638;
+  color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  &:hover:not(:disabled) {
+    background: #b32d2e;
+  }
+
+  &:active:not(:disabled) {
+    background: #8a2424;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(214, 54, 56, 0.2);
+  }
+}
+
+.cht-button--ghost {
+  background: transparent;
+  color: #1d2327;
+
+  &:hover:not(:disabled) {
+    background: #f3f4f6;
+  }
+
+  &:active:not(:disabled) {
+    background: #e5e7eb;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.2);
+  }
+}
+
+.cht-button--link {
+  background: transparent;
+  color: $accent-color;
+  padding-left: 0;
+  padding-right: 0;
+
+  &:hover:not(:disabled) {
+    color: $accent-hover;
+    text-decoration: underline;
+  }
+
+  &:active:not(:disabled) {
+    color: $accent-active;
+  }
+
+  &:focus {
+    box-shadow: none;
+    text-decoration: underline;
+  }
+}
