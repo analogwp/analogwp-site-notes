@@ -12,15 +12,40 @@ const AdminHeader = ({
     currentPage = 'dashboard',
     onNavigate
 }) => {
+    const logoUrl = window.agwpChtAjax?.pluginUrl ? `${window.agwpChtAjax.pluginUrl}assets/images/analog-logo.svg` : '';
+
     return (
         <div className="mb-5 border-b border-b-gray-300">
             <div className="flex items-center justify-between py-6">
-                <h1 
-                    className="text-3xl font-semibold! text-gray-900 m-0 tracking-tight cursor-pointer"
-                    onClick={() => onNavigate && onNavigate('dashboard')}
-                >
-                    {__('Client Handoff', 'analogwp-client-handoff')}
-                </h1>
+                <div className="flex items-center gap-4">
+                    <h1 
+                        className="text-3xl font-semibold! text-gray-900 m-0 p-0! tracking-tight cursor-pointer"
+                        onClick={() => onNavigate && onNavigate('dashboard')}
+                    >
+                        {__('Client Handoff', 'analogwp-client-handoff')}
+                    </h1>
+										<svg 
+                        className="w-5! h-5! text-gray-700" 
+                        width="24" 
+                        height="24" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                    >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    {logoUrl && (
+                        <img 
+                            src={logoUrl} 
+                            alt="Analog Logo" 
+                            className="h-8 w-auto"
+                        />
+                    )}
+                </div>
                 <div className="flex gap-3 text-base">
                     <Button 
                         variant={currentPage === 'dashboard' ? 'primary' : 'secondary'}

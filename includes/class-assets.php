@@ -208,6 +208,7 @@ class AGWP_CHT_Assets {
 			'pluginVersion' => AGWP_CHT_VERSION,
 			'wpVersion'     => get_bloginfo( 'version' ),
 			'phpVersion'    => phpversion(),
+			'pluginUrl'     => AGWP_CHT_PLUGIN_URL,
 		);
 	}
 
