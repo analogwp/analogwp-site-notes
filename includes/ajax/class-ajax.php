@@ -113,6 +113,7 @@ class AGWP_CHT_Ajax {
 		}
 
 		// Get POST data.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
 		$post_data = wp_unslash( $_POST );
 
 		// Handle screenshot URL if provided.
@@ -165,6 +166,7 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
 		$post_data = wp_unslash( $_POST );
 		$page_url  = isset( $post_data['page_url'] ) ? sanitize_url( $post_data['page_url'] ) : '';
 
@@ -236,6 +238,7 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
 		$post_data  = wp_unslash( $_POST );
 		$comment_id = isset( $post_data['comment_id'] ) ? intval( $post_data['comment_id'] ) : 0;
 		$status     = isset( $post_data['status'] ) ? sanitize_text_field( $post_data['status'] ) : '';
@@ -264,6 +267,7 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
 		$post_data = wp_unslash( $_POST );
 
 		$reply_data = array(
@@ -305,6 +309,7 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Unauthorized', 'analogwp-client-handoff' ), 403 );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
 		$post_data  = wp_unslash( $_POST );
 		$comment_id = isset( $post_data['comment_id'] ) ? intval( $post_data['comment_id'] ) : 0;
 
@@ -361,7 +366,8 @@ class AGWP_CHT_Ajax {
 		// Ensure database tables exist
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'agwp_cht_comments';
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) != $table_name ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table existence check, safe usage.
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) ) !== $table_name ) {
 			// Tables don't exist, create them
 			$this->database->create_tables();
 		}
@@ -749,7 +755,10 @@ class AGWP_CHT_Ajax {
 			return $file_url;
 
 		} catch ( Exception $e ) {
-			error_log( 'AGWP CHT Screenshot save error: ' . $e->getMessage() );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Error logging for debugging screenshot uploads.
+				error_log( 'AGWP CHT Screenshot save error: ' . $e->getMessage() );
+			}
 			return '';
 		}
 	}
