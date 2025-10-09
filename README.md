@@ -1,435 +1,292 @@
-# Client Handoff Toolkit - Visual Commenting System
-
-**A comprehensive WordPress plugin for streamlined agency-client collaboration with an intuitive visual commenting system, advanced task management, timesheet tracking, and seamless handoff workflow.**
+# Client Handoff Toolkit for WordPress
 
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg)](https://wordpress.org/)
 [![PHP](https://img.shields.io/badge/PHP-7.4%2B-purple.svg)](https://php.net/)
 [![License](https://img.shields.io/badge/License-GPL%20v2%2B-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![Version](https://img.shields.io/badge/Version-1.1.0-orange.svg)](https://github.com/analogwp/analogwp-client-handoff)
 
----
-
-## 🎯 **Overview**
-
-The Client Handoff Toolkit transforms how agencies and clients collaborate during website projects. Instead of lengthy email chains and confusing feedback documents, clients can simply **click on any element** of their website to leave visual comments with automatic screenshots. 
-
-**🆕 Version 1.1.0** introduces powerful new features including task editing, persistent timesheet tracking, and modern toast notifications for an enhanced user experience.
-
-### **Perfect For:**
-- **Web Agencies** - Streamline client feedback collection with time tracking
-- **Freelance Developers** - Professional client collaboration with project management
-- **Website Maintenance** - Ongoing client communication with task history
-- **Design Reviews** - Visual feedback on layouts with time tracking
-- **Bug Reporting** - Clear visual documentation with resolution tracking
+**Transform client feedback into action.** Your clients click on any website element to leave comments. You manage everything through a beautiful admin dashboard. No more confusing emails or vague "fix the blue thing" requests.
 
 ---
 
-## ✨ **Features Status**
+## 🚀 Quick Start
 
-### 🎪 **Visual Commenting System** ✅ **IMPLEMENTED**
-- ✅ **One-Click Feedback**: Click anywhere on your website to add comments
-- ✅ **Automatic Screenshots**: Captures visual context with every comment using html2canvas
-- ✅ **Smart Element Detection**: Identifies and targets specific page elements with CSS selectors
-- ✅ **Priority Levels**: Low, Medium, High priority classification system
-- ✅ **Real-Time Collaboration**: Reply to comments with threaded conversations
+### Installation
 
-### 📊 **Advanced Task Management** ✅ **IMPLEMENTED**
-- ✅ **Status Tracking**: Open → In Progress → Resolved workflow
-- ✅ **Kanban Board View**: Drag-and-drop interface for task management
-- ✅ **🆕 Task Editing**: Edit existing tasks with pre-populated modal forms
-- ✅ **Filter & Search**: Find comments by status, user, or priority
-- ✅ **User Assignment**: Basic user tracking and assignment
-- ✅ **Page Integration**: Comments linked to specific WordPress pages/posts
-- ✅ **🆕 Modern UI**: Enhanced button placement and user interactions
+1. Download or clone this repository
+2. Upload to `/wp-content/plugins/analogwp-client-handoff`
+3. Activate via **WordPress Admin → Plugins**
+4. Configure settings at **Client Handoff → Settings**
+5. Build assets: `npm install && npm run build`
 
-### ⏱️ **Timesheet & Tracking** ✅ **NEW IN v1.1.0**
-- ✅ **🆕 Task-Specific Timesheets**: Each task maintains its own time tracking data
-- ✅ **🆕 Persistent Time Entries**: Add/remove time entries that survive page refreshes
-- ✅ **🆕 Time Validation**: Smart validation for hours (0-23) and minutes (0-59)
-- ✅ **🆕 Real-time Totals**: Automatic calculation of total time per task
-- ✅ **🆕 Professional Interface**: Clean timesheet UI in task detail sidebar
-- ✅ **🆕 Database Persistence**: All timesheet data stored in database with JSON format
+### First Steps
 
-### 🔔 **Modern Notifications** ✅ **NEW IN v1.1.0**
-- ✅ **🆕 react-hot-toast Integration**: Modern toast notification system
-- ✅ **🆕 Smart Positioning**: Notifications positioned above WordPress admin bar
-- ✅ **🆕 Success/Error Feedback**: Clear feedback for all operations
-- ✅ **🆕 Non-intrusive Design**: Auto-dismiss with smooth animations
-- ✅ **🆕 Confirmation Dialogs**: Modern confirmation dialogs replace browser alerts
+**For Clients:**
+1. Look for the toggle button in the WordPress admin bar
+2. Click it to enable comment mode
+3. Click any element on the page to add feedback
+4. Comments are captured automatically with screenshots
 
-### 🎨 **User Experience** ✅ **ENHANCED**
-- ✅ **Responsive Design**: Modern interface optimized for all devices
-- ✅ **Admin Bar Integration**: Easy toggle controls without disrupting workflow
-- ✅ **React-Based Interface**: Modern, fast, and interactive components
-- ✅ **WordPress Native**: Seamlessly integrates with WordPress admin styling
-- ✅ **Drag & Drop**: Movable comment popups for better usability
-- ✅ **🆕 Enhanced Interactions**: Improved button placement and event handling
-
-### 🔒 **Security & Performance** ✅ **IMPLEMENTED**
-- ✅ **Nonce Verification**: All AJAX requests protected against CSRF
-- ✅ **User Capability Checks**: Role-based access control system
-- ✅ **Data Sanitization**: All inputs sanitized before database storage
-- ✅ **SQL Injection Prevention**: Prepared statements used throughout
-- ✅ **XSS Protection**: Output escaping implemented properly
-- ✅ **🆕 Enhanced Validation**: Improved input validation for timesheet data
-
-### 🚀 **Planned Features** ❌ **ROADMAP**
-- ❌ **Email Notifications**: Automatic notifications for new comments (v1.2)
-- ❌ **Advanced Timesheet**: Dedicated timesheet table for better performance (v1.2)
-- ❌ **Real-time Collaboration**: Live updates across browser tabs (v1.2)
-- ❌ **Bulk Operations**: Multi-task editing capabilities (v1.2)
-- ❌ **Export Features**: CSV/PDF export for timesheets and tasks (v1.2)
-- ❌ **Elementor Integration**: Better element targeting for page builders (v1.3)
-- ❌ **Advanced Analytics**: Detailed reporting and insights (v1.3)
-- ❌ **Multi-language Support**: WPML/Polylang integration (v1.4)
+**For Administrators:**
+1. View all feedback at **Client Handoff → Dashboard**
+2. Track tasks with status (Open, In Progress, Resolved)
+3. Reply to comments and update priorities
+4. Manage user access and settings
 
 ---
 
-## 🆕 **What's New in v1.1.0**
+## ✨ Key Features
 
-### **🎯 Task Editing System**
-- **Edit Any Task**: Click the edit (pencil) icon on any task card
-- **Pre-filled Forms**: Modal automatically populates with existing task data
-- **Seamless Updates**: Changes save immediately with proper validation
-- **Available Everywhere**: Edit buttons in both kanban and list views
+### Visual Commenting ✅
+- **One-click feedback** - Click any element to comment
+- **Automatic screenshots** - Context captured with html2canvas
+- **Smart element detection** - CSS selectors and position fallback
+- **Reply threads** - Full conversation support
+- **User avatars** - WordPress Gravatar integration
 
-### **⏱️ Timesheet Functionality**
-- **Individual Tracking**: Each task has its own separate timesheet
-- **Add Time Entries**: Enter hours, minutes, and optional descriptions
-- **Persistent Data**: All timesheet data survives page refreshes and sessions
-- **Total Calculations**: Automatic time totals per task
-- **Professional UI**: Clean interface in task detail sidebar
+### Task Management ✅
+- **Kanban board** - Organize by status (Open, In Progress, Resolved)
+- **Priority levels** - High, Medium, Low classification
+- **Category system** - Custom categories for organization
+- **Task editing** - Update comments and details
+- **Advanced filtering** - Search, filter by status/category/priority
 
-### **🔔 Modern Notifications**
-- **Toast System**: Replaced WordPress notices with modern react-hot-toast
-- **Perfect Positioning**: Notifications appear above admin bar, not underneath
-- **Better UX**: Success/error feedback for all operations
-- **Smooth Animations**: Non-intrusive auto-dismiss functionality
+### Timesheet Tracking ✅
+- **Time logging** - Track hours per task
+- **Persistent storage** - All time entries saved to database
+- **Time reports** - View total hours by task/category
+- **Edit capabilities** - Modify or delete time entries
 
-### **🛠️ Technical Improvements**
-- **Database Upgrade**: Automatic `timesheet` column addition
-- **Enhanced Components**: Improved React component architecture
-- **Better State Management**: Proper synchronization across components
-- **Error Handling**: Graceful error recovery with user feedback
+### Access Control ✅
+- **Role-based access** - Configure which roles can see the plugin
+- **Frontend toggle** - Enable/disable comments on frontend
+- **Secure AJAX** - Nonce verification on all requests
+- **Permission checks** - WordPress capability system
 
----
-
-## 🚀 **Quick Start Guide**
-
-### **Step 1: Installation**
-
-**Option A: Upload Plugin Files**
-1. Download/clone the plugin to `/wp-content/plugins/analogwp-client-handoff/`
-2. Install dependencies: `npm install`
-3. Build assets: `npm run build`
-4. Activate in WordPress Admin > Plugins
-5. 🆕 **Database automatically upgrades** to support new features
-
-**Option B: Development Setup**
-```bash
-# Clone and setup for development
-git clone [repo-url] /path/to/wordpress/wp-content/plugins/analogwp-client-handoff/
-cd analogwp-client-handoff
-npm install
-npm run start  # For development with hot reload
-```
-
-### **Step 2: Configure Settings**
-1. Go to **WordPress Admin > Client Handoff**
-2. Set user permissions (who can add comments)
-3. Configure screenshot settings
-4. Save settings
-
-### **Step 3: Start Using New Features**
-1. **Add Comments**: Visit any page and click "Page Tasks & Comments"
-2. **🆕 Edit Tasks**: Click the edit (pencil) icon on any existing task
-3. **🆕 Track Time**: Open any task detail and use the Timesheet section
-4. **🆕 Enjoy Modern UI**: Experience improved notifications and interactions
+### Modern UI/UX ✅
+- **React 18** - Fast, interactive interface
+- **Toast notifications** - Real-time feedback with react-toastify
+- **Responsive design** - Works on all devices
+- **WordPress integration** - Matches admin theme
 
 ---
 
-## 📋 **Detailed Usage**
+## 📖 Usage Guide
 
-### **For Clients (Adding Feedback)**
+### Creating Visual Comments
 
 1. **Enable Comment Mode**
-   - Look for "Page Tasks & Comments" in the top admin bar
-   - Or use the sidebar toggle button (right side of screen)
-
-2. **Add Visual Comments**
+   - Click the toggle button in the WordPress admin bar
+   - Page overlay appears with instructions
+   
+2. **Add a Comment**
    - Click on any element you want to comment on
-   - A popup form will appear at the click location
-   - Enter your feedback and select priority level
-   - Click "Save Comment" - screenshot automatically captured
-   - 🆕 **Enjoy improved notifications** with modern toast system
+   - A popup appears asking for your comment
+   - Type your feedback and click "Save Comment"
+   - Screenshot is automatically captured
 
-3. **🆕 Edit Existing Comments**
-   - Click the edit (pencil) icon on any task card
-   - Modify details in the pre-populated form
-   - Save changes and see immediate updates
-
-### **For Developers/Agencies (Managing Tasks & Time)**
-
-1. **Admin Dashboard**
-   - Navigate to **Client Handoff > Visual Comments**
-   - View all comments in a comprehensive kanban board
-   - Filter by status, priority, user, or page
-   - 🆕 **Use improved interface** with better notifications
-
-2. **🆕 Task Management**
-   - **Edit Tasks**: Click edit button on any task card
-   - **Update Status**: Drag tasks between columns or use dropdowns
-   - **Priority Management**: Change priority levels easily
-   - **Modern Confirmations**: No more browser alert dialogs
-
-3. **🆕 Time Tracking**
-   - **Open Task Details**: Click on any task to open detail view
-   - **Access Timesheet**: Scroll to timesheet section in sidebar
-   - **Add Time**: Enter hours, minutes, and description
-   - **Track Progress**: View real-time totals per task
-   - **Persistent Data**: All time entries survive page refreshes
-
-### **🆕 Advanced Features**
-
-1. **Timesheet Management**
-   - Each task maintains separate timesheet data
-   - Add time entries with validation (0-23 hours, 0-59 minutes)
-   - Optional descriptions for time entries
-   - Remove individual time entries
-   - Automatic total calculation
-
-2. **Enhanced UI/UX**
-   - Modern toast notifications for all actions
-   - Improved button placement and interactions
-   - Better error handling with user-friendly messages
-   - Responsive design optimized for all devices
-
----
-- ✅ **User Capability Checks**: Role-based access control system
-- ✅ **Data Sanitization**: All inputs sanitized before database storage
-- ✅ **SQL Injection Prevention**: Prepared statements used throughout
-- ✅ **XSS Protection**: Output escaping implemented properly
-
-### 🚀 **Planned Features** ❌ **NOT YET IMPLEMENTED**
-- ❌ **Email Notifications**: Automatic notifications for new comments (v1.1)
-- ❌ **Elementor Integration**: Better element targeting for page builders (v1.2)
-- ❌ **Advanced Analytics**: Detailed reporting and insights (v1.2)
-- ❌ **Multi-language Support**: WPML/Polylang integration (v1.3)
-- ❌ **Cloud Storage**: External storage options for screenshots (v1.3)
-- ❌ **Team Collaboration**: Advanced user assignment and permissions (v1.2)
-- ❌ **CSV Export**: Data export functionality (v1.1)
-- ❌ **Mobile App**: Native companion mobile application (Future)
-
----
-
-## 🚀 **Quick Start Guide**
-
-### **Step 1: Installation**
-
-**Option A: Upload Plugin Files**
-1. Download/clone the plugin to `/wp-content/plugins/analogwp-client-handoff/`
-2. Install dependencies: `npm install`
-3. Build assets: `npm run build`
-4. Activate in WordPress Admin > Plugins
-
-**Option B: Development Setup**
-```bash
-# Clone and setup for development
-git clone [repo-url] /path/to/wordpress/wp-content/plugins/analogwp-client-handoff/
-cd analogwp-client-handoff
-npm install
-npm run start  # For development with hot reload
-```
-
-### **Step 2: Configure Settings**
-1. Go to **WordPress Admin > Client Handoff**
-2. Set user permissions (who can add comments)
-3. Configure screenshot settings
-4. Save settings
-
-### **Step 3: Start Commenting**
-1. Visit any page on your website
-2. Click **"Page Tasks & Comments"** in the admin bar
-3. Click on any element to add a comment
-4. Fill out the comment form with priority level
-5. Submit - screenshot automatically captured!
-
----
-
-## 📋 **Detailed Usage**
-
-### **For Clients (Adding Feedback)**
-
-1. **Enable Comment Mode**
-   - Look for "Page Tasks & Comments" in the top admin bar
-   - Or use the sidebar toggle button (right side of screen)
-
-2. **Add Visual Comments**
-   - Click on any element you want to comment on
-   - A popup form will appear at the click location
-   - Enter your feedback and select priority level
-   - Click "Save Comment" - screenshot automatically captured
-
-3. **View Existing Comments**
-   - Comments appear as numbered red markers on the page
+3. **View Comments**
+   - Existing comments appear as numbered markers
    - Click any marker to view details and replies
-   - Use the sidebar to see all comments in one place
+   - Add replies or update status (if permitted)
 
-### **For Developers/Agencies (Managing Tasks)**
+### Managing Tasks (Admin)
 
-1. **Admin Dashboard**
-   - Navigate to **Client Handoff > Visual Comments**
-   - View all comments in a comprehensive table
-   - Filter by status, priority, user, or page
-   - Export data to CSV for reporting
+1. **Dashboard Overview**
+   - Access via **Client Handoff → Dashboard**
+   - View statistics: total tasks, open, in progress, resolved
+   - Filter by status, category, or priority
+   - Search across all comments
 
-2. **Task Management**
-   - Update comment status: Open → In Progress → Resolved
-   - Add replies to client comments
-   - Assign tasks to team members
-   - Track progress with visual status indicators
+2. **Task Actions**
+   - **Edit**: Click edit icon to modify task details
+   - **Reply**: Add threaded replies with avatars
+   - **Status**: Change between Open, In Progress, Resolved
+   - **Delete**: Remove tasks (admin only)
+   - **Log Time**: Track hours spent on tasks
 
-3. **Priority Management**
-   - High Priority: Red badges for urgent items
-   - Medium Priority: Yellow badges for standard tasks
-   - Low Priority: Blue badges for minor items
+3. **Timesheet**
+   - Access via **Client Handoff → Timesheet**
+   - View all time entries across tasks
+   - Filter by date range, task, or user
+   - Export reports (coming soon)
+
+### Configuration
+
+Access settings at **Client Handoff → Settings**:
+
+#### General Settings
+- **Allowed User Roles**: Select which roles can access the plugin
+- **Enable Frontend Comments**: Toggle comments app on frontend
+
+#### Categories & Priorities
+- **Categories**: Create custom categories (e.g., Design, Content, Bug)
+- **Priorities**: Manage priority levels (High, Medium, Low by default)
 
 ---
 
-## 🛠 **Technical Architecture**
+## 🛠️ Technical Details
 
-### **Frontend Technology Stack**
-- **React 18**: Modern component-based UI
-- **SCSS**: Modular styling with WordPress theme compatibility
-- **html2canvas**: Screenshot capture technology
-- **Webpack**: Asset bundling and optimization
+<details>
+<summary><strong>Architecture & Stack</strong></summary>
 
-### **WordPress Integration**
-- **AJAX Endpoints**: Secure server communication
-- **Custom Database Tables**: Optimized storage structure
-- **User Capabilities**: WordPress role-based permissions
-- **Nonce Security**: Protection against CSRF attacks
+### Frontend
+- **React 18.2.0** - UI framework
+- **WordPress Components** - @wordpress/components for consistency
+- **html2canvas** - Screenshot capture
+- **react-toastify** - Toast notifications
+- **Sass** - Styling with CSS variables
 
-### **Database Structure**
+### Backend
+- **WordPress 6.0+** - Core platform
+- **PHP 7.4+** - Server-side logic
+- **MySQL** - Database storage
+- **REST API** - AJAX endpoints
 
-**Comments Table** (`wp_agwp_cht_comments`):
-```sql
-- id (Primary Key)
-- post_id (WordPress Post ID)
-- user_id (Comment Author)
-- comment_text (Feedback Content)
-- screenshot_url (Auto-captured Image)
-- x_position, y_position (Click Coordinates)
-- page_url (Full URL)
-- status (open/in_progress/resolved)
-- priority (low/medium/high)
-- created_at, updated_at (Timestamps)
-```
+### Build System
+- **@wordpress/scripts** - Build tooling
+- **Webpack 5** - Module bundling
+- **Babel** - JavaScript compilation
+- **PostCSS** - CSS processing
 
-**Replies Table** (`wp_agwp_cht_comment_replies`):
-```sql
-- id (Primary Key)
-- comment_id (Parent Comment)
-- user_id (Reply Author)
-- reply_text (Reply Content)
-- created_at (Timestamp)
-```
+</details>
 
-### **Component Architecture**
-```
+<details>
+<summary><strong>Database Structure</strong></summary>
+
+### Comments Table (\`wp_agwp_cht_comments\`)
+\`\`\`sql
+CREATE TABLE wp_agwp_cht_comments (
+  id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  post_id bigint(20) UNSIGNED NOT NULL,
+  user_id bigint(20) UNSIGNED NOT NULL,
+  comment_text text NOT NULL,
+  element_selector varchar(500) DEFAULT NULL,
+  screenshot_url longtext DEFAULT NULL,
+  x_position int(11) DEFAULT NULL,
+  y_position int(11) DEFAULT NULL,
+  page_url varchar(500) DEFAULT NULL,
+  status varchar(20) DEFAULT 'open',
+  priority varchar(20) DEFAULT 'medium',
+  category varchar(100) DEFAULT NULL,
+  created_at datetime DEFAULT CURRENT_TIMESTAMP,
+  updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY post_id (post_id),
+  KEY user_id (user_id),
+  KEY status (status),
+  KEY priority (priority),
+  KEY category (category)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+\`\`\`
+
+### Replies Table (\`wp_agwp_cht_comment_replies\`)
+\`\`\`sql
+CREATE TABLE wp_agwp_cht_comment_replies (
+  id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  comment_id bigint(20) UNSIGNED NOT NULL,
+  user_id bigint(20) UNSIGNED NOT NULL,
+  reply_text text NOT NULL,
+  created_at datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY comment_id (comment_id),
+  KEY user_id (user_id),
+  FOREIGN KEY (comment_id) REFERENCES wp_agwp_cht_comments(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+\`\`\`
+
+### Timesheet Table (\`wp_agwp_cht_timesheet\`)
+\`\`\`sql
+CREATE TABLE wp_agwp_cht_timesheet (
+  id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  comment_id bigint(20) UNSIGNED NOT NULL,
+  user_id bigint(20) UNSIGNED NOT NULL,
+  hours decimal(10,2) NOT NULL,
+  description text DEFAULT NULL,
+  logged_at datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY comment_id (comment_id),
+  KEY user_id (user_id),
+  FOREIGN KEY (comment_id) REFERENCES wp_agwp_cht_comments(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+\`\`\`
+
+</details>
+
+<details>
+<summary><strong>Component Structure</strong></summary>
+
+\`\`\`
 src/
-├── components/
-│   ├── VisualCommentsApp.js     # Main application container
-│   ├── CommentPopup.js          # Click-to-comment form
-│   ├── CommentSidebar.js        # Sliding sidebar interface
-│   ├── CommentMarker.js         # On-page comment indicators
-│   └── CommentOverlay.js        # Instructions and helpers
-├── admin/
-│   ├── AdminApp.js              # Admin dashboard React app
+├── frontend/
 │   ├── components/
-│   │   ├── TasksKanban.js       # Kanban board view
-│   │   ├── TaskDetail.js        # Individual task details
-│   │   └── AddTaskModal.js      # New task creation modal
-│   └── AdminHeader.js           # Admin navigation and filters
-└── styles/
-    ├── frontend.scss            # Public-facing styles
-    └── admin-new.scss           # Admin interface styles
-```
+│   │   ├── VisualCommentsApp.js     # Main app container
+│   │   ├── CommentToggle.js          # Toggle button
+│   │   ├── CommentOverlay.js         # Instruction overlay
+│   │   ├── CommentPopup.js           # New comment form
+│   │   ├── CommentsDisplay.js        # Comments manager
+│   │   └── CommentMarker.js          # Individual markers
+│   ├── styles/
+│   │   └── frontend.scss             # Frontend styles
+│   └── frontend.js                   # Entry point
+│
+├── admin/
+│   ├── components/
+│   │   ├── Dashboard.js              # Main dashboard
+│   │   ├── TaskBoard.js              # Kanban board
+│   │   ├── TaskCard.js               # Individual tasks
+│   │   ├── TaskDetail.js             # Task detail view
+│   │   ├── Timesheet.js              # Timesheet view
+│   │   ├── Settings.js               # Settings page
+│   │   └── settings/
+│   │       ├── AccessControlSettings.js
+│   │       ├── CategorySettings.js
+│   │       └── PrioritySettings.js
+│   ├── styles/
+│   │   └── admin.scss                # Admin styles
+│   └── admin.js                      # Entry point
+│
+└── shared/
+    └── utils/                        # Shared utilities
+\`\`\`
 
----
+</details>
 
-## ⚙️ **Configuration Options**
+<details>
+<summary><strong>Security Features</strong></summary>
 
-### **User Permissions**
-Control who can add comments:
-```php
-// In WordPress functions.php or custom plugin
-update_option('agwp_cht_allowed_roles', ['administrator', 'editor', 'client']);
-```
+### Implemented Protections
+- ✅ **Nonce Verification** - All AJAX requests protected with WordPress nonces
+- ✅ **User Capability Checks** - Role-based access control via \`user_has_access()\`
+- ✅ **Data Sanitization** - All inputs cleaned with \`sanitize_text_field()\` and \`wp_kses_post()\`
+- ✅ **SQL Injection Prevention** - Prepared statements via \`$wpdb->prepare()\`
+- ✅ **XSS Protection** - Output escaping with \`esc_html()\`, \`esc_url()\`, \`esc_attr()\`
+- ✅ **CSRF Protection** - WordPress nonces on all forms and AJAX calls
 
-### **Screenshot Settings**
-```php
-// Disable automatic screenshots
-update_option('agwp_cht_auto_screenshot', false);
-
-// Change screenshot quality
-update_option('agwp_cht_screenshot_quality', 0.8);
-```
-
-### **Styling Customization**
-```scss
-// Override default colors in your theme
-.cht-comment-sidebar {
-    --primary-color: #your-brand-color;
-    --success-color: #your-success-color;
-    --danger-color: #your-error-color;
+### Permission System
+\`\`\`php
+// Helper method in main plugin class
+public static function user_has_access() {
+    if ( ! is_user_logged_in() ) {
+        return false;
+    }
+    
+    if ( current_user_can( 'manage_options' ) ) {
+        return true; // Admin always has access
+    }
+    
+    $settings = get_option( 'agwp_cht_settings', array() );
+    $allowed_roles = $settings['general']['allowed_roles'] ?? array();
+    
+    $user = wp_get_current_user();
+    return ! empty( array_intersect( $allowed_roles, $user->roles ) );
 }
-```
+\`\`\`
 
----
+</details>
 
-## 🔧 **Development**
-
-### **Development Commands**
-```bash
-npm run start      # Development with hot reload
-npm run build      # Production build
-npm run dev        # Development build
-```
-
-### **File Structure**
-- **PHP Backend**: `/analogwp-client-handoff.php` - Main plugin file
-- **React Frontend**: `/src/` - All JavaScript/React components  
-- **Admin Interface**: `/admin/` - WordPress admin pages and React admin app
-- **Styles**: `/src/styles/` - SCSS source files
-- **Built Assets**: `/build/` - Compiled JavaScript and CSS
-
-### **Build Process**
-- Uses `@wordpress/scripts` for consistent WordPress development
-- Supports modern JavaScript (ES6+) and JSX
-- SCSS compilation with autoprefixer
-- Asset optimization and minification for production
-
----
-
-## 🔒 **Security & Performance**
-
-### **Security Features**
-- ✅ **Nonce Verification** - All AJAX requests protected
-- ✅ **User Capability Checks** - Role-based access control  
-- ✅ **Data Sanitization** - All inputs cleaned before storage
-- ✅ **SQL Injection Prevention** - Prepared statements used
-- ✅ **XSS Protection** - Output escaping implemented
-
-### **Performance Optimizations**
-- ✅ **Lazy Loading** - Components load only when needed
-- ✅ **Asset Minification** - Compressed CSS/JS for faster loading
-- ✅ **Database Optimization** - Indexed columns for fast queries
-- ✅ **Caching Support** - Compatible with WordPress caching plugins
-
----
-
-## 🌐 **Browser Compatibility**
+<details>
+<summary><strong>Browser Compatibility</strong></summary>
 
 | Browser | Version | Status |
 |---------|---------|--------|
@@ -440,111 +297,247 @@ npm run dev        # Development build
 | Mobile Safari | iOS 13+ | ✅ Full Support |
 | Chrome Mobile | Android 8+ | ✅ Full Support |
 
+</details>
+
 ---
 
-## 🚨 **Troubleshooting**
+## 🔧 Development
 
-### **Common Issues & Solutions**
+### Prerequisites
+- Node.js 14+
+- npm or yarn
+- WordPress development environment
 
-**� Comments Not Saving**
-- Check user has `edit_posts` capability
-- Verify WordPress nonces are working
-- Ensure database tables were created during activation
+### Setup
 
-**🔴 Screenshots Not Capturing**
-- Check browser console for JavaScript errors
-- Verify html2canvas library loaded properly
-- Ensure no CORS issues with external resources
+1. **Clone the repository**
+   \`\`\`bash
+   git clone https://github.com/analogwp/analogwp-client-handoff.git
+   cd analogwp-client-handoff
+   \`\`\`
 
-**🔴 Toggle Button Missing**
-- Confirm user is logged in with appropriate permissions
-- Check if WordPress admin bar is enabled
-- Verify plugin scripts are enqueued properly
+2. **Install dependencies**
+   \`\`\`bash
+   npm install
+   \`\`\`
 
-**🔴 Sidebar Not Appearing**
-- Clear browser cache and WordPress caches
-- Check for JavaScript conflicts with other plugins
-- Ensure CSS assets compiled correctly
+3. **Start development**
+   \`\`\`bash
+   npm run start
+   \`\`\`
+   This will:
+   - Watch for file changes
+   - Auto-compile SCSS to CSS
+   - Bundle JavaScript with hot reload
 
-### **Debug Mode**
-Enable WordPress debug mode for detailed error information:
-```php
+4. **Build for production**
+   \`\`\`bash
+   npm run build
+   \`\`\`
+
+### Available Commands
+
+- \`npm run start\` - Start development server with watch mode
+- \`npm run build\` - Build optimized production assets
+- \`npm run format\` - Format code with Prettier
+- \`npm run lint:css\` - Lint SCSS files
+- \`npm run lint:js\` - Lint JavaScript files
+- \`npm run packages-update\` - Update WordPress packages
+
+### File Structure
+
+**Key PHP Files:**
+- \`analogwp-client-handoff.php\` - Main plugin file with hooks and helper methods
+- \`includes/class-database.php\` - Database operations
+- \`includes/class-assets.php\` - Asset enqueuing
+- \`includes/ajax/class-ajax.php\` - AJAX endpoint handlers
+- \`includes/admin/class-admin.php\` - Admin menu and pages
+
+**React Entry Points:**
+- \`src/frontend.js\` - Frontend commenting app
+- \`src/admin.js\` - Admin dashboard and settings
+
+**Styles:**
+- \`src/frontend/styles/frontend.scss\` - Frontend styles
+- \`src/admin/styles/admin.scss\` - Admin dashboard styles
+
+### Customization
+
+**Custom Color Scheme:**
+\`\`\`scss
+// In your theme or child theme
+:root {
+  --agwp-cht-primary: #your-brand-color;
+  --agwp-cht-danger: #your-error-color;
+  --agwp-cht-success: #your-success-color;
+}
+\`\`\`
+
+**Extend Functionality:**
+\`\`\`php
+// Add custom comment meta
+add_filter( 'agwp_cht_comment_data', function( $data ) {
+    $data['custom_field'] = 'custom_value';
+    return $data;
+} );
+
+// Modify allowed roles programmatically
+add_filter( 'agwp_cht_allowed_roles', function( $roles ) {
+    $roles[] = 'shop_manager';
+    return $roles;
+} );
+\`\`\`
+
+---
+
+## 🚨 Troubleshooting
+
+<details>
+<summary><strong>Comments Not Saving</strong></summary>
+
+**Possible Causes:**
+- User doesn't have proper permissions
+- WordPress nonces expired
+- Database tables missing
+
+**Solutions:**
+1. Check user has access via Settings → Allowed User Roles
+2. Refresh the page to regenerate nonces
+3. Deactivate and reactivate plugin to create tables
+4. Check WordPress debug log for errors
+
+</details>
+
+<details>
+<summary><strong>Screenshots Not Capturing</strong></summary>
+
+**Possible Causes:**
+- html2canvas library not loaded
+- CORS issues with external resources
+- Browser doesn't support canvas API
+
+**Solutions:**
+1. Check browser console for JavaScript errors
+2. Ensure all images have proper CORS headers
+3. Try on a different browser
+4. Disable browser extensions that might interfere
+
+</details>
+
+<details>
+<summary><strong>Toggle Button Missing</strong></summary>
+
+**Possible Causes:**
+- User not logged in
+- User doesn't have access permissions
+- Admin bar disabled
+- Frontend comments disabled in settings
+
+**Solutions:**
+1. Confirm user is logged in to WordPress
+2. Check Settings → Allowed User Roles includes user's role
+3. Enable WordPress admin bar in user profile
+4. Enable Settings → Enable Frontend Comments
+5. Clear browser and WordPress caches
+
+</details>
+
+<details>
+<summary><strong>Permission Errors in Admin</strong></summary>
+
+**Error:** "You do not have sufficient permissions to access this page"
+
+**Solutions:**
+1. Ensure user role is in Settings → Allowed User Roles
+2. Clear WordPress object cache
+3. Check if \`user_has_access()\` method is working:
+   \`\`\`php
+   // Add to functions.php temporarily
+   add_action( 'admin_init', function() {
+       if ( class_exists( 'AGWP_CHT_Client_Handoff_Toolkit' ) ) {
+           var_dump( AGWP_CHT_Client_Handoff_Toolkit::user_has_access() );
+       }
+   } );
+   \`\`\`
+
+</details>
+
+<details>
+<summary><strong>Debug Mode</strong></summary>
+
+Enable WordPress debug mode for detailed error logging:
+
+\`\`\`php
 // In wp-config.php
-define('WP_DEBUG', true);
-define('WP_DEBUG_LOG', true);
-define('WP_DEBUG_DISPLAY', false);
-```
+define( 'WP_DEBUG', true );
+define( 'WP_DEBUG_LOG', true );
+define( 'WP_DEBUG_DISPLAY', false );
+define( 'SCRIPT_DEBUG', true );
+\`\`\`
+
+Check debug log at \`wp-content/debug.log\`
+
+</details>
 
 ---
 
-## 📈 **Development Roadmap**
+## 📈 Roadmap
 
-### **Version 1.0.0** ✅ **CURRENT RELEASE**
-- ✅ Visual commenting system with click-to-comment functionality
-- ✅ Automatic screenshot capture using html2canvas
-- ✅ Task management with Kanban board interface
-- ✅ Status tracking (Open, In Progress, Resolved)
-- ✅ Priority levels (High, Medium, Low)
-- ✅ Admin dashboard with statistics
-- ✅ React-based frontend and admin interfaces
-- ✅ WordPress security best practices
-- ✅ Responsive design for mobile compatibility
-- ✅ Database optimization with indexed columns
+### Version 1.1.0 ✅ **CURRENT**
+- ✅ Task editing functionality
+- ✅ Persistent timesheet tracking
+- ✅ Modern toast notifications
+- ✅ Enhanced UI/UX improvements
+- ✅ Access control system
+- ✅ User avatars in replies
 
-### **Version 1.1** 🔄 **NEXT RELEASE** 
+### Version 1.2 🔜 **NEXT**
 - ⏳ Email notifications for new comments and status changes
 - ⏳ Enhanced mobile interface with touch optimizations
-- ⏳ CSV export functionality for reports
-- ⏳ Additional screenshot customization options
-- ⏳ Improved filtering and search capabilities
-- ⏳ Bulk actions for comment management
+- ⏳ CSV/PDF export for timesheet reports
+- ⏳ Advanced filtering with saved filter presets
+- ⏳ Bulk actions for task management
+- ⏳ Custom fields for tasks
+- 🎨 Custom branding options
 
-### **Version 1.2** 📅 **PLANNED**
-- 🔗 Elementor integration for better element targeting  
-- 📊 Advanced analytics dashboard with charts and insights
-- 👥 Enhanced team collaboration with user assignment
-- 🎨 Custom branding options for client-facing interface
-- 🔧 API endpoints for third-party integrations
-- 📱 Progressive Web App (PWA) features
+### Version 1.3 📅 **PLANNED**
+- ⏳ Advanced analytics dashboard with charts
+- ⏳ Custom branding options
+- ⏳ REST API endpoints for third-party integrations
+- ⏳ Progressive Web App (PWA) features
+- ⏳ Multi-language support (WPML/Polylang)
 
-### **Version 1.3** 🔮 **FUTURE**
-- 🌍 Multi-language support (WPML/Polylang compatibility)
-- ☁️ Cloud storage integration for screenshots (AWS S3, Google Cloud)
-- 🤖 AI-powered comment categorization and insights
-- 📱 Native mobile app companion
-- 🔄 Real-time collaboration with WebSocket support
-- 📋 Custom workflow templates
-
-### **Community Requests** 💡 **OPEN FOR FEEDBACK**
-- 🎭 Page builder integrations (Beaver Builder, Divi, etc.)
-- 📧 Slack/Discord notifications
-- 🔐 SSO integration (Google, Microsoft, etc.)
-- 📊 Time tracking for tasks
-- 🎯 Project templates and presets
+### Future Ideas 🔮
+- ⏳ Cloud storage for screenshots (AWS S3, Google Cloud)
+- ⏳ AI-powered resolutions
+- ⏳ Native mobile app companion
+- ⏳ Real-time collaboration with WebSocket
+- ⏳ Project templates and workflows
 
 ---
 
-## 🤝 **Contributing**
+## 🤝 Contributing
 
 We welcome contributions! Here's how to get started:
 
 1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+2. **Create** a feature branch: \`git checkout -b feature/amazing-feature\`
 3. **Make** your changes with proper testing
-4. **Commit** with descriptive messages (`git commit -m 'Add amazing feature'`)
-5. **Push** to your branch (`git push origin feature/amazing-feature`)
+4. **Commit** with descriptive messages: \`git commit -m 'Add amazing feature'\`
+5. **Push** to your branch: \`git push origin feature/amazing-feature\`
 6. **Open** a Pull Request with detailed description
 
-### **Development Guidelines**
-- Follow WordPress coding standards
+### Development Guidelines
+- Follow [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/)
 - Write descriptive commit messages
-- Add comments for complex functionality
-- Test across multiple browsers
+- Add code comments for complex functionality
+- Test across multiple browsers and WordPress versions
 - Update documentation as needed
+- Include screenshots for UI changes
 
 ---
 
-## 📄 **License**
+## 📄 License
 
 This project is licensed under the **GNU General Public License v2.0 or later**.
 
@@ -552,201 +545,19 @@ You are free to use, modify, and distribute this plugin under the terms of the G
 
 ---
 
-## 🆘 **Support**
+## 🆘 Support
 
-### **Get Help**
-- 📖 **Documentation**: Check this README for detailed guidance
-- 🐛 **Bug Reports**: Open an issue with steps to reproduce
-- 💡 **Feature Requests**: Suggest improvements via GitHub issues
-- 💬 **Community**: Join discussions in the issues section
+### Get Help
+- 📖 **Documentation**: This README and inline code comments
+- 🐛 **Bug Reports**: [Open an issue](https://github.com/analogwp/analogwp-client-handoff/issues) with reproduction steps
+- 💡 **Feature Requests**: [Suggest improvements](https://github.com/analogwp/analogwp-client-handoff/issues) via GitHub issues
+- 💬 **Discussions**: Join conversations in the [issues section](https://github.com/analogwp/analogwp-client-handoff/issues)
 
-### **Professional Support**
-For priority support, custom development, or consulting services, please contact the development team.
+### Professional Support
+For priority support, custom development, or consulting services, contact the development team.
 
 ---
 
 **Built with ❤️ for WordPress agencies, developers, and their clients.**
 
 *Making website feedback as simple as point and click.*
-   - Click on any element you want to comment on
-   - A popup will appear asking for your comment
-   - Type your feedback and click "Save Comment"
-   - A screenshot will be automatically captured
-
-3. **View and Reply to Comments**
-   - Existing comments appear as numbered markers
-   - Click on any marker to view details
-   - Add replies or update status (if permitted)
-
-## 🎯 Technical Implementation
-
-### Dynamic DOM Targeting
-The plugin uses two approaches for reliable element targeting:
-
-1. **CSS Selector Generation**: Creates unique selectors for clicked elements
-2. **Position-based Fallback**: Stores X/Y coordinates as backup
-3. **Screenshot Capture**: Uses html2canvas to capture visual context
-
-### Database Structure
-
-**Comments Table** (`wp_agwp_cht_comments`):
-- `id` - Unique comment ID
-- `post_id` - Associated WordPress post
-- `user_id` - Comment author
-- `comment_text` - The actual comment
-- `element_selector` - CSS selector for the element
-- `screenshot_url` - Base64 or URL of captured screenshot
-- `x_position`, `y_position` - Element coordinates
-- `page_url` - Full URL where comment was made
-- `status` - open, in_progress, resolved
-- Timestamps for created/updated
-
-**Replies Table** (`wp_agwp_cht_comment_replies`):
-- `id` - Unique reply ID
-- `comment_id` - Parent comment reference
-- `user_id` - Reply author
-- `reply_text` - Reply content
-- `created_at` - Timestamp
-
-### React Components Structure
-
-```
-src/
-├── components/
-│   ├── VisualCommentsApp.js     # Main app container
-│   ├── CommentToggle.js         # Toggle button component
-│   ├── CommentOverlay.js        # Instruction overlay
-│   ├── CommentPopup.js          # New comment form
-│   ├── CommentsDisplay.js       # Comments manager
-│   └── CommentMarker.js         # Individual comment markers
-├── admin/
-│   └── AdminDashboard.js        # Admin dashboard component
-├── styles/
-│   ├── frontend.scss            # Frontend styles
-│   └── admin.scss               # Admin styles
-├── frontend.js                  # Frontend entry point
-└── admin.js                     # Admin entry point
-```
-
-## 🔧 Development
-
-### Development Workflow
-
-1. **Start Development Server**
-   ```bash
-   npm run start
-   ```
-   This will:
-   - Watch for file changes
-   - Auto-compile SCSS to CSS
-   - Bundle JavaScript with hot reload
-
-2. **Code Structure**
-   - PHP files handle WordPress integration and AJAX endpoints
-   - React components manage the frontend user interface
-   - SCSS files provide styling with WordPress admin theme compatibility
-
-3. **Build for Production**
-   ```bash
-   npm run build
-   ```
-
-### Key Files
-
-- `analogwp-client-handoff.php` - Main plugin file with WordPress hooks
-- `admin/admin-page.php` - Admin dashboard HTML
-- `admin/comments-page.php` - Comments management page
-- `src/components/VisualCommentsApp.js` - Main React application
-- `package.json` - Dependencies and build scripts
-- `webpack.config.js` - Asset bundling configuration
-
-## 🎨 Customization
-
-### Styling
-All styles are in SCSS format with CSS variables for easy customization:
-
-```scss
-// Custom color scheme
-$primary-color: #your-brand-color;
-$danger-color: #your-error-color;
-$success-color: #your-success-color;
-```
-
-### User Permissions
-Configure which user roles can add comments:
-
-```php
-// In WordPress Admin > Client Handoff > Settings
-'allowed_roles' => ['administrator', 'editor', 'author']
-```
-
-### Screenshot Settings
-Control screenshot capture:
-
-```php
-// Disable auto-screenshots
-update_option('agwp_cht_auto_screenshot', 0);
-```
-
-## 🔒 Security Features
-
-- **Nonce Verification**: All AJAX requests are protected with WordPress nonces
-- **User Capability Checks**: Actions restricted based on user permissions
-- **Data Sanitization**: All inputs sanitized before database storage
-- **Escaped Outputs**: All dynamic content properly escaped for display
-
-## 📋 Browser Support
-
-- Chrome/Chromium 80+
-- Firefox 75+
-- Safari 13+
-- Edge 80+
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the GPL v2 or later - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-For support, please:
-1. Check the WordPress admin for any error messages
-2. Enable WordPress debug mode to see detailed errors
-3. Ensure all dependencies are installed and assets are built
-4. Check browser console for JavaScript errors
-
-### Common Issues
-
-**Comments not saving:**
-- Check user permissions
-- Verify nonce security tokens
-- Ensure database tables were created properly
-
-**Toggle button not appearing:**
-- Confirm user has `edit_posts` capability
-- Check if admin bar is enabled
-- Verify scripts are properly enqueued
-
-**Screenshots not capturing:**
-- Ensure html2canvas library loaded
-- Check for CORS issues with external resources
-- Verify browser supports canvas API
-
-## 🚀 Roadmap
-
-- **v1.1**: Mobile responsive improvements
-- **v1.2**: Integration with popular page builders (Elementor, Gutenberg)
-- **v1.3**: Email notifications for new comments
-- **v1.4**: Advanced filtering and sorting options
-- **v1.5**: Multi-language support
-
----
-
-Built with ❤️ for WordPress agencies and their clients.

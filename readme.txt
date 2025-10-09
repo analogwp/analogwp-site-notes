@@ -108,10 +108,6 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 * Responsive design for mobile compatibility
 * WordPress admin bar integration
 
-== Upgrade Notice ==
-
-= 1.0.0 =
-Initial release of Client Handoff Toolkit. Install to start streamlining your client collaboration process.
 
 == Developer Notes ==
 
