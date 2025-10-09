@@ -10,6 +10,7 @@ import Draggable from 'react-draggable';
  */
 import { getStatusByKey } from '../constants/taskStatuses';
 import { Button } from './ui';
+import logger from '../../shared/utils/logger';
 
 const CommentMarker = ({ 
     comment, 
@@ -52,7 +53,7 @@ const CommentMarker = ({
             setReplyText('');
             setShowReplyForm(false);
         } catch (error) {
-            console.error('Error submitting reply:', error);
+            logger.error('Error submitting reply:', error);
         } finally {
             setIsSubmittingReply(false);
         }
@@ -87,7 +88,7 @@ const CommentMarker = ({
                 }, 2000);
             }
         } catch (error) {
-            console.error('Error finding element:', error);
+            logger.error('Error finding element:', error);
         }
     };
 

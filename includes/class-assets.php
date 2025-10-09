@@ -181,6 +181,9 @@ class AGWP_CHT_Assets {
 		$saved_settings   = get_option( 'agwp_cht_settings', array() );
 		$settings         = wp_parse_args( $saved_settings, $default_settings );
 
+		$debug_enabled = isset( $settings['advanced']['enable_debug_mode'] ) ? $settings['advanced']['enable_debug_mode'] : false;
+		$log_level = isset( $settings['advanced']['log_level'] ) ? $settings['advanced']['log_level'] : 'error';
+
 		return array(
 			'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
 			'nonce'             => wp_create_nonce( 'agwp_cht_nonce' ),
@@ -190,6 +193,8 @@ class AGWP_CHT_Assets {
 			'canManageComments' => AGWP_CHT_Client_Handoff_Toolkit::user_has_access(),
 			'settings'          => $settings,
 			'strings'           => $this->get_frontend_strings(),
+			'debug'             => $debug_enabled,
+			'logLevel'          => $log_level,
 		);
 	}
 
@@ -200,6 +205,10 @@ class AGWP_CHT_Assets {
 	 * @return array Localized data.
 	 */
 	private function get_admin_localized_data() {
+		$settings = get_option( 'agwp_cht_settings', array() );
+		$debug_enabled = isset( $settings['advanced']['enable_debug_mode'] ) ? $settings['advanced']['enable_debug_mode'] : false;
+		$log_level = isset( $settings['advanced']['log_level'] ) ? $settings['advanced']['log_level'] : 'error';
+
 		return array(
 			'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 			'nonce'         => wp_create_nonce( 'agwp_cht_nonce' ),
@@ -209,6 +218,8 @@ class AGWP_CHT_Assets {
 			'wpVersion'     => get_bloginfo( 'version' ),
 			'phpVersion'    => phpversion(),
 			'pluginUrl'     => AGWP_CHT_PLUGIN_URL,
+			'debug'         => $debug_enabled,
+			'logLevel'      => $log_level,
 		);
 	}
 

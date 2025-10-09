@@ -7,28 +7,29 @@ import { createRoot } from '@wordpress/element';
  * Internal dependencies
  */
 import VisualCommentsApp from './frontend/components/VisualCommentsApp';
+import logger from './shared/utils/logger';
 import './frontend/styles/frontend.scss';
 
 // Debug logging
-console.log('CHT: Frontend script loaded!');
-console.log('CHT: Document ready state:', document.readyState);
-console.log('CHT: agwpChtAjax available:', typeof agwpChtAjax !== 'undefined');
+logger.debug('Frontend script loaded!');
+logger.debug('Document ready state:', document.readyState);
+logger.debug('agwpChtAjax available:', typeof agwpChtAjax !== 'undefined');
 
 // Simple initialization function
 function initVisualComments() {
-    console.log('CHT: Initializing Visual Comments');
+    logger.info('Initializing Visual Comments');
     
     // Ensure agwpChtAjax is available
     if (typeof agwpChtAjax === 'undefined') {
-        console.error('CHT: agwpChtAjax object not found');
+        logger.error('agwpChtAjax object not found');
         return;
     }
     
-    console.log('CHT: agwpChtAjax found:', agwpChtAjax);
+    logger.debug('agwpChtAjax found:', agwpChtAjax);
     
     // Check if React is available
     if (typeof createRoot === 'undefined') {
-        console.error('CHT: createRoot not available');
+        logger.error('createRoot not available');
         // Fallback to simple version
         createSimpleInterface();
         return;
@@ -39,15 +40,15 @@ function initVisualComments() {
     appContainer.id = 'cht-visual-comments-app';
     document.body.appendChild(appContainer);
     
-    console.log('CHT: Container created, mounting React app');
+    logger.debug('Container created, mounting React app');
     
     try {
         // Create root and render the React app
         const root = createRoot(appContainer);
         root.render(<VisualCommentsApp />);
-        console.log('CHT: React app mounted successfully');
+        logger.info('React app mounted successfully');
     } catch (error) {
-        console.error('CHT: Error mounting React app:', error);
+        logger.error('Error mounting React app:', error);
         // Fallback to simple version
         appContainer.remove();
         createSimpleInterface();
@@ -56,7 +57,7 @@ function initVisualComments() {
 
 // Fallback simple interface (like our test version)
 function createSimpleInterface() {
-    console.log('CHT: Creating simple interface fallback');
+    logger.debug('Creating simple interface fallback');
     
     const appContainer = document.createElement('div');
     appContainer.id = 'cht-visual-comments-app';
@@ -91,20 +92,20 @@ function createSimpleInterface() {
 
 // Multiple initialization strategies
 if (document.readyState === 'loading') {
-    console.log('CHT: DOM loading, adding DOMContentLoaded listener');
+    logger.debug('DOM loading, adding DOMContentLoaded listener');
     document.addEventListener('DOMContentLoaded', initVisualComments);
 } else {
     // DOM is already loaded
-    console.log('CHT: DOM already loaded, initializing immediately');
+    logger.debug('DOM already loaded, initializing immediately');
     initVisualComments();
 }
 
 // Fallback - also try after window load
 window.addEventListener('load', function() {
     if (!document.getElementById('cht-visual-comments-app')) {
-        console.log('CHT: Fallback initialization');
+        logger.debug('Fallback initialization');
         initVisualComments();
     } else {
-        console.log('CHT: App already initialized');
+        logger.debug('App already initialized');
     }
 });

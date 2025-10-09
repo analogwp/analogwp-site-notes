@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { showToast } from '../ToastProvider';
+import logger from '../../../shared/utils/logger';
 
 // Settings Context
 const SettingsContext = createContext();
@@ -190,7 +191,7 @@ export const SettingsProvider = ({ children }) => {
                 showToast.error(__('Failed to load settings', 'analogwp-client-handoff'));
             }
         } catch (error) {
-            console.error('Error loading settings:', error);
+            logger.error('Error loading settings:', error);
             showToast.error(__('Error loading settings', 'analogwp-client-handoff'));
         } finally {
             setLoading(false);
@@ -243,7 +244,7 @@ export const SettingsProvider = ({ children }) => {
                 return false;
             }
         } catch (err) {
-            console.error('Error saving settings:', err);
+            logger.error('Error saving settings:', err);
             if (!silent) {
                 showToast.error(__('Error saving settings. Please try again.', 'analogwp-client-handoff'));
             }
@@ -345,7 +346,7 @@ export const SettingsProvider = ({ children }) => {
                 return false;
             }
         } catch (error) {
-            console.error('Error importing settings:', error);
+            logger.error('Error importing settings:', error);
             showToast.error(__('Error importing settings file', 'analogwp-client-handoff'));
             return false;
         }

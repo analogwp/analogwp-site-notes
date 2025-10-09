@@ -12,6 +12,7 @@ import AdminHeader from '../components/AdminHeader';
 import Settings from '../components/Settings';
 import { ToastProvider, showToast, showConfirmation } from '../components/ToastProvider';
 import SettingsProvider, { useSettings } from '../components/settings/SettingsProvider';
+import logger from '../../shared/utils/logger';
 
 const UnifiedAdminApp = ({ initialPage = 'dashboard' }) => {
     return (
@@ -62,7 +63,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                 setPages(data.data.pages || []);
             }
         } catch (error) {
-            console.error('Error loading pages:', error);
+            logger.error('Error loading pages', error);
         }
     };
 
@@ -86,10 +87,10 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                 setUsers(data.data.users || []);
                 setCategories(data.data.categories || []);
             } else {
-                console.error('Error loading admin data:', data.message);
+                logger.error('Error loading admin data', data.message);
             }
         } catch (error) {
-            console.error('Error loading admin data:', error);
+            logger.error('Error loading admin data', error);
         } finally {
             setLoading(false);
         }
@@ -147,10 +148,10 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
             if (data.success) {
                 setComments([data.data.comment, ...comments]);
             } else {
-                console.error('Error adding comment:', data.message);
+                logger.error('Error adding comment:', data.message);
             }
         } catch (error) {
-            console.error('Error adding comment:', error);
+            logger.error('Error adding comment:', error);
         }
     };
 
@@ -173,18 +174,18 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                 // Reload admin data to get the latest tasks
                 loadAdminData();
             } else {
-                console.error('Error adding task:', data.message);
+                logger.error('Error adding task:', data.message);
                 throw new Error(data.message);
             }
         } catch (error) {
-            console.error('Error adding task:', error);
+            logger.error('Error adding task:', error);
             throw error;
         }
     };
 
     const handleUpdateComment = async (commentId, updates) => {
-        console.log('Updating comment with ID:', commentId);
-        console.log('Updates to apply:', updates);
+        logger.debug('Updating comment with ID:', commentId);
+        logger.debug('Updates to apply:', updates);
         try {
             const response = await fetch(agwpChtAjax.ajaxUrl, {
                 method: 'POST',
@@ -200,7 +201,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
             });
 
             const data = await response.json();
-            console.log('Server response:', data);
+            logger.debug('Server response:', data);
             if (data.success) {
                 setComments(comments.map(comment => {
                     if (comment.id === commentId) {
@@ -223,12 +224,12 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                 showToast.success(__('Task updated successfully!', 'analogwp-client-handoff'));
             } else {
                 const errorMessage = data.data?.message || data.message || 'Unknown error';
-                console.error('Error updating comment:', errorMessage);
-                console.error('Full response:', data);
+                logger.error('Error updating comment:', errorMessage);
+                logger.error('Full response:', data);
                 showToast.error(__('Error updating task. Please try again.', 'analogwp-client-handoff'));
             }
         } catch (err) {
-            console.error('Error updating comment:', err);
+            logger.error('Error updating comment:', err);
             showToast.error(__('Error updating task. Please try again.', 'analogwp-client-handoff'));
         }
     };
@@ -263,11 +264,11 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                 setComments(comments.filter(comment => comment.id !== commentId));
                 showToast.success(__('Task deleted successfully!', 'analogwp-client-handoff'));
             } else {
-                console.error('Error deleting comment:', data.message);
+                logger.error('Error deleting comment:', data.message);
                 showToast.error(__('Error deleting task. Please try again.', 'analogwp-client-handoff'));
             }
         } catch (err) {
-            console.error('Error deleting comment:', err);
+            logger.error('Error deleting comment:', err);
             showToast.error(__('Error deleting task. Please try again.', 'analogwp-client-handoff'));
         }
     };
@@ -296,7 +297,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                 : `${__('Tasks', 'analogwp-client-handoff')} - Analog Client Handoff`;
         } catch (error) {
             // Fallback if URL manipulation fails
-            console.log('Navigation:', page);
+            logger.navigation('Navigation:', page);
         }
     };
 

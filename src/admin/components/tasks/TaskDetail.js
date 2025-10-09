@@ -11,6 +11,7 @@ import { Button } from '../ui';
 import { showConfirmation, showToast } from '../ToastProvider';
 import { TASK_STATUSES, getStatusByKey } from '../../constants/taskStatuses';
 import { useSettings } from '../settings/SettingsProvider';
+import logger from '../../../shared/utils/logger';
 
 const TaskDetail = ({ 
     comment, 
@@ -92,7 +93,7 @@ const TaskDetail = ({
             await onStatusChange(comment.id, newStatus);
             setStatus(newStatus);
         } catch (error) {
-            console.error('Failed to update status:', error);
+            logger.error('Failed to update status:', error);
         }
         setIsUpdating(false);
     };
@@ -105,7 +106,7 @@ const TaskDetail = ({
                 setPriority(newPriority);
             }
         } catch (error) {
-            console.error('Failed to update priority:', error);
+            logger.error('Failed to update priority:', error);
         }
         setIsUpdating(false);
     };
@@ -158,7 +159,7 @@ const TaskDetail = ({
             setNewTimeEntry({ hours: '', minutes: '', description: '' });
             showToast.success(__('Time entry added successfully', 'analogwp-client-handoff'));
         } catch (error) {
-            console.error('Error saving time entry:', error);
+            logger.error('Error saving time entry:', error);
             // Revert the local state if saving failed
             setTimeEntries(timeEntries);
             showToast.error(__('Failed to save time entry. Please try again.', 'analogwp-client-handoff'));
@@ -181,7 +182,7 @@ const TaskDetail = ({
             });
             showToast.success(__('Time entry removed', 'analogwp-client-handoff'));
         } catch (error) {
-            console.error('Error removing time entry:', error);
+            logger.error('Error removing time entry:', error);
             // Revert the local state if saving failed
             setTimeEntries(originalEntries);
             showToast.error(__('Failed to remove time entry. Please try again.', 'analogwp-client-handoff'));
@@ -194,7 +195,7 @@ const TaskDetail = ({
             setEditingTitle(false);
             showToast.success(__('Title updated successfully', 'analogwp-client-handoff'));
         } catch (error) {
-            console.error('Error updating title:', error);
+            logger.error('Error updating title:', error);
             showToast.error(__('Failed to update title', 'analogwp-client-handoff'));
         }
     };
@@ -205,7 +206,7 @@ const TaskDetail = ({
             setEditingText(false);
             showToast.success(__('Content updated successfully', 'analogwp-client-handoff'));
         } catch (error) {
-            console.error('Error updating content:', error);
+            logger.error('Error updating content:', error);
             showToast.error(__('Failed to update content', 'analogwp-client-handoff'));
         }
     };

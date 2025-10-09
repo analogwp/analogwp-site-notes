@@ -14,6 +14,7 @@ import { ChevronRightIcon, ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon } fro
  */
 import { TASK_STATUSES, getStatusByKey } from '../constants/taskStatuses';
 import { Button } from './ui';
+import logger from '../../shared/utils/logger';
 
 const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComments, isVisible, onClose }) => {
     const [selectedComment, setSelectedComment] = useState(null);
@@ -50,7 +51,7 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
             setReplyTexts(prev => ({ ...prev, [commentId]: '' }));
             setShowReplyForms(prev => ({ ...prev, [commentId]: false }));
         } catch (error) {
-            console.error('Error submitting reply:', error);
+            logger.error('Error submitting reply:', error);
         } finally {
             setIsSubmittingReply(prev => ({ ...prev, [commentId]: false }));
         }

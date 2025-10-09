@@ -12,6 +12,7 @@ import CommentToggle from './CommentToggle';
 import CommentOverlay from './CommentOverlay';
 import CommentPopup from './CommentPopup';
 import CommentSidebar from './CommentSidebar';
+import logger from '../../shared/utils/logger';
 
 const VisualCommentsApp = () => {
     const [isActive, setIsActive] = useState(false);
@@ -146,15 +147,13 @@ const VisualCommentsApp = () => {
             });
 
             const data = await response.json();
-            if (data.success) {
+                if (data.success) {
                 setComments(data.data);
             }
         } catch (error) {
-            console.error('Error loading comments:', error);
+            logger.error('Error loading comments:', error);
         }
-    };
-
-    // Save new comment
+    };    // Save new comment
     const saveComment = async (commentText, screenshotUrl = '', priority = 'medium', commentTitle = '') => {
         if (!selectedElement) return;
 
@@ -191,7 +190,7 @@ const VisualCommentsApp = () => {
                 showNotification(__('Error saving comment', 'analogwp-client-handoff'), 'error');
             }
         } catch (error) {
-            console.error('Error saving comment:', error);
+            logger.error('Error saving comment:', error);
             showNotification(__('Error saving comment', 'analogwp-client-handoff'), 'error');
         }
     };
@@ -220,7 +219,7 @@ const VisualCommentsApp = () => {
                 showNotification(__('Error adding reply', 'analogwp-client-handoff'), 'error');
             }
         } catch (error) {
-            console.error('Error adding reply:', error);
+            logger.error('Error adding reply:', error);
             showNotification(__('Error adding reply', 'analogwp-client-handoff'), 'error');
         }
     };
@@ -251,7 +250,7 @@ const VisualCommentsApp = () => {
                 showNotification(__('Error updating status', 'analogwp-client-handoff'), 'error');
             }
         } catch (error) {
-            console.error('Error updating status:', error);
+            logger.error('Error updating status:', error);
             showNotification(__('Error updating status', 'analogwp-client-handoff'), 'error');
         }
     };

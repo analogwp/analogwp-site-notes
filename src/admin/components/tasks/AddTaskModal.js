@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { showToast } from '../ToastProvider';
 import { useSettings } from '../settings/SettingsProvider';
+import logger from '../../../shared/utils/logger';
 
 const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, statuses = [], isSidebar = false }) => {
     const { categories, priorities } = useSettings();
@@ -202,8 +203,8 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
             taskData.timesheet = timesheetData;
         }
 
-        console.log('Task data being saved:', taskData);
-        console.log('Is editing task?', !!editTask);
+        logger.debug('Task data being saved:', taskData);
+        logger.debug('Is editing task?', !!editTask);
 
         try {
             await onSave(taskData);
@@ -236,7 +237,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                 );
             }
         } catch (err) {
-            console.error('Error saving task:', err);
+            logger.error('Error saving task:', err);
             showToast.error(__('Error saving task. Please try again.', 'analogwp-client-handoff'));
         }
     };

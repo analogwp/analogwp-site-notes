@@ -10,6 +10,7 @@ import Draggable from 'react-draggable';
  * Internal dependencies
  */
 import { Button } from './ui';
+import logger from '../../shared/utils/logger';
 
 const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
     const [title, setTitle] = useState('');
@@ -66,7 +67,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
         const originalScrollLeft = window.pageXOffset;
         
         try {
-            console.log('Starting centered screenshot capture at position:', position);
+            logger.debug('Starting centered screenshot capture at position:', position);
 
             // Get the full page dimensions
             const fullWidth = Math.max(document.body.scrollWidth, document.documentElement.scrollWidth);
@@ -87,7 +88,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
             const actualWidth = endX - startX;
             const actualHeight = endY - startY;
             
-            console.log('Capture area:', { 
+            logger.debug('Capture area:', { 
                 startX, startY, 
                 actualWidth, actualHeight,
                 centerX, centerY 
@@ -206,7 +207,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                         }
                     } catch (e) {
                         // If cloning cleanup fails, continue anyway
-                        console.warn('Style cleanup failed:', e);
+                        logger.warn('Style cleanup failed:', e);
                     }
                 },
                 ignoreElements: (element) => {
@@ -290,12 +291,12 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
             
             // Convert to data URL
             const dataURL = croppedCanvas.toDataURL('image/png', screenshotQuality);
-            console.log('Screenshot captured successfully, size:', dataURL.length);
+            logger.debug('Screenshot captured successfully, size:', dataURL.length);
             
             return dataURL;
 
         } catch (error) {
-            console.error('Screenshot capture failed:', error);
+            logger.error('Screenshot capture failed:', error);
             
             // Clean up temporary elements
             const overlay = document.querySelector('#cht-debug-overlay');
@@ -306,7 +307,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
             
             // Try alternative approach with simpler options
             try {
-                console.log('Attempting fallback screenshot capture...');
+                logger.debug('Attempting fallback screenshot capture...');
                 
                 // Recalculate dimensions for fallback since they might be out of scope
                 const fallbackFullWidth = Math.max(document.body.scrollWidth, document.documentElement.scrollWidth);
@@ -404,11 +405,11 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                 const screenshotQuality = settings.general?.screenshot_quality ?? 0.8;
 
                 const fallbackDataURL = croppedCanvas.toDataURL('image/png', screenshotQuality);
-                console.log('Fallback screenshot captured successfully');
+                logger.debug('Fallback screenshot captured successfully');
                 return fallbackDataURL;
                 
             } catch (fallbackError) {
-                console.error('Fallback screenshot capture also failed:', fallbackError);
+                logger.error('Fallback screenshot capture also failed:', fallbackError);
                 
                 // Clean up any remaining temporary elements
                 const overlay = document.querySelector('#cht-debug-overlay');
@@ -434,7 +435,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
             const settings = window.agwpChtAjax?.settings || {};
             const autoScreenshot = settings.general?.auto_screenshot ?? true;
             
-            console.log('Screenshot settings:', {
+            logger.debug('Screenshot settings:', {
                 settings: window.agwpChtAjax?.settings,
                 autoScreenshot,
                 generalSettings: settings.general
@@ -443,13 +444,13 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
             // Capture screenshot only if auto_screenshot is enabled
             const screenshotUrl = autoScreenshot ? await captureScreenshot() : '';
             
-            console.log('Screenshot captured:', screenshotUrl ? 'Yes' : 'No (disabled or failed)');
+            logger.debug('Screenshot captured:', screenshotUrl ? 'Yes' : 'No (disabled or failed)');
             
             // Save comment with title
             await onSave(comment.trim(), screenshotUrl, priority, title.trim());
             
         } catch (error) {
-            console.error('Error saving comment:', error);
+            logger.error('Error saving comment:', error);
         } finally {
             setIsLoading(false);
         }

@@ -28,6 +28,7 @@ import {
     FieldDescription 
 } from './FieldComponents';
 import { showToast } from '../ToastProvider';
+import logger from '../../../shared/utils/logger';
 
 const LabelsAndFiltersSettings = () => {
     const { categories, setCategories, priorities, setPriorities, saveSettings } = useSettings();
@@ -48,7 +49,7 @@ const LabelsAndFiltersSettings = () => {
         try {
             await saveSettings(true, newCategories, null);
         } catch (error) {
-            console.error('Error saving categories:', error);
+            logger.error('Error saving categories:', error);
             showToast.error(__('Failed to save categories', 'analogwp-client-handoff'));
         }
     };
@@ -59,7 +60,7 @@ const LabelsAndFiltersSettings = () => {
         try {
             await saveSettings(true, null, newPriorities);
         } catch (error) {
-            console.error('Error saving priorities:', error);
+            logger.error('Error saving priorities:', error);
             showToast.error(__('Failed to save priorities', 'analogwp-client-handoff'));
         }
     };
