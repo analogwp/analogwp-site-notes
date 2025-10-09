@@ -529,10 +529,16 @@ const TaskDetail = ({
                                         <div key={reply.id || index} className="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0">
                                             <div className="flex items-start space-x-3">
                                                 <div 
-                                                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white bg-gray-500"
-                                                    style={{ backgroundColor: '#6b7280' }}
+                                                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white bg-gray-500 flex-shrink-0 border-2 border-white shadow-sm"
+                                                    style={{ 
+                                                        backgroundImage: reply.avatar ? `url(${reply.avatar})` : 'none',
+                                                        backgroundColor: reply.avatar ? 'transparent' : '#6b7280',
+                                                        backgroundSize: 'cover',
+                                                        backgroundPosition: 'center',
+                                                        backgroundRepeat: 'no-repeat'
+                                                    }}
                                                 >
-                                                    {getUserInitials(reply.display_name || 'Unknown')}
+                                                    {!reply.avatar && getUserInitials(reply.display_name || 'Unknown')}
                                                 </div>
                                                 <div className="flex-1">
                                                     <div className="flex items-center justify-between mb-2">

@@ -183,7 +183,7 @@ class AGWP_CHT_Database {
 		foreach ( $comments as $comment ) {
 			$comment->replies = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT r.*, u.display_name as user_name, u.user_email
+					"SELECT r.*, u.display_name, u.user_email
                     FROM {$replies_table} r
                     LEFT JOIN {$wpdb->users} u ON r.user_id = u.ID
                     WHERE r.comment_id = %d
@@ -191,6 +191,19 @@ class AGWP_CHT_Database {
 					$comment->id
 				)
 			);
+
+			// Add avatar URLs to replies
+			if ( is_array( $comment->replies ) ) {
+				foreach ( $comment->replies as $reply ) {
+					if ( ! empty( $reply->user_id ) ) {
+						$reply->avatar = get_avatar_url( $reply->user_id, array( 'size' => 80 ) );
+					} elseif ( ! empty( $reply->user_email ) ) {
+						$reply->avatar = get_avatar_url( $reply->user_email, array( 'size' => 80 ) );
+					} else {
+						$reply->avatar = get_avatar_url( 0, array( 'size' => 80 ) );
+					}
+				}
+			}
 
 			// Decode categories from JSON
 			if ( ! empty( $comment->category ) ) {
