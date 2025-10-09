@@ -152,12 +152,15 @@ class AGWP_CHT_Database {
 		if ( empty( $page_url ) ) {
 			// Get all comments for admin dashboard.
 			$comments = $wpdb->get_results(
-				"SELECT c.*, u.display_name as user_name, u.user_email,
-				        a.display_name as assigned_name, a.user_email as assigned_email
-                FROM {$comments_table} c
-                LEFT JOIN {$wpdb->users} u ON c.user_id = u.ID
-                LEFT JOIN {$wpdb->users} a ON c.assigned_to = a.ID
-                ORDER BY c.created_at DESC"
+				$wpdb->prepare(
+					"SELECT c.*, u.display_name as user_name, u.user_email,
+					        a.display_name as assigned_name, a.user_email as assigned_email
+	                FROM %i c
+	                LEFT JOIN {$wpdb->users} u ON c.user_id = u.ID
+	                LEFT JOIN {$wpdb->users} a ON c.assigned_to = a.ID
+	                ORDER BY c.created_at DESC",
+					$comments_table
+				)
 			);
 		} else {
 			// Get comments for specific page.
@@ -165,11 +168,12 @@ class AGWP_CHT_Database {
 				$wpdb->prepare(
 					"SELECT c.*, u.display_name as user_name, u.user_email,
 					        a.display_name as assigned_name, a.user_email as assigned_email
-					FROM {$comments_table} c
+					FROM %i c
 					LEFT JOIN {$wpdb->users} u ON c.user_id = u.ID
 					LEFT JOIN {$wpdb->users} a ON c.assigned_to = a.ID
 					WHERE c.page_url = %s
 					ORDER BY c.created_at DESC",
+					$comments_table,
 					$page_url
 				)
 			);
@@ -184,10 +188,11 @@ class AGWP_CHT_Database {
 			$comment->replies = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT r.*, u.display_name, u.user_email
-                    FROM {$replies_table} r
+                    FROM %i r
                     LEFT JOIN {$wpdb->users} u ON r.user_id = u.ID
                     WHERE r.comment_id = %d
                     ORDER BY r.created_at ASC",
+					$replies_table,
 					$comment->id
 				)
 			);
@@ -437,18 +442,19 @@ class AGWP_CHT_Database {
 		$table_name = $wpdb->prefix . 'agwp_cht_comments';
 
 		// Get counts by status.
-		$open_count     = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name} WHERE status = %s", 'open' ) );
-		$resolved_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name} WHERE status = %s", 'resolved' ) );
-		$total_count    = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" );
+		$open_count     = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE status = %s', $table_name, 'open' ) );
+		$resolved_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE status = %s', $table_name, 'resolved' ) );
+		$total_count    = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table_name ) );
 
 		// Get recent comments.
 		$recent_comments = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT c.*, u.display_name as user_name
-                FROM {$table_name} c
+                FROM %i c
                 LEFT JOIN {$wpdb->users} u ON c.user_id = u.ID
                 ORDER BY c.created_at DESC
                 LIMIT %d",
+				$table_name,
 				10
 			)
 		);
