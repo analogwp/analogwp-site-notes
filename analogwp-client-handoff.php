@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Client Handoff Toolkit
- * Plugin URI: https://analogwp.com/analogwp-client-handoff
+ * Plugin URI: https://github.com/analogwp/analogwp-client-handoff
  * Description: A comprehensive solution for agency-client transitions with visual commenting system, maintenance scheduling, and client-friendly editing mode.
  * Version: 1.0.0
  * Author: AnalogWP
