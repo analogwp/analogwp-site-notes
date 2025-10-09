@@ -42,7 +42,7 @@ const AdminHeader = ({
                         <img 
                             src={logoUrl} 
                             alt="Analog Logo" 
-                            className="h-8 w-auto"
+                            className="h-6! w-auto"
                         />
                     )}
                 </div>
