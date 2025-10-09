@@ -133,6 +133,16 @@ class AGWP_CHT_Assets {
 			return false;
 		}
 
+		// Check if frontend comments are enabled in settings
+		if ( ! AGWP_CHT_Client_Handoff_Toolkit::frontend_comments_enabled() ) {
+			return false;
+		}
+
+		// Check if current user has access
+		if ( ! AGWP_CHT_Client_Handoff_Toolkit::user_has_access() ) {
+			return false;
+		}
+
 		// Add any additional conditions here.
 		return apply_filters( 'agwp_cht_load_frontend_assets', true );
 	}
@@ -177,7 +187,7 @@ class AGWP_CHT_Assets {
 			'postId'            => get_the_ID(),
 			'pageUrl'           => get_permalink(),
 			'currentUser'       => $this->get_current_user_data(),
-			'canManageComments' => current_user_can( 'manage_options' ),
+			'canManageComments' => AGWP_CHT_Client_Handoff_Toolkit::user_has_access(),
 			'settings'          => $settings,
 			'strings'           => $this->get_frontend_strings(),
 		);

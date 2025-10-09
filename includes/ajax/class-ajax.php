@@ -300,8 +300,8 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
-		// Check permissions.
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions - user must have access to client handoff.
+		if ( ! AGWP_CHT_Client_Handoff_Toolkit::user_has_access() ) {
 			$this->send_error( __( 'Unauthorized', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -332,8 +332,8 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
-		// Check permissions.
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions - user must have access to client handoff.
+		if ( ! AGWP_CHT_Client_Handoff_Toolkit::user_has_access() ) {
 			$this->send_error( __( 'Unauthorized', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -353,8 +353,8 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
-		// Check permissions.
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions - user must have access to client handoff.
+		if ( ! AGWP_CHT_Client_Handoff_Toolkit::user_has_access() ) {
 			$this->send_error( __( 'Unauthorized', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -472,8 +472,8 @@ class AGWP_CHT_Ajax {
 			'users'        => $formatted_users,
 			'categories'   => $formatted_categories,
 			'capabilities' => array(
-				'manage_comments' => current_user_can( 'manage_options' ),
-				'delete_comments' => current_user_can( 'manage_options' ),
+				'manage_comments' => AGWP_CHT_Client_Handoff_Toolkit::user_has_access(),
+				'delete_comments' => AGWP_CHT_Client_Handoff_Toolkit::user_has_access(),
 			),
 			'stats'        => $stats,
 		);
@@ -666,6 +666,11 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
+		// Check permissions - user must have access to client handoff.
+		if ( ! AGWP_CHT_Client_Handoff_Toolkit::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-client-handoff' ), 403 );
+		}
+
 		// Prepare task data.
 		$task_data = array(
 			'post_id'         => isset( $post_data['post_id'] ) ? intval( $post_data['post_id'] ) : 0,
@@ -760,8 +765,8 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Security check failed.', 'analogwp-client-handoff' ) );
 		}
 
-		// Check user capabilities.
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check user capabilities - users with access can view settings (not edit).
+		if ( ! AGWP_CHT_Client_Handoff_Toolkit::user_has_access() ) {
 			$this->send_error( __( 'Insufficient permissions.', 'analogwp-client-handoff' ) );
 		}
 
@@ -770,7 +775,6 @@ class AGWP_CHT_Ajax {
 			'general' => array(
 				'allowed_roles'             => array( 'administrator', 'editor' ),
 				'enable_frontend_comments'  => true,
-				'require_approval'          => false,
 				'auto_screenshot'           => true,
 				'screenshot_quality'        => 0.8,
 				'comments_per_page'         => 20,
@@ -852,7 +856,6 @@ class AGWP_CHT_Ajax {
 		if ( isset( $settings['general'] ) ) {
 			$settings['general']['allowed_roles']              = isset( $settings['general']['allowed_roles'] ) ? array_map( 'sanitize_text_field', (array) $settings['general']['allowed_roles'] ) : array();
 			$settings['general']['enable_frontend_comments']   = isset( $settings['general']['enable_frontend_comments'] ) ? (bool) $settings['general']['enable_frontend_comments'] : true;
-			$settings['general']['require_approval']           = isset( $settings['general']['require_approval'] ) ? (bool) $settings['general']['require_approval'] : false;
 			$settings['general']['auto_screenshot']            = isset( $settings['general']['auto_screenshot'] ) ? (bool) $settings['general']['auto_screenshot'] : false;
 			$settings['general']['screenshot_quality']         = isset( $settings['general']['screenshot_quality'] ) ? floatval( $settings['general']['screenshot_quality'] ) : 0.8;
 			$settings['general']['comments_per_page']          = isset( $settings['general']['comments_per_page'] ) ? intval( $settings['general']['comments_per_page'] ) : 20;

@@ -45,10 +45,15 @@ class AGWP_CHT_Admin {
 	 * @since 1.0.0
 	 */
 	public function add_admin_menu() {
+		// Check if user has access based on allowed roles
+		if ( ! AGWP_CHT_Client_Handoff_Toolkit::user_has_access() ) {
+			return;
+		}
+
 		add_menu_page(
 			__( 'Client Handoff', 'analogwp-client-handoff' ),
 			__( 'Client Handoff', 'analogwp-client-handoff' ),
-			'manage_options',
+			'read', // Use 'read' capability which all logged-in users have
 			'agwp-cht-dashboard',
 			array( $this, 'render_admin_page' ),
 			'dashicons-feedback',
@@ -59,7 +64,7 @@ class AGWP_CHT_Admin {
 			'agwp-cht-dashboard',
 			__( 'Tasks', 'analogwp-client-handoff' ),
 			__( 'Tasks', 'analogwp-client-handoff' ),
-			'manage_options',
+			'read',
 			'agwp-cht-dashboard',
 			array( $this, 'render_admin_page' )
 		);
@@ -68,7 +73,7 @@ class AGWP_CHT_Admin {
 			'agwp-cht-dashboard',
 			__( 'Settings', 'analogwp-client-handoff' ),
 			__( 'Settings', 'analogwp-client-handoff' ),
-			'manage_options',
+			'manage_options', // Only admins can access settings
 			'agwp-cht-settings',
 			array( $this, 'render_admin_page' )
 		);
@@ -82,7 +87,17 @@ class AGWP_CHT_Admin {
 	 */
 	public function add_admin_bar_toggle( $wp_admin_bar ) {
 		// Only show on frontend, not in admin.
-		if ( is_admin() || ! current_user_can( 'manage_options' ) ) {
+		if ( is_admin() ) {
+			return;
+		}
+
+		// Check if frontend comments are enabled
+		if ( ! AGWP_CHT_Client_Handoff_Toolkit::frontend_comments_enabled() ) {
+			return;
+		}
+
+		// Check if user has access
+		if ( ! AGWP_CHT_Client_Handoff_Toolkit::user_has_access() ) {
 			return;
 		}
 
@@ -138,16 +153,24 @@ class AGWP_CHT_Admin {
 	 * @since 1.0.0
 	 */
 	public function render_admin_page() {
-		// Security check.
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'analogwp-client-handoff' ) );
-		}
-
 		$current_screen = get_current_screen();
 		$page_slug      = '';
 
 		if ( $current_screen && isset( $current_screen->id ) ) {
 			$page_slug = $current_screen->id;
+		}
+
+		// Check permissions based on page type.
+		if ( 'client-handoff_page_agwp-cht-settings' === $page_slug ) {
+			// Settings page requires admin access.
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'analogwp-client-handoff' ) );
+			}
+		} else {
+			// Dashboard/Tasks page requires user to have access based on allowed roles.
+			if ( ! AGWP_CHT_Client_Handoff_Toolkit::user_has_access() ) {
+				wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'analogwp-client-handoff' ) );
+			}
 		}
 
 		// Determine which admin page to render.
@@ -202,9 +225,9 @@ class AGWP_CHT_Admin {
 	 */
 	public function get_admin_capabilities() {
 		return array(
-			'manage_comments' => current_user_can( 'manage_options' ),
-			'delete_comments' => current_user_can( 'manage_options' ),
-			'view_stats'      => current_user_can( 'manage_options' ),
+			'manage_comments' => AGWP_CHT_Client_Handoff_Toolkit::user_has_access(),
+			'delete_comments' => AGWP_CHT_Client_Handoff_Toolkit::user_has_access(),
+			'view_stats'      => AGWP_CHT_Client_Handoff_Toolkit::user_has_access(),
 		);
 	}
 
@@ -215,7 +238,7 @@ class AGWP_CHT_Admin {
 	 * @return bool True if user can manage plugin.
 	 */
 	public function can_manage_plugin() {
-		return current_user_can( 'manage_options' );
+		return AGWP_CHT_Client_Handoff_Toolkit::user_has_access();
 	}
 
 	/**

@@ -258,6 +258,55 @@ final class AGWP_CHT_Client_Handoff_Toolkit {
 	}
 
 	/**
+	 * Check if current user has access to client handoff functionality.
+	 *
+	 * @since 1.0.0
+	 * @return bool True if user has access.
+	 */
+	public static function user_has_access() {
+		// Administrators always have access
+		if ( current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+
+		// Get allowed roles from settings
+		$settings      = get_option( 'agwp_cht_settings', array() );
+		$allowed_roles = isset( $settings['general']['allowed_roles'] ) ? $settings['general']['allowed_roles'] : array( 'administrator', 'editor' );
+
+		// Ensure administrator is always in the list
+		if ( ! in_array( 'administrator', $allowed_roles, true ) ) {
+			$allowed_roles[] = 'administrator';
+		}
+
+		// Get current user
+		$user = wp_get_current_user();
+
+		if ( ! $user || ! $user->exists() ) {
+			return false;
+		}
+
+		// Check if user has any of the allowed roles
+		foreach ( $allowed_roles as $role ) {
+			if ( in_array( $role, $user->roles, true ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if frontend comments are enabled.
+	 *
+	 * @since 1.0.0
+	 * @return bool True if frontend comments are enabled.
+	 */
+	public static function frontend_comments_enabled() {
+		$settings = get_option( 'agwp_cht_settings', array() );
+		return isset( $settings['general']['enable_frontend_comments'] ) ? (bool) $settings['general']['enable_frontend_comments'] : true;
+	}
+
+	/**
 	 * Prevent cloning.
 	 *
 	 * @since 1.0.0

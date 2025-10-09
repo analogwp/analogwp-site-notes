@@ -29,7 +29,6 @@ const defaultSettings = {
         screenshot_quality: 0.8,
         comments_per_page: 20,
         enable_frontend_comments: true,
-        require_approval: false,
         auto_save_drafts: true
     },
     advanced: {
@@ -46,7 +45,6 @@ const settingsSchema = {
         screenshot_quality: { type: 'number', min: 0.1, max: 1, required: true },
         comments_per_page: { type: 'number', min: 5, max: 100, required: true },
         enable_frontend_comments: { type: 'boolean', required: true },
-        require_approval: { type: 'boolean', required: true },
         auto_save_drafts: { type: 'boolean', required: true }
     },
     advanced: {
@@ -289,7 +287,6 @@ export const SettingsProvider = ({ children }) => {
             general: {
                 allowed_roles: settings.general?.allowed_roles || defaultSettings.general.allowed_roles,
                 enable_frontend_comments: settings.general?.enable_frontend_comments ?? defaultSettings.general.enable_frontend_comments,
-                require_approval: settings.general?.require_approval ?? defaultSettings.general.require_approval,
                 auto_screenshot: settings.general?.auto_screenshot ?? defaultSettings.general.auto_screenshot,
                 screenshot_quality: settings.general?.screenshot_quality ?? defaultSettings.general.screenshot_quality,
                 comments_per_page: settings.general?.comments_per_page ?? defaultSettings.general.comments_per_page,

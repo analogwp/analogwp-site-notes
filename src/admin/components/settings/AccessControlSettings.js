@@ -93,14 +93,6 @@ const AccessControlSettings = () => {
                         checked={settings.general?.enable_frontend_comments ?? true}
                         onChange={(value) => updateSetting('general.enable_frontend_comments', value)}
                     />
-
-                    <ToggleField
-                        id="require_approval"
-                        label={__('Require Comment Approval', 'analogwp-client-handoff')}
-                        description={__('New comments will need to be approved before being visible to others.', 'analogwp-client-handoff')}
-                        checked={settings.general?.require_approval ?? false}
-                        onChange={(value) => updateSetting('general.require_approval', value)}
-                    />
                 </SettingsCard>
             </SettingsSection>
         </div>
