@@ -1,17 +1,26 @@
 #!/bin/bash
 
 # Client Handoff Toolkit - Build and Package Script
-# Version 1.1.0 - Internal Testing Release
+# For internal testing releases
 
 set -e  # Exit on any error
 
-echo "🚀 Building Client Handoff Toolkit v1.1.0 for Internal Testing"
+# Get plugin directory and version
+PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLUGIN_SLUG="analogwp-client-handoff"
+
+# Extract version from main plugin file
+VERSION=$(grep "Version:" "$PLUGIN_DIR/analogwp-client-handoff.php" | awk '{print $3}')
+if [ -z "$VERSION" ]; then
+    echo "❌ Error: Could not extract version from plugin file"
+    exit 1
+fi
+
+echo "🚀 Building Client Handoff Toolkit v${VERSION} for Internal Testing"
 echo "================================================================"
 
-# Get plugin directory
-PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="$PLUGIN_DIR/build-package"
-PACKAGE_NAME="analogwp-client-handoff-v1.1.0-testing"
+PACKAGE_NAME="$PLUGIN_SLUG-v${VERSION}-testing"
 
 # Colors for output
 RED='\033[0;31m'
@@ -118,11 +127,11 @@ cat > "$PACKAGE_PATH/PACKAGE_INFO.txt" << EOF
 Client Handoff Toolkit - Internal Testing Package
 ================================================
 
-Version: 1.1.0
+Version: ${VERSION}
 Build Date: $(date)
 Package Type: Internal Testing Release
 
-🆕 NEW FEATURES IN v1.1.0:
+🆕 FEATURES IN v${VERSION}:
 - Task editing functionality
 - Persistent timesheet system  
 - Modern toast notifications

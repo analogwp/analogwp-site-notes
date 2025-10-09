@@ -10,7 +10,10 @@
     "format": "wp-scripts format",
     "lint:css": "wp-scripts lint-style",
     "lint:js": "wp-scripts lint-js",
-    "packages-update": "wp-scripts packages-update"
+    "packages-update": "wp-scripts packages-update",
+    "package": "npm run build && bash build-package.sh",
+    "package:wporg": "npm run build && bash build-wporg.sh",
+    "clean": "rm -rf build build-package *.zip *.tar.gz"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.14",
@@ -34,13 +37,13 @@
     "react-draggable": "^4.5.0",
     "react-hot-toast": "^2.6.0"
   },
-  "author": "Your Name",
+  "author": "AnalogWP",
   "license": "GPL-2.0-or-later",
   "keywords": [
     "wordpress",
     "plugin",
     "visual-comments",
     "client-handoff",
-    "elementor"
+    "agency"
   ]
 }

@@ -1,0 +1,93 @@
+# A set of files you probably don't want in your WordPress.org distribution
+# For WordPress.org SVN deployment
+
+# Directories
+/.git
+/.github
+/.vscode
+/.idea
+/node_modules
+/vendor
+/tests
+/bin
+/build-package
+/src
+
+# Build & Development Files
+.babelrc
+.eslintignore
+.eslintrc
+.eslintrc.js
+.eslintrc.json
+.editorconfig
+.gitattributes
+.gitignore
+.distignore
+.nvmrc
+.travis.yml
+.phpcs.xml
+.phpcs.xml.dist
+phpcs.xml
+phpcs.xml.dist
+phpunit.xml
+phpunit.xml.dist
+composer.json
+composer.lock
+package.json
+package-lock.json
+yarn.lock
+webpack.config.js
+postcss.config.js
+tailwind.config.js
+tsconfig.json
+
+# Documentation (not needed in production)
+README.md
+CONTRIBUTING.md
+CHANGELOG.md
+TESTING_GUIDE.md
+DEPLOYMENT_CHECKLIST.md
+MIGRATION_COMPLETE.md
+DEBUG_LOGGING_REFERENCE.md
+WORDPRESS_ORG_CHECKLIST.md
+CODE_OF_CONDUCT.md
+CREDITS.md
+LICENSE.md
+
+# Build scripts
+build-package.sh
+migrate-to-logger.sh
+*.sh
+
+# Development files
+*.log
+*.tmp
+*.temp
+.DS_Store
+.env
+.env.*
+debug.log
+error_log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Package files
+*.zip
+*.tar.gz
+*-testing/
+*-release/
+
+# IDE specific
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.idea
+.vscode
+
+# Testing
+.phpunit.result.cache
+coverage/
+.nyc_output/

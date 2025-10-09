@@ -5,6 +5,7 @@ vendor/
 # Build files
 assets/dist/
 build/
+dist/
 
 # Distribution packages
 build-package/
