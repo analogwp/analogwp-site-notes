@@ -107,8 +107,7 @@ class AGWP_CHT_Ajax {
 	 * @since 1.0.0
 	 */
 	public function save_comment() {
-		// Verify nonce.
-		if ( ! $this->verify_nonce() ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -128,16 +127,16 @@ class AGWP_CHT_Ajax {
 
 		// Prepare comment data.
 		$comment_data = array(
-			'post_id'          => isset( $post_data['post_id'] ) ? intval( $post_data['post_id'] ) : 0,
-			'comment_title'    => isset( $post_data['comment_title'] ) ? $post_data['comment_title'] : '',
-			'comment_text'     => isset( $post_data['comment_text'] ) ? $post_data['comment_text'] : '',
-			'element_selector' => isset( $post_data['element_selector'] ) ? $post_data['element_selector'] : '',
+			'post_id'          => isset( $post_data['post_id'] ) ? absint( $post_data['post_id'] ) : 0,
+			'comment_title'    => isset( $post_data['comment_title'] ) ? sanitize_text_field( $post_data['comment_title'] ) : '',
+			'comment_text'     => isset( $post_data['comment_text'] ) ? sanitize_textarea_field( $post_data['comment_text'] ) : '',
+			'element_selector' => isset( $post_data['element_selector'] ) ? sanitize_text_field( $post_data['element_selector'] ) : '',
 			'screenshot_url'   => $screenshot_url,
-			'x_position'       => isset( $post_data['x_position'] ) ? intval( $post_data['x_position'] ) : 0,
-			'y_position'       => isset( $post_data['y_position'] ) ? intval( $post_data['y_position'] ) : 0,
-			'page_url'         => isset( $post_data['page_url'] ) ? $post_data['page_url'] : '',
-			'status'           => isset( $post_data['status'] ) ? $post_data['status'] : 'open',
-			'priority'         => isset( $post_data['priority'] ) ? $post_data['priority'] : 'medium',
+			'x_position'       => isset( $post_data['x_position'] ) ? absint( $post_data['x_position'] ) : 0,
+			'y_position'       => isset( $post_data['y_position'] ) ? absint( $post_data['y_position'] ) : 0,
+			'page_url'         => isset( $post_data['page_url'] ) ? sanitize_text_field( $post_data['page_url'] ) : '',
+			'status'           => isset( $post_data['status'] ) ? sanitize_text_field( $post_data['status'] ) : 'open',
+			'priority'         => isset( $post_data['priority'] ) ? sanitize_text_field( $post_data['priority'] ) : 'medium',
 		);
 
 		// Save comment.
@@ -161,8 +160,7 @@ class AGWP_CHT_Ajax {
 	 * @since 1.0.0
 	 */
 	public function get_comments() {
-		// Verify nonce.
-		if ( ! $this->verify_nonce() ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -189,42 +187,40 @@ class AGWP_CHT_Ajax {
 	 * @since 1.0.0
 	 */
 	public function update_comment() {
-		// Verify nonce.
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
-		if ( ! wp_verify_nonce( $nonce, 'agwp_cht_nonce' ) ) {
-			wp_send_json_error( array( 'message' => 'Invalid nonce' ) );
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid nonce', 'analogwp-client-handoff' ) ) );
 			return;
 		}
 
 		// Check user capability.
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( array( 'message' => 'Insufficient permissions' ) );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'analogwp-client-handoff' ) ) );
 			return;
 		}
 
 		$post_data  = wp_unslash( $_POST );
-		$comment_id = isset( $post_data['comment_id'] ) ? intval( $post_data['comment_id'] ) : 0;
+		$comment_id = isset( $post_data['comment_id'] ) ? absint( $post_data['comment_id'] ) : 0;
 
 		$updates = array();
 
-		// Get data from the 'updates' field (JSON format - main app)
+		// Get data from the 'updates' field (JSON format - main app).
 		if ( isset( $post_data['updates'] ) && ! empty( $post_data['updates'] ) ) {
-			$updates = json_decode( $post_data['updates'], true );
+			$updates = json_decode( sanitize_textarea_field( $post_data['updates'] ), true );
 		}
 
 		if ( empty( $comment_id ) || empty( $updates ) || ! is_array( $updates ) ) {
-			wp_send_json_error( array( 'message' => 'Comment ID and updates are required' ) );
+			wp_send_json_error( array( 'message' => __( 'Comment ID and updates are required', 'analogwp-client-handoff' ) ) );
 			return;
 		}
 
 		$result = $this->database->update_comment( $comment_id, $updates );
 
 		if ( ! $result ) {
-			wp_send_json_error( array( 'message' => 'Failed to update comment' ) );
+			wp_send_json_error( array( 'message' => __( 'Failed to update comment', 'analogwp-client-handoff' ) ) );
 			return;
 		}
 
-		wp_send_json_success( array( 'message' => 'Comment updated successfully' ) );
+		wp_send_json_success( array( 'message' => __( 'Comment updated successfully', 'analogwp-client-handoff' ) ) );
 	}
 
 	/**
@@ -233,14 +229,13 @@ class AGWP_CHT_Ajax {
 	 * @since 1.0.0
 	 */
 	public function update_comment_status() {
-		// Verify nonce.
-		if ( ! $this->verify_nonce() ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
 		$post_data  = wp_unslash( $_POST );
-		$comment_id = isset( $post_data['comment_id'] ) ? intval( $post_data['comment_id'] ) : 0;
+		$comment_id = isset( $post_data['comment_id'] ) ? absint( $post_data['comment_id'] ) : 0;
 		$status     = isset( $post_data['status'] ) ? sanitize_text_field( $post_data['status'] ) : '';
 
 		if ( empty( $comment_id ) || empty( $status ) ) {
@@ -262,17 +257,16 @@ class AGWP_CHT_Ajax {
 	 * @since 1.0.0
 	 */
 	public function add_reply() {
-		// Verify nonce.
-		if ( ! $this->verify_nonce() ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
-		$post_data = wp_unslash( $_POST );
+		$post_data = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
 
+		// Sanitized before use.
 		$reply_data = array(
-			'comment_id' => isset( $post_data['comment_id'] ) ? intval( $post_data['comment_id'] ) : 0,
-			'reply_text' => isset( $post_data['reply_text'] ) ? $post_data['reply_text'] : '',
+			'comment_id' => isset( $post_data['comment_id'] ) ? absint( $post_data['comment_id'] ) : 0,
+			'reply_text' => isset( $post_data['reply_text'] ) ? sanitize_textarea_field( $post_data['reply_text'] ) : '',
 		);
 
 		if ( empty( $reply_data['comment_id'] ) || empty( $reply_data['reply_text'] ) ) {
@@ -299,8 +293,7 @@ class AGWP_CHT_Ajax {
 	 * @since 1.0.0
 	 */
 	public function delete_comment() {
-		// Verify nonce.
-		if ( ! $this->verify_nonce() ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -311,7 +304,9 @@ class AGWP_CHT_Ajax {
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
 		$post_data  = wp_unslash( $_POST );
-		$comment_id = isset( $post_data['comment_id'] ) ? intval( $post_data['comment_id'] ) : 0;
+
+		// Sanitized before use.
+		$comment_id = isset( $post_data['comment_id'] ) ? absint( $post_data['comment_id'] ) : 0;
 
 		if ( empty( $comment_id ) ) {
 			$this->send_error( __( 'Comment ID is required', 'analogwp-client-handoff' ) );
@@ -332,8 +327,7 @@ class AGWP_CHT_Ajax {
 	 * @since 1.0.0
 	 */
 	public function get_dashboard_stats() {
-		// Verify nonce.
-		if ( ! $this->verify_nonce() ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -353,8 +347,7 @@ class AGWP_CHT_Ajax {
 	 */
 	public function get_admin_data() {
 		// Verify nonce via POST data.
-		$post_data = wp_unslash( $_POST );
-		if ( ! wp_verify_nonce( $post_data['nonce'], 'agwp_cht_nonce' ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -363,12 +356,12 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Unauthorized', 'analogwp-client-handoff' ), 403 );
 		}
 
-		// Ensure database tables exist
+		// Ensure database tables exist.
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'agwp_cht_comments';
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table existence check, safe usage.
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) ) !== $table_name ) {
-			// Tables don't exist, create them
+			// Tables don't exist, create them.
 			$this->database->create_tables();
 		}
 
@@ -378,9 +371,9 @@ class AGWP_CHT_Ajax {
 			$comments = array();
 		}
 
-		// Enhance comments with complete user data including avatars
+		// Enhance comments with complete user data including avatars.
 		foreach ( $comments as &$comment ) {
-			// Creator information
+			// Creator information.
 			if ( ! empty( $comment->user_id ) ) {
 				$user_data = get_userdata( $comment->user_id );
 				if ( $user_data ) {
@@ -407,7 +400,7 @@ class AGWP_CHT_Ajax {
 				);
 			}
 
-			// Assigned user information
+			// Assigned user information.
 			if ( ! empty( $comment->assigned_to ) ) {
 				$assigned_data = get_userdata( $comment->assigned_to );
 				if ( $assigned_data ) {
@@ -429,18 +422,18 @@ class AGWP_CHT_Ajax {
 				$comment->assignee = null;
 			}
 
-			// Keep backward compatibility with user field (using creator)
+			// Keep backward compatibility with user field (using creator).
 			$comment->user = $comment->creator;
 		}
 
-		// Get all users who can manage comments or who have created comments
+		// Get all users who can manage comments or who have created comments.
 		$users = get_users(
 			array(
 				'fields' => array( 'ID', 'display_name', 'user_email' ),
 			)
 		);
 
-		// Format users for frontend
+		// Format users for frontend.
 		$formatted_users = array();
 		foreach ( $users as $user ) {
 			$formatted_users[] = array(
@@ -451,7 +444,7 @@ class AGWP_CHT_Ajax {
 			);
 		}
 
-		// Get categories (we can use post categories or create custom ones later)
+		// Get categories (we can use post categories or create custom ones later).
 		$categories = get_categories( array( 'hide_empty' => false ) );
 		$formatted_categories = array();
 		foreach ( $categories as $category ) {
@@ -494,8 +487,7 @@ class AGWP_CHT_Ajax {
 	 */
 	public function get_pages() {
 		// Verify nonce via POST data.
-		$post_data = wp_unslash( $_POST );
-		if ( ! wp_verify_nonce( $post_data['nonce'], 'agwp_cht_nonce' ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -652,8 +644,7 @@ class AGWP_CHT_Ajax {
 	 */
 	public function add_new_task() {
 		// Verify nonce via POST data.
-		$post_data = wp_unslash( $_POST );
-		if ( ! wp_verify_nonce( $post_data['nonce'], 'agwp_cht_nonce' ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
@@ -662,19 +653,22 @@ class AGWP_CHT_Ajax {
 			$this->send_error( __( 'Unauthorized', 'analogwp-client-handoff' ), 403 );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
+		$post_data  = wp_unslash( $_POST );
+
 		// Prepare task data.
 		$task_data = array(
 			'post_id'         => isset( $post_data['post_id'] ) ? intval( $post_data['post_id'] ) : 0,
-			'comment_title'   => isset( $post_data['comment_title'] ) ? $post_data['comment_title'] : '',
-			'comment_text'    => isset( $post_data['comment_text'] ) ? $post_data['comment_text'] : '',
-			'page_url'        => isset( $post_data['page_url'] ) ? $post_data['page_url'] : get_permalink( intval( $post_data['post_id'] ) ),
-			'status'          => isset( $post_data['status'] ) ? $post_data['status'] : 'open',
-			'priority'        => isset( $post_data['priority'] ) ? $post_data['priority'] : 'medium',
-			'assigned_to'     => isset( $post_data['assigned_to'] ) ? intval( $post_data['assigned_to'] ) : 0,
-			'categories'      => isset( $post_data['categories'] ) ? $post_data['categories'] : array(),
-			'due_date'        => isset( $post_data['due_date'] ) ? $post_data['due_date'] : '',
-			'time_estimation' => isset( $post_data['time_estimation'] ) ? $post_data['time_estimation'] : '',
-			'timesheet'       => isset( $post_data['timesheet'] ) ? $post_data['timesheet'] : '',
+			'comment_title'   => isset( $post_data['comment_title'] ) ? sanitize_text_field( $post_data['comment_title'] ) : '',
+			'comment_text'    => isset( $post_data['comment_text'] ) ? sanitize_textarea_field( $post_data['comment_text'] ) : '',
+			'page_url'        => isset( $post_data['page_url'] ) ? sanitize_url( $post_data['page_url'] ) : get_permalink( absint( $post_data['post_id'] ) ),
+			'status'          => isset( $post_data['status'] ) ? sanitize_text_field( $post_data['status'] ) : 'open',
+			'priority'        => isset( $post_data['priority'] ) ? sanitize_text_field( $post_data['priority'] ) : 'medium',
+			'assigned_to'     => isset( $post_data['assigned_to'] ) ? absint( $post_data['assigned_to'] ) : 0,
+			'categories'      => isset( $post_data['categories'] ) ? sanitize_text_field( $post_data['categories'] ) : array(),
+			'due_date'        => isset( $post_data['due_date'] ) ? sanitize_text_field( $post_data['due_date'] ) : '',
+			'time_estimation' => isset( $post_data['time_estimation'] ) ? sanitize_text_field( $post_data['time_estimation'] ) : '',
+			'timesheet'       => isset( $post_data['timesheet'] ) ? sanitize_textarea_field( $post_data['timesheet'] ) : '',
 		);
 
 		$task_id = $this->database->save_comment( $task_data );
@@ -755,8 +749,8 @@ class AGWP_CHT_Ajax {
 	 */
 	public function get_settings() {
 		// Verify nonce.
-		if ( ! $this->verify_nonce() ) {
-			$this->send_error( __( 'Security check failed.', 'analogwp-client-handoff' ) );
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
+			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
 		// Check user capabilities - users with access can view settings (not edit).
@@ -825,9 +819,8 @@ class AGWP_CHT_Ajax {
 	 * @since 1.0.0
 	 */
 	public function save_settings() {
-		// Verify nonce.
-		if ( ! $this->verify_nonce() ) {
-			$this->send_error( __( 'Security check failed.', 'analogwp-client-handoff' ) );
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_cht_nonce' ) ) {
+			$this->send_error( __( 'Security check failed', 'analogwp-client-handoff' ), 403 );
 		}
 
 		// Check user capabilities.

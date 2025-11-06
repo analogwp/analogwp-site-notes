@@ -249,7 +249,7 @@ class AGWP_CHT_Database {
 
 		$insert_data = array(
 			'post_id'          => isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0,
-			'user_id'          => get_current_user_id(), // Always set to current user (creator)
+			'user_id'          => get_current_user_id(), // Always set to current user (creator).
 			'assigned_to'      => isset( $data['assigned_to'] ) ? intval( $data['assigned_to'] ) : 0,
 			'comment_title'    => isset( $data['comment_title'] ) ? sanitize_text_field( wp_unslash( $data['comment_title'] ) ) : '',
 			'comment_text'     => sanitize_textarea_field( wp_unslash( $data['comment_text'] ) ),
