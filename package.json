@@ -1,6 +1,6 @@
 {
   "name": "client-handoff-toolkit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A comprehensive solution for agency-client transitions with visual commenting system",
   "main": "index.js",
   "scripts": {

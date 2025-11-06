@@ -3,7 +3,7 @@
  * Plugin Name: Client Handoff Toolkit
  * Plugin URI: https://github.com/analogwp/analogwp-client-handoff
  * Description: A comprehensive solution for agency-client transitions with visual commenting system, maintenance scheduling, and client-friendly editing mode.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: AnalogWP
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define plugin constants
 if ( ! defined( 'AGWP_CHT_VERSION' ) ) {
-	define( 'AGWP_CHT_VERSION', '1.0.0' );
+	define( 'AGWP_CHT_VERSION', '1.0.1' );
 }
 
 if ( ! defined( 'AGWP_CHT_PLUGIN_URL' ) ) {
