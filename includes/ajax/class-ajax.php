@@ -115,7 +115,7 @@ class AGWP_CHT_Ajax {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
 		$post_data = wp_unslash( $_POST );
 
-		// Handle screenshot URL if provided.
+		// Sanitize and handle screenshot URL if provided.
 		$screenshot_url = '';
 		if ( ! empty( $post_data['screenshot_url'] ) ) {
 			if ( 0 === strpos( $post_data['screenshot_url'], 'data:image' ) ) {
