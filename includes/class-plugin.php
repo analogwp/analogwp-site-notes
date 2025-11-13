@@ -8,9 +8,10 @@
 
 namespace AnalogWP\SiteNotes;
 
-use AnalogWP\SiteNotes\Admin\Admin;
-use AnalogWP\SiteNotes\Ajax\Ajax;
-use AnalogWP\SiteNotes\Assets;
+use AnalogWP\SiteNotes\Core\Admin;
+use AnalogWP\SiteNotes\API\Ajax;
+use AnalogWP\SiteNotes\Core\Assets;
+use AnalogWP\SiteNotes\Core\Data\Database;
 
 /**
  * Main plugin class
@@ -60,31 +61,25 @@ final class Plugin {
 	public $assets = null;
 
 	/**
-	 * Get plugin instance.
-	 *
-	 * @since 1.0.0
-	 * @return Plugin|null
-	 */
-	public static function get_instance() {
-		return self::$instance;
-	}
-
-	/**
 	 * Loads the plugin main instance and initializes it.
 	 *
 	 * @return bool True if the plugin main instance could be loaded, false otherwise.
 	 */
-	public static function load() {
-		if ( null !== self::$instance ) {
-			return false;
+	public static function load_instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+
+			/**
+			 * Sites Notes loaded action.
+			 *
+			 * Fires when Sites Notes is fully loaded and instantiated.
+			 *
+			 * @since 1.0.2
+			 */
+			do_action( 'analog_site_notes_loaded' );
 		}
 
-		self::$instance = new self();
-		self::$instance->init();
-
-		do_action( 'analog_site_notes_loaded' );
-
-		return true;
+		return self::$instance;
 	}
 
 	/**
@@ -93,7 +88,36 @@ final class Plugin {
 	 * @since 1.0.0
 	 */
 	private function __construct() {
-		$this->includes();
+		// Load all else.
+		add_action( 'init', array( $this, 'setup' ), -999 );
+
+		// Multisite handling.
+		if ( is_multisite() ) {
+			// Handle new blog creation on multisite.
+			add_action( 'wpmu_new_blog', array( $this, 'create_tables_on_new_blog' ), 10, 1 );
+
+			// Handle blog deletion on multisite.
+			add_filter( 'wpmu_drop_tables', array( $this, 'drop_tables_on_blog_delete' ) );
+		}
+
+		// Register activation hook.
+		register_activation_hook( AGWP_SN_PLUGIN_FILE, array( $this, 'activate' ) );
+
+		// Register deactivation hook.
+		register_deactivation_hook( AGWP_SN_PLUGIN_FILE, array( $this, 'deactivate' ) );
+	}
+
+
+
+	/**
+	 * Loads the translation files.
+	 *
+	 * @since 1.0.2
+	 * @access public
+	 * @return void
+	 */
+	public function lang() {
+		load_plugin_textdomain( 'analogwp-site-notes', false, AGWP_SN_PLUGIN_PATH . 'languages' );
 	}
 
 	/**
@@ -102,35 +126,32 @@ final class Plugin {
 	 * @since 1.0.0
 	 */
 	private function includes() {
-		// Core classes.
-		require_once AGWP_SN_PLUGIN_PATH . 'includes/class-database.php';
-		require_once AGWP_SN_PLUGIN_PATH . 'includes/class-assets.php';
-		require_once AGWP_SN_PLUGIN_PATH . 'includes/admin/class-admin.php';
-		require_once AGWP_SN_PLUGIN_PATH . 'includes/ajax/class-ajax.php';
+		// Global includes.
+		require_once AGWP_SN_PLUGIN_PATH . 'includes/utils/trait-instance.php';
+		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/class-assets.php';
+		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/data/class-database.php';
+		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/class-admin.php';
+		require_once AGWP_SN_PLUGIN_PATH . 'includes/api/class-ajax.php';
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/class-extensions.php';
 	}
 
 	/**
-	 * Initialize plugin.
+	 * Setup plugin.
 	 *
 	 * @since 1.0.0
 	 */
-	private function init() {
+	public function setup() {
+		// Load translation files.
+		$this->lang();
+
+		// Include required files.
+		$this->includes();
+
 		// Initialize core components.
-		$this->database = new Database();
-		$this->assets   = new Assets();
-		$this->admin    = new Admin();
-		$this->ajax     = new Ajax();
-
-		// Multisite: Create tables when a new site is created.
-		if ( is_multisite() ) {
-			add_action( 'wpmu_new_blog', array( $this, 'create_tables_on_new_blog' ), 10, 1 );
-			add_filter( 'wpmu_drop_tables', array( $this, 'drop_tables_on_blog_delete' ) );
-		}
-
-		// Register activation and deactivation hooks.
-		register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+		$this->database = Database::get_instance();
+		$this->assets   = Assets::get_instance();
+		$this->admin    = Admin::get_instance();
+		$this->ajax     = Ajax::get_instance();
 	}
 
 	/**
@@ -142,7 +163,7 @@ final class Plugin {
 	public function activate( $network_wide = false ) {
 		// Create database tables.
 		if ( ! $this->database ) {
-			$this->database = new Database();
+			$this->database = Database::get_instance();
 		}
 
 		// Handle multisite activation.
@@ -165,7 +186,7 @@ final class Plugin {
 		// Flush rewrite rules.
 		flush_rewrite_rules();
 
-		do_action( 'agwp_sn_activated' );
+		do_action( 'agwp_sn_plugin_activated' );
 	}
 
 	/**
@@ -177,7 +198,7 @@ final class Plugin {
 		// Flush rewrite rules.
 		flush_rewrite_rules();
 
-		do_action( 'agwp_sn_deactivated' );
+		do_action( 'agwp_sn_plugin_deactivated' );
 	}
 
 	/**
@@ -260,6 +281,17 @@ final class Plugin {
 	public static function frontend_comments_enabled() {
 		$settings = get_option( 'agwp_sn_settings', array() );
 		return isset( $settings['general']['enable_frontend_comments'] ) ? (bool) $settings['general']['enable_frontend_comments'] : true;
+	}
+
+	/**
+	 * Retrieves the main instance of the plugin.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return Plugin Plugin main instance.
+	 */
+	public static function instance() {
+		return self::$instance;
 	}
 
 	/**

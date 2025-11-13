@@ -2,13 +2,14 @@
 /**
  * Admin functionality class.
  *
- * @package AnalogWP_Site_Notes
+ * @package AnalogWP\SiteNotes
  * @since 1.0.0
  */
 
-namespace AnalogWP\SiteNotes\Admin;
+namespace AnalogWP\SiteNotes\Core;
 
 use AnalogWP\SiteNotes\Plugin;
+use AnalogWP\SiteNotes\Utils\Has_Instance;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,6 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Admin {
+	use Has_Instance;
 
 	/**
 	 * Constructor.

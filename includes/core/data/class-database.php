@@ -2,12 +2,13 @@
 /**
  * Database management class.
  *
- * @package AnalogWP_Site_Notes
+ * @package AnalogWP\SiteNotes
  * @since 1.0.0
  */
 
+namespace AnalogWP\SiteNotes\Core\Data;
 
-namespace AnalogWP\SiteNotes;
+use AnalogWP\SiteNotes\Utils\Has_Instance;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,14 +21,153 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Database {
+	use Has_Instance;
 
 	/**
-	 * Constructor.
+	 * Return table name by key
 	 *
-	 * @since 1.0.0
+	 * @param  string $table table key.
+	 * @param  string $return return type: all, name, query.
+	 * @return mixed
 	 */
-	public function __construct() {
-		// Database-related hooks can be added here if needed.
+	public static function tables( $table = null, $return = 'all' ) {
+
+		global $wpdb;
+
+		$prefix = 'agwp_sn_';
+
+		$tables = array(
+			'comments' => array(
+				'name'        => $wpdb->prefix . $prefix . 'comments',
+				'export_name' => $prefix . 'comments',
+				'query'       => "
+						id int(11) NOT NULL AUTO_INCREMENT,
+						post_id int(11) NOT NULL,
+						user_id int(11) NOT NULL DEFAULT 0,
+						assigned_to int(11) DEFAULT 0,
+						comment_title varchar(255) DEFAULT '',
+						comment_text text NOT NULL,
+						element_selector varchar(500) DEFAULT '',
+						screenshot_url varchar(500) DEFAULT '',
+						x_position int(11) DEFAULT 0,
+						y_position int(11) DEFAULT 0,
+						page_url varchar(500) NOT NULL,
+						status varchar(20) DEFAULT 'open',
+						priority varchar(20) DEFAULT 'medium',
+						category varchar(100) DEFAULT '',
+						due_date date DEFAULT NULL,
+						time_estimation varchar(20) DEFAULT '',
+						timesheet longtext DEFAULT NULL,
+						created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+						updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+						PRIMARY KEY (id),
+						KEY post_id (post_id),
+						KEY user_id (user_id),
+						KEY assigned_to (assigned_to),
+						KEY status (status),
+						KEY priority (priority),
+						KEY category (category),
+						KEY due_date (due_date),
+						KEY created_at (created_at)
+					",
+			),
+			'comment_replies' => array(
+				'name'        => $wpdb->prefix . $prefix . 'comment_replies',
+				'export_name' => $prefix . 'comment_replies',
+				'query'       => '
+						id int(11) NOT NULL AUTO_INCREMENT,
+						comment_id int(11) NOT NULL,
+						user_id int(11) NOT NULL DEFAULT 0,
+						reply_text text NOT NULL,
+						created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+						PRIMARY KEY (id),
+						KEY comment_id (comment_id),
+						KEY created_at (created_at)
+					',
+			),
+		);
+
+		if ( ! $table && 'all' === $return ) {
+			return $tables;
+		}
+
+		switch ( $return ) {
+			case 'all':
+				return isset( $tables[ $table ] ) ? $tables[ $table ] : false;
+
+			case 'name':
+				return isset( $tables[ $table ] ) ? $tables[ $table ]['name'] : false;
+
+			case 'query':
+				return isset( $tables[ $table ] ) ? $tables[ $table ]['query'] : false;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if given table is exists
+	 *
+	 * @param  string $table_name Table name.
+	 * @return bool
+	 */
+	public static function table_exists( $table_name ) {
+		global $wpdb;
+
+		try {
+			// Use prepare to safely include the table name in the query.
+			$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
+			$result = ( strtolower( $table_name ) === strtolower( $found ) );
+		} catch ( \Exception $e ) {
+			$result = false;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Check if given column exists in a table
+	 *
+	 * @param  string $table_name Table name.
+	 * @param  string $column_name Column name.
+	 * @return bool
+	 */
+	public static function column_exists( $table_name, $column_name ) {
+		global $wpdb;
+
+		try {
+			// Use prepare to safely include the table and column names in the query.
+			$found = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					DB_NAME,
+					$table_name,
+					$column_name
+				)
+			);
+
+			$result = ( strtolower( $column_name ) === strtolower( $found ) );
+		} catch ( \Exception $e ) {
+			$result = false;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Check if table is exists
+	 *
+	 * @param  string $table Table name.
+	 * @return boolean
+	 */
+	public function is_table_exists( $table = null ) {
+		$table_name = $this->tables( $table, 'name' );
+
+		if ( ! $table_name ) {
+			return false;
+		}
+
+		return self::table_exists( $table_name );
 	}
 
 	/**
@@ -40,55 +180,19 @@ class Database {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		// Comments table.
-		$comments_table = $wpdb->prefix . 'agwp_sn_comments';
-		$comments_sql   = "CREATE TABLE $comments_table (
-			id int(11) NOT NULL AUTO_INCREMENT,
-			post_id int(11) NOT NULL,
-			user_id int(11) NOT NULL DEFAULT 0,
-			assigned_to int(11) DEFAULT 0,
-			comment_title varchar(255) DEFAULT '',
-			comment_text text NOT NULL,
-			element_selector varchar(500) DEFAULT '',
-			screenshot_url varchar(500) DEFAULT '',
-			x_position int(11) DEFAULT 0,
-			y_position int(11) DEFAULT 0,
-			page_url varchar(500) NOT NULL,
-			status varchar(20) DEFAULT 'open',
-			priority varchar(20) DEFAULT 'medium',
-			category varchar(100) DEFAULT '',
-			due_date date DEFAULT NULL,
-			time_estimation varchar(20) DEFAULT '',
-			timesheet longtext DEFAULT NULL,
-			created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-			updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			PRIMARY KEY (id),
-			KEY post_id (post_id),
-			KEY user_id (user_id),
-			KEY assigned_to (assigned_to),
-			KEY status (status),
-			KEY priority (priority),
-			KEY category (category),
-			KEY due_date (due_date),
-			KEY created_at (created_at)
-		) $charset_collate;";
+		foreach ( self::tables() as $table ) {
+			$table_name = $table['name'];
+			$table_query  = $table['query'];
 
-		// Replies table.
-		$replies_table = $wpdb->prefix . 'agwp_sn_comment_replies';
-		$replies_sql   = "CREATE TABLE $replies_table (
-			id int(11) NOT NULL AUTO_INCREMENT,
-			comment_id int(11) NOT NULL,
-			user_id int(11) NOT NULL DEFAULT 0,
-			reply_text text NOT NULL,
-			created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-			PRIMARY KEY (id),
-			KEY comment_id (comment_id),
-			KEY created_at (created_at)
-		) $charset_collate;";
+			if ( ! self::table_exists( $table_name ) ) {
+				$sql = "CREATE TABLE $table_name (
+						$table_query
+					) $charset_collate;";
 
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta( $comments_sql );
-		dbDelta( $replies_sql );
+				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+				dbDelta( $sql );
+			}
+		}
 
 		// Run database upgrades.
 		$this->upgrade_database();
@@ -105,18 +209,10 @@ class Database {
 	public function upgrade_database() {
 		global $wpdb;
 
-		$comments_table = $wpdb->prefix . 'agwp_sn_comments';
+		$comments_table = self::tables( 'comments', 'name' );
 
 		// Check if timesheet column exists, if not add it.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema check query.
-		$column_exists = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
-				DB_NAME,
-				$comments_table,
-				'timesheet'
-			)
-		);
+		$column_exists = self::column_exists( $comments_table, 'timesheet' );
 
 		if ( empty( $column_exists ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Required schema update.
@@ -124,15 +220,7 @@ class Database {
 		}
 
 		// Check if comment_title column exists, if not add it.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema check query.
-		$title_column_exists = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
-				DB_NAME,
-				$comments_table,
-				'comment_title'
-			)
-		);
+		$title_column_exists = self::column_exists( $comments_table, 'comment_title' );
 
 		if ( empty( $title_column_exists ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Required schema update.
@@ -150,8 +238,8 @@ class Database {
 	public function get_comments( $page_url = '' ) {
 		global $wpdb;
 
-		$comments_table = $wpdb->prefix . 'agwp_sn_comments';
-		$replies_table  = $wpdb->prefix . 'agwp_sn_comment_replies';
+		$comments_table = self::tables( 'comments', 'name' );
+		$replies_table  = self::tables( 'comment_replies', 'name' );
 
 		// Prepare query based on whether page_url is provided.
 		if ( empty( $page_url ) ) {
@@ -254,7 +342,7 @@ class Database {
 			return false;
 		}
 
-		$table_name = $wpdb->prefix . 'agwp_sn_comments';
+		$table_name = self::tables( 'comments', 'name' );
 
 		$insert_data = array(
 			'post_id'          => isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0,
@@ -300,7 +388,7 @@ class Database {
 			return false;
 		}
 
-		$table_name = $wpdb->prefix . 'agwp_sn_comments';
+		$table_name = self::tables( 'comments', 'name' );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Update operation, no caching needed.
 		$result = $wpdb->update(
@@ -319,17 +407,20 @@ class Database {
 	 *
 	 * @since 1.0.0
 	 * @param int   $comment_id Comment ID.
-	 * @param array $updates Array of field => value pairs to update.
+	 * @param array $data Array of field => value pairs to update.
 	 * @return bool True on success, false on error.
 	 */
 	public function update_comment( $comment_id, $data ) {
 		global $wpdb;
 
+		$table_name = self::tables( 'comments', 'name' );
+
 		// Check if comment exists.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Existence check before update.
 		$exists = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM {$wpdb->prefix}agwp_sn_comments WHERE id = %d",
+				'SELECT id FROM %i WHERE id = %d',
+				$table_name,
 				$comment_id
 			)
 		);
@@ -368,11 +459,11 @@ class Database {
 
 		// Sanitize data.
 		foreach ( $filtered_data as $key => $value ) {
-			if ( $value === null ) {
+			if ( null === $value ) {
 				continue; // Keep NULL values as NULL.
 			}
 			// Skip sanitization for category as it's already JSON-encoded.
-			if ( $key === 'category' && is_string( $value ) && strpos( $value, '[' ) === 0 ) {
+			if ( 'category' === $key && is_string( $value ) && strpos( $value, '[' ) === 0 ) {
 				continue;
 			}
 			$filtered_data[ $key ] = sanitize_text_field( $value );
@@ -380,7 +471,7 @@ class Database {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Update operation, no caching needed.
 		$result = $wpdb->update(
-			$wpdb->prefix . 'agwp_sn_comments',
+			$table_name,
 			$filtered_data,
 			array( 'id' => $comment_id ),
 			null,
@@ -405,7 +496,7 @@ class Database {
 			return false;
 		}
 
-		$table_name = $wpdb->prefix . 'agwp_sn_comment_replies';
+		$table_name = self::tables( 'comment_replies', 'name' );
 
 		$insert_data = array(
 			'comment_id' => intval( $data['comment_id'] ),
@@ -437,8 +528,8 @@ class Database {
 			return false;
 		}
 
-		$comments_table = $wpdb->prefix . 'agwp_sn_comments';
-		$replies_table  = $wpdb->prefix . 'agwp_sn_comment_replies';
+		$comments_table = self::tables( 'comments', 'name' );
+		$replies_table  = self::tables( 'comment_replies', 'name' );
 
 		// Delete replies first.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Delete operation, no caching needed.
@@ -452,6 +543,42 @@ class Database {
 	}
 
 	/**
+	 * Returns total rows count in requested table
+	 *
+	 * @param  string $table_name  Table name.
+	 * @param  string $status Optional. Status to filter by.
+	 * @return int
+	 */
+	public static function count_by_status( $table_name, $status = null ) {
+		global $wpdb;
+
+		if ( empty( $table_name ) ) {
+			return 0;
+		}
+
+		if ( ! empty( $status ) ) {
+			return intval(
+				$wpdb->get_var(
+					$wpdb->prepare(
+						'SELECT COUNT(*) FROM %i WHERE status = %s',
+						$table_name,
+						$status
+					)
+				)
+			);
+		}
+
+		return intval(
+			$wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM %i',
+					$table_name,
+				)
+			)
+		);
+	}
+
+	/**
 	 * Get dashboard statistics.
 	 *
 	 * @since 1.0.0
@@ -460,15 +587,12 @@ class Database {
 	public function get_dashboard_stats() {
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'agwp_sn_comments';
+		$table_name = self::tables( 'comments', 'name' );
 
 		// Get counts by status.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Dashboard stats, frequently changing data.
-		$open_count     = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE status = %s', $table_name, 'open' ) );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Dashboard stats, frequently changing data.
-		$resolved_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE status = %s', $table_name, 'resolved' ) );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Dashboard stats, frequently changing data.
-		$total_count    = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table_name ) );
+		$open_count     = self::count_by_status( $table_name, 'open' );
+		$resolved_count = self::count_by_status( $table_name, 'resolved' );
+		$total_count    = self::count_by_status( $table_name );
 
 		// Get recent comments.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Dashboard recent items, frequently changing data.
@@ -488,7 +612,7 @@ class Database {
 			'open_count'      => intval( $open_count ),
 			'resolved_count'  => intval( $resolved_count ),
 			'total_count'     => intval( $total_count ),
-			'recent_comments' => $recent_comments ?: array(),
+			'recent_comments' => $recent_comments ? $recent_comments : array(),
 		);
 	}
 }

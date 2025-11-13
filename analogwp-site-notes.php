@@ -16,30 +16,26 @@
  */
 
 // Prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 // Define plugin constants.
-if ( ! defined( 'AGWP_SN_VERSION' ) ) {
-	define( 'AGWP_SN_VERSION', '1.0.1' );
+define( 'AGWP_SN_VERSION', '1.0.1' );
+define( 'AGWP_SN_PLUGIN_FILE', __FILE__ );
+define( 'AGWP_SN_PLUGIN_URL', plugin_dir_url( AGWP_SN_PLUGIN_FILE ) );
+define( 'AGWP_SN_PLUGIN_PATH', plugin_dir_path( AGWP_SN_PLUGIN_FILE ) );
+
+// Third party dependencies.
+$vendor_file = __DIR__ . '/vendor/autoload.php';
+
+if ( is_readable( $vendor_file ) ) {
+	require_once $vendor_file;
 }
 
-if ( ! defined( 'AGWP_SN_PLUGIN_URL' ) ) {
-	define( 'AGWP_SN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-}
-
-if ( ! defined( 'AGWP_SN_PLUGIN_PATH' ) ) {
-	define( 'AGWP_SN_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
-}
-
-if ( ! defined( 'AGWP_SN_PLUGIN_FILE' ) ) {
-	define( 'AGWP_SN_PLUGIN_FILE', __FILE__ );
-}
 
 /**
  * Load the main plugin class.
  */
 require_once AGWP_SN_PLUGIN_PATH . 'includes/class-plugin.php';
 
-\AnalogWP\SiteNotes\Plugin::load();
+// Initialize the plugin.
+\AnalogWP\SiteNotes\Plugin::load_instance();

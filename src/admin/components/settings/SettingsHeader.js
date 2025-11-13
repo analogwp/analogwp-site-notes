@@ -7,15 +7,10 @@ import { __ } from '@wordpress/i18n';
  * External dependencies
  */
 import { 
-    Cog6ToothIcon, 
-    UserGroupIcon, 
-    BellIcon, 
-    ShieldCheckIcon, 
-    PaintBrushIcon, 
+    Cog6ToothIcon,
+    ShieldCheckIcon,
     CommandLineIcon,
     TagIcon,
-    ArrowPathIcon,
-    ArrowUpTrayIcon,
     CheckCircleIcon,
     ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
@@ -29,7 +24,7 @@ import { useExtensions } from '../extensions/ExtensionsProvider';
 
 const SettingsHeader = ({ activeTab, onTabChange }) => {
     const { saving, hasUnsavedChanges, lastSaved, saveSettings } = useSettings();
-    const { registeredTabs, isProActive } = useExtensions();
+    const { registeredTabs, isExtActive } = useExtensions();
 
     // Base tabs available in free version
     const baseTabs = [
@@ -38,28 +33,28 @@ const SettingsHeader = ({ activeTab, onTabChange }) => {
             label: __('General', 'analogwp-site-notes'),
             icon: Cog6ToothIcon,
             description: __('Basic plugin configuration', 'analogwp-site-notes'),
-            isPro: false
+            isExt: false
         },
         { 
             id: 'access-control', 
             label: __('Access Control', 'analogwp-site-notes'),
             icon: ShieldCheckIcon,
             description: __('Manage user permissions and access', 'analogwp-site-notes'),
-            isPro: false
+            isExt: false
         },
         { 
             id: 'labels-filters', 
             label: __('Labels & Filters', 'analogwp-site-notes'),
             icon: TagIcon,
             description: __('Manage categories and priorities', 'analogwp-site-notes'),
-            isPro: false
+            isExt: false
         },
         { 
             id: 'advanced', 
             label: __('Advanced', 'analogwp-site-notes'),
             icon: CommandLineIcon,
             description: __('Advanced configuration options', 'analogwp-site-notes'),
-            isPro: false
+            isExt: false
         }
     ];
 

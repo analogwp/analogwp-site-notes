@@ -28,52 +28,52 @@ export const useExtensions = () => {
 export const ExtensionsProvider = ({ children }) => {
     const [registeredTabs, setRegisteredTabs] = useState([]);
     const [registeredFields, setRegisteredFields] = useState({});
-    const [proFeatures, setProFeatures] = useState({});
-    const [isProActive, setIsProActive] = useState(false);
+    const [extFeatures, setExtFeatures] = useState({});
+    const [isExtActive, setIsExtActive] = useState(false);
 
     useEffect(() => {
-        // Check if pro plugin is active
-        checkProPluginStatus();
+        // Check if ext plugin is active
+        checkExtPluginStatus();
         
-        // Listen for pro plugin registration
+        // Listen for ext plugin registration
         if (window.snExtensions) {
             loadExtensions();
         }
         
-        // Set up event listener for dynamic pro plugin loading
-        document.addEventListener('sn-pro-loaded', loadExtensions);
+        // Set up event listener for dynamic ext plugin loading
+        document.addEventListener('sn-ext-loaded', loadExtensions);
         
         return () => {
-            document.removeEventListener('sn-pro-loaded', loadExtensions);
+            document.removeEventListener('sn-ext-loaded', loadExtensions);
         };
     }, []);
 
-    const checkProPluginStatus = () => {
-        // Check if pro plugin is active via global flag or AJAX
-        const proActive = window.agwpSnAjax?.isProActive || false;
-        setIsProActive(proActive);
+    const checkExtPluginStatus = () => {
+        // Check if ext plugin is active via global flag or AJAX
+        const extActive = window.agwpSnAjax?.isExtActive || false;
+        setIsExtActive(extActive);
     };
 
     const loadExtensions = () => {
         if (window.snExtensions) {
             const extensions = window.snExtensions;
             
-            // Register pro tabs
+            // Register ext tabs
             if (extensions.tabs) {
                 setRegisteredTabs(extensions.tabs);
             }
             
-            // Register pro fields for existing tabs
+            // Register ext fields for existing tabs
             if (extensions.fields) {
                 setRegisteredFields(extensions.fields);
             }
             
-            // Register pro features
+            // Register ext features
             if (extensions.features) {
-                setProFeatures(extensions.features);
+                setExtFeatures(extensions.features);
             }
             
-            setIsProActive(true);
+            setIsExtActive(true);
         }
     };
 
@@ -98,14 +98,14 @@ export const ExtensionsProvider = ({ children }) => {
     };
 
     const isFeatureAvailable = (featureName) => {
-        return isProActive && proFeatures[featureName];
+        return isExtActive && extFeatures[featureName];
     };
 
     const value = {
         registeredTabs,
         registeredFields,
-        proFeatures,
-        isProActive,
+        extFeatures,
+        isExtActive,
         registerTab,
         registerFields,
         isFeatureAvailable

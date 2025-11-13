@@ -2,11 +2,14 @@
 /**
  * Assets management class.
  *
- * @package AnalogWP_Site_Notes
+ * @package AnalogWP\SiteNotes
  * @since 1.0.0
  */
 
-namespace AnalogWP\SiteNotes;
+namespace AnalogWP\SiteNotes\Core;
+
+use AnalogWP\SiteNotes\Plugin;
+use AnalogWP\SiteNotes\Utils\Has_Instance;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,6 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Assets {
+	use Has_Instance;
 
 	/**
 	 * Constructor.
@@ -173,7 +177,7 @@ class Assets {
 	 * @return array Localized data.
 	 */
 	private function get_frontend_localized_data() {
-		// Get plugin settings
+		// Get plugin settings.
 		$default_settings = array(
 			'general' => array(
 				'auto_screenshot'    => true,

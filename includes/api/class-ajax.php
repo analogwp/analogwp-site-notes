@@ -2,14 +2,15 @@
 /**
  * AJAX functionality class.
  *
- * @package AnalogWP_Site_Notes
+ * @package AnalogWP\SiteNotes
  * @since 1.0.0
  */
 
-namespace AnalogWP\SiteNotes\Ajax;
+namespace AnalogWP\SiteNotes\API;
 
-use AnalogWP\SiteNotes\Database;
+use AnalogWP\SiteNotes\Core\Data\Database;
 use AnalogWP\SiteNotes\Plugin;
+use AnalogWP\SiteNotes\Utils\Has_Instance;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,6 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Ajax {
+	use Has_Instance;
 
 	/**
 	 * Database instance.
@@ -37,7 +39,7 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->database = new Database();
+		$this->database = Plugin::instance()->database;
 		$this->init_hooks();
 	}
 
@@ -342,6 +344,7 @@ class Ajax {
 		}
 
 		$stats = $this->database->get_dashboard_stats();
+
 		$this->send_success( $stats );
 	}
 
