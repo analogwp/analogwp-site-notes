@@ -181,7 +181,7 @@ print_step "Verifying package contents..."
 
 REQUIRED_FILES=(
     "analogwp-site-notes.php"
-    "includes/class-database.php"
+    "includes/core/data/class-database.php"
     "build/admin.js"
     "build/admin.css"
     "build/frontend.js"
