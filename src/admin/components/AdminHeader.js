@@ -12,7 +12,7 @@ const AdminHeader = ({
     currentPage = 'dashboard',
     onNavigate
 }) => {
-    const logoUrl = window.agwpSnAjax?.pluginUrl ? `${window.agwpSnAjax.pluginUrl}assets/images/analog-logo.svg` : '';
+    const logoUrl = window.agwp_sn_ajax?.pluginUrl ? `${window.agwp_sn_ajax.pluginUrl}assets/images/analog-logo.svg` : '';
 
     return (
         <div className="mb-5 border-b border-b-gray-300">

@@ -13,19 +13,19 @@ import './frontend/styles/frontend.scss';
 // Debug logging
 logger.debug('Frontend script loaded!');
 logger.debug('Document ready state:', document.readyState);
-logger.debug('agwpSnAjax available:', typeof agwpSnAjax !== 'undefined');
+logger.debug('agwp_sn_ajax available:', typeof agwp_sn_ajax !== 'undefined');
 
 // Simple initialization function
 function initVisualComments() {
     logger.info('Initializing Visual Comments');
     
-    // Ensure agwpSnAjax is available
-    if (typeof agwpSnAjax === 'undefined') {
-        logger.error('agwpSnAjax object not found');
+    // Ensure agwp_sn_ajax is available
+    if (typeof agwp_sn_ajax === 'undefined') {
+        logger.error('agwp_sn_ajax object not found');
         return;
     }
     
-    logger.debug('agwpSnAjax found:', agwpSnAjax);
+    logger.debug('agwp_sn_ajax found:', agwp_sn_ajax);
     
     // Check if React is available
     if (typeof createRoot === 'undefined') {
@@ -81,7 +81,7 @@ function createSimpleInterface() {
         <h3>SN Visual Comments (Fallback)</h3>
         <p>✅ JavaScript is working!</p>
         <p>⚠️ React fallback mode</p>
-        <p><strong>Post ID:</strong> ${agwpSnAjax.postId}</p>
+        <p><strong>Post ID:</strong> ${agwp_sn_ajax.postId}</p>
         <button onclick="this.parentNode.style.display='none'" style="float: right;">Close</button>
         <hr>
         <div>Basic visual commenting interface would appear here.</div>

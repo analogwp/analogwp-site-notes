@@ -8,9 +8,9 @@
 
 namespace AnalogWP\SiteNotes\API;
 
-use AnalogWP\SiteNotes\Core\Data\Database;
 use AnalogWP\SiteNotes\Plugin;
 use AnalogWP\SiteNotes\Utils\Has_Instance;
+use AnalogWP\SiteNotes\Core\Data\Database;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -114,36 +114,39 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function save_comment() {
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
 
-		// Get POST data.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
-		$post_data = wp_unslash( $_POST );
+		// Check permissions - user must have access to site notes.
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
+		}
 
 		// Sanitize and handle screenshot URL if provided.
 		$screenshot_url = '';
-		if ( ! empty( $post_data['screenshot_url'] ) ) {
-			if ( 0 === strpos( $post_data['screenshot_url'], 'data:image' ) ) {
-				$screenshot_url = $this->save_screenshot_from_data_url( $post_data['screenshot_url'] );
+		if ( ! empty( $_POST['screenshot_url'] ) ) {
+			$sanitized_screenshot_url = sanitize_text_field( wp_unslash( $_POST['screenshot_url'] ) );
+			if ( 0 === strpos( $sanitized_screenshot_url, 'data:image' ) ) {
+				$screenshot_url = $this->save_screenshot_from_data_url( $sanitized_screenshot_url );
 			} else {
-				$screenshot_url = sanitize_url( $post_data['screenshot_url'] );
+				$screenshot_url = sanitize_url( $sanitized_screenshot_url );
 			}
 		}
 
 		// Prepare comment data.
 		$comment_data = array(
-			'post_id'          => isset( $post_data['post_id'] ) ? absint( $post_data['post_id'] ) : 0,
-			'comment_title'    => isset( $post_data['comment_title'] ) ? sanitize_text_field( $post_data['comment_title'] ) : '',
-			'comment_text'     => isset( $post_data['comment_text'] ) ? sanitize_textarea_field( $post_data['comment_text'] ) : '',
-			'element_selector' => isset( $post_data['element_selector'] ) ? sanitize_text_field( $post_data['element_selector'] ) : '',
+			'post_id'          => isset( $_POST['post_id'] ) ? absint( wp_unslash( $_POST['post_id'] ) ) : 0,
+			'comment_title'    => isset( $_POST['comment_title'] ) ? sanitize_text_field( wp_unslash( $_POST['comment_title'] ) ) : '',
+			'comment_text'     => isset( $_POST['comment_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comment_text'] ) ) : '',
+			'element_selector' => isset( $_POST['element_selector'] ) ? sanitize_text_field( wp_unslash( $_POST['element_selector'] ) ) : '',
 			'screenshot_url'   => $screenshot_url,
-			'x_position'       => isset( $post_data['x_position'] ) ? absint( $post_data['x_position'] ) : 0,
-			'y_position'       => isset( $post_data['y_position'] ) ? absint( $post_data['y_position'] ) : 0,
-			'page_url'         => isset( $post_data['page_url'] ) ? sanitize_text_field( $post_data['page_url'] ) : '',
-			'status'           => isset( $post_data['status'] ) ? sanitize_text_field( $post_data['status'] ) : 'open',
-			'priority'         => isset( $post_data['priority'] ) ? sanitize_text_field( $post_data['priority'] ) : 'medium',
+			'x_position'       => isset( $_POST['x_position'] ) ? absint( wp_unslash( $_POST['x_position'] ) ) : 0,
+			'y_position'       => isset( $_POST['y_position'] ) ? absint( wp_unslash( $_POST['y_position'] ) ) : 0,
+			'page_url'         => isset( $_POST['page_url'] ) ? sanitize_text_field( wp_unslash( $_POST['page_url'] ) ) : '',
+			'status'           => isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : 'open',
+			'priority'         => isset( $_POST['priority'] ) ? sanitize_text_field( wp_unslash( $_POST['priority'] ) ) : 'medium',
 		);
 
 		// Save comment.
@@ -167,13 +170,17 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function get_comments() {
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
-		$post_data = wp_unslash( $_POST );
-		$page_url  = isset( $post_data['page_url'] ) ? sanitize_url( $post_data['page_url'] ) : '';
+		// Check permissions - user must have access to site notes.
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
+		}
+
+		$page_url  = isset( $_POST['page_url'] ) ? sanitize_url( wp_unslash( $_POST['page_url'] ) ) : '';
 
 		if ( empty( $page_url ) ) {
 			$this->send_error( __( 'Page URL is required', 'analogwp-site-notes' ) );
@@ -194,25 +201,24 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function update_comment() {
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid nonce', 'analogwp-site-notes' ) ) );
 			return;
 		}
 
-		// Check user capability.
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'analogwp-site-notes' ) ) );
-			return;
+		// Check permissions - user must have access to site notes.
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
-		$post_data  = wp_unslash( $_POST );
-		$comment_id = isset( $post_data['comment_id'] ) ? absint( $post_data['comment_id'] ) : 0;
+		$comment_id = isset( $_POST['comment_id'] ) ? absint( wp_unslash( $_POST['comment_id'] ) ) : 0;
 
 		$updates = array();
 
 		// Get data from the 'updates' field (JSON format - main app).
-		if ( isset( $post_data['updates'] ) && ! empty( $post_data['updates'] ) ) {
-			$updates = json_decode( sanitize_textarea_field( $post_data['updates'] ), true );
+		if ( isset( $_POST['updates'] ) && ! empty( $_POST['updates'] ) ) {
+			$updates = json_decode( sanitize_textarea_field( wp_unslash( $_POST['updates'] ) ), true );
 		}
 
 		if ( empty( $comment_id ) || empty( $updates ) || ! is_array( $updates ) ) {
@@ -236,14 +242,18 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function update_comment_status() {
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
-		$post_data  = wp_unslash( $_POST );
-		$comment_id = isset( $post_data['comment_id'] ) ? absint( $post_data['comment_id'] ) : 0;
-		$status     = isset( $post_data['status'] ) ? sanitize_text_field( $post_data['status'] ) : '';
+		// Check permissions - user must have access to site notes.
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
+		}
+
+		$comment_id = isset( $_POST['comment_id'] ) ? absint( wp_unslash( $_POST['comment_id'] ) ) : 0;
+		$status     = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
 
 		if ( empty( $comment_id ) || empty( $status ) ) {
 			$this->send_error( __( 'Comment ID and status are required', 'analogwp-site-notes' ) );
@@ -264,16 +274,20 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function add_reply() {
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
 
-		$post_data = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
+		// Check permissions - user must have access to site notes.
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
+		}
 
 		// Sanitized before use.
 		$reply_data = array(
-			'comment_id' => isset( $post_data['comment_id'] ) ? absint( $post_data['comment_id'] ) : 0,
-			'reply_text' => isset( $post_data['reply_text'] ) ? sanitize_textarea_field( $post_data['reply_text'] ) : '',
+			'comment_id' => isset( $_POST['comment_id'] ) ? absint( wp_unslash( $_POST['comment_id'] ) ) : 0,
+			'reply_text' => isset( $_POST['reply_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['reply_text'] ) ) : '',
 		);
 
 		if ( empty( $reply_data['comment_id'] ) || empty( $reply_data['reply_text'] ) ) {
@@ -300,6 +314,7 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function delete_comment() {
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
@@ -309,11 +324,8 @@ class Ajax {
 			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
-		$post_data  = wp_unslash( $_POST );
-
 		// Sanitized before use.
-		$comment_id = isset( $post_data['comment_id'] ) ? absint( $post_data['comment_id'] ) : 0;
+		$comment_id = isset( $_POST['comment_id'] ) ? absint( wp_unslash( $_POST['comment_id'] ) ) : 0;
 
 		if ( empty( $comment_id ) ) {
 			$this->send_error( __( 'Comment ID is required', 'analogwp-site-notes' ) );
@@ -334,6 +346,7 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function get_dashboard_stats() {
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
@@ -354,7 +367,7 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function get_admin_data() {
-		// Verify nonce via POST data.
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
@@ -365,10 +378,9 @@ class Ajax {
 		}
 
 		// Ensure database tables exist.
-		global $wpdb;
-		$table_name = $wpdb->prefix . 'agwp_sn_comments';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table existence check, safe usage.
-		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) ) !== $table_name ) {
+		$table_name = $this->database::tables( 'comments', 'name' );
+
+		if ( ! $this->database::table_exists( $table_name ) ) {
 			// Tables don't exist, create them.
 			$this->database->create_tables();
 		}
@@ -494,9 +506,14 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function get_pages() {
-		// Verify nonce via POST data.
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
+		}
+
+		// Check permissions - user must have access to site notes.
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
 		$items = array();
@@ -651,7 +668,7 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function add_new_task() {
-		// Verify nonce via POST data.
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
@@ -661,22 +678,19 @@ class Ajax {
 			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via $this->verify_nonce() above.
-		$post_data  = wp_unslash( $_POST );
-
 		// Prepare task data.
 		$task_data = array(
-			'post_id'         => isset( $post_data['post_id'] ) ? intval( $post_data['post_id'] ) : 0,
-			'comment_title'   => isset( $post_data['comment_title'] ) ? sanitize_text_field( $post_data['comment_title'] ) : '',
-			'comment_text'    => isset( $post_data['comment_text'] ) ? sanitize_textarea_field( $post_data['comment_text'] ) : '',
-			'page_url'        => isset( $post_data['page_url'] ) ? sanitize_url( $post_data['page_url'] ) : get_permalink( absint( $post_data['post_id'] ) ),
-			'status'          => isset( $post_data['status'] ) ? sanitize_text_field( $post_data['status'] ) : 'open',
-			'priority'        => isset( $post_data['priority'] ) ? sanitize_text_field( $post_data['priority'] ) : 'medium',
-			'assigned_to'     => isset( $post_data['assigned_to'] ) ? absint( $post_data['assigned_to'] ) : 0,
-			'categories'      => isset( $post_data['categories'] ) ? sanitize_text_field( $post_data['categories'] ) : array(),
-			'due_date'        => isset( $post_data['due_date'] ) ? sanitize_text_field( $post_data['due_date'] ) : '',
-			'time_estimation' => isset( $post_data['time_estimation'] ) ? sanitize_text_field( $post_data['time_estimation'] ) : '',
-			'timesheet'       => isset( $post_data['timesheet'] ) ? sanitize_textarea_field( $post_data['timesheet'] ) : '',
+			'post_id'         => isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0,
+			'comment_title'   => isset( $_POST['comment_title'] ) ? sanitize_text_field( wp_unslash( $_POST['comment_title'] ) ) : '',
+			'comment_text'    => isset( $_POST['comment_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comment_text'] ) ) : '',
+			'page_url'        => isset( $_POST['page_url'] ) ? sanitize_url( wp_unslash( $_POST['page_url'] ) ) : get_permalink( absint( $_POST['post_id'] ) ),
+			'status'          => isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : 'open',
+			'priority'        => isset( $_POST['priority'] ) ? sanitize_text_field( wp_unslash( $_POST['priority'] ) ) : 'medium',
+			'assigned_to'     => isset( $_POST['assigned_to'] ) ? absint( wp_unslash( $_POST['assigned_to'] ) ) : 0,
+			'categories'      => isset( $_POST['categories'] ) ? sanitize_text_field( wp_unslash( $_POST['categories'] ) ) : array(),
+			'due_date'        => isset( $_POST['due_date'] ) ? sanitize_text_field( wp_unslash( $_POST['due_date'] ) ) : '',
+			'time_estimation' => isset( $_POST['time_estimation'] ) ? sanitize_text_field( wp_unslash( $_POST['time_estimation'] ) ) : '',
+			'timesheet'       => isset( $_POST['timesheet'] ) ? sanitize_textarea_field( wp_unslash( $_POST['timesheet'] ) ) : '',
 		);
 
 		$task_id = $this->database->save_comment( $task_data );
@@ -756,7 +770,7 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function get_settings() {
-		// Verify nonce.
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
@@ -827,20 +841,19 @@ class Ajax {
 	 * @since 1.0.0
 	 */
 	public function save_settings() {
+		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
 
-		// Check user capabilities.
-		if ( ! current_user_can( 'manage_options' ) ) {
-			$this->send_error( __( 'Insufficient permissions.', 'analogwp-site-notes' ) );
+		// Check permissions - user must have access to site notes.
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
-		// Get and sanitize form data.
-		$post_data  = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above.
-		$settings   = isset( $post_data['settings'] ) ? json_decode( sanitize_textarea_field( $post_data['settings'] ), true ) : array();
-		$categories = isset( $post_data['categories'] ) ? json_decode( sanitize_textarea_field( $post_data['categories'] ), true ) : array();
-		$priorities = isset( $post_data['priorities'] ) ? json_decode( sanitize_textarea_field( $post_data['priorities'] ), true ) : array();
+		$settings   = isset( $_POST['settings'] ) ? json_decode( sanitize_textarea_field( wp_unslash( $_POST['settings'] ) ), true ) : array();
+		$categories = isset( $_POST['categories'] ) ? json_decode( sanitize_textarea_field( wp_unslash( $_POST['categories'] ) ), true ) : array();
+		$priorities = isset( $_POST['priorities'] ) ? json_decode( sanitize_textarea_field( wp_unslash( $_POST['priorities'] ) ), true ) : array();
 
 		// Validate settings structure.
 		if ( ! is_array( $settings ) ) {

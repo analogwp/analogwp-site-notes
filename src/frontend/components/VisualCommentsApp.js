@@ -134,14 +134,14 @@ const VisualCommentsApp = () => {
     // Load comments from server
     const loadComments = async () => {
         try {
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_get_comments',
-                    nonce: agwpSnAjax.nonce,
+                    nonce: agwp_sn_ajax.nonce,
                     page_url: window.location.href
                 })
             });
@@ -158,15 +158,15 @@ const VisualCommentsApp = () => {
         if (!selectedElement) return;
 
         try {
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_save_comment',
-                    nonce: agwpSnAjax.nonce,
-                    post_id: agwpSnAjax.postId || 0,
+                    nonce: agwp_sn_ajax.nonce,
+                    post_id: agwp_sn_ajax.postId || 0,
                     comment_title: commentTitle,
                     comment_text: commentText,
                     element_selector: selectedElement.selector,
@@ -198,14 +198,14 @@ const VisualCommentsApp = () => {
     // Add reply to comment
     const addReply = async (commentId, replyText) => {
         try {
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_add_reply',
-                    nonce: agwpSnAjax.nonce,
+                    nonce: agwp_sn_ajax.nonce,
                     comment_id: commentId,
                     reply_text: replyText
                 })
@@ -226,17 +226,17 @@ const VisualCommentsApp = () => {
 
     // Update comment status
     const updateCommentStatus = async (commentId, status) => {
-        if (!agwpSnAjax.canManageComments) return;
+        if (!agwp_sn_ajax.canManageComments) return;
 
         try {
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_update_comment_status',
-                    nonce: agwpSnAjax.nonce,
+                    nonce: agwp_sn_ajax.nonce,
                     comment_id: commentId,
                     status: status
                 })
@@ -296,7 +296,7 @@ const VisualCommentsApp = () => {
                         comments={comments}
                         onAddReply={addReply}
                         onUpdateStatus={updateCommentStatus}
-                        canManageComments={agwpSnAjax.canManageComments}
+                        canManageComments={agwp_sn_ajax.canManageComments}
                         isVisible={sidebarVisible}
                         onClose={() => setSidebarVisible(!sidebarVisible)}
                     />

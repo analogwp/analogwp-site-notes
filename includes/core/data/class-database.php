@@ -116,6 +116,7 @@ class Database {
 
 		try {
 			// Use prepare to safely include the table name in the query.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name cannot be parameterized, but is sanitized.
 			$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
 			$result = ( strtolower( $table_name ) === strtolower( $found ) );
 		} catch ( \Exception $e ) {
@@ -137,6 +138,7 @@ class Database {
 
 		try {
 			// Use prepare to safely include the table and column names in the query.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table and column names cannot be parameterized, but are sanitized.
 			$found = $wpdb->get_var(
 				$wpdb->prepare(
 					'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
@@ -209,14 +211,14 @@ class Database {
 	public function upgrade_database() {
 		global $wpdb;
 
-		$comments_table = self::tables( 'comments', 'name' );
+		$comments_table = esc_html( self::tables( 'comments', 'name' ) );
 
 		// Check if timesheet column exists, if not add it.
 		$column_exists = self::column_exists( $comments_table, 'timesheet' );
 
 		if ( empty( $column_exists ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Required schema update.
-			$wpdb->query( "ALTER TABLE {$comments_table} ADD COLUMN timesheet longtext DEFAULT NULL" );
+			$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD COLUMN timesheet longtext DEFAULT NULL AFTER time_estimation', $comments_table ) );
 		}
 
 		// Check if comment_title column exists, if not add it.
@@ -224,7 +226,7 @@ class Database {
 
 		if ( empty( $title_column_exists ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Required schema update.
-			$wpdb->query( "ALTER TABLE {$comments_table} ADD COLUMN comment_title varchar(255) DEFAULT '' AFTER assigned_to" );
+			$wpdb->query( $wpdb->prepare( "ALTER TABLE %i ADD COLUMN comment_title varchar(255) DEFAULT '' AFTER assigned_to", $comments_table ) );
 		}
 	}
 
@@ -558,6 +560,7 @@ class Database {
 
 		if ( ! empty( $status ) ) {
 			return intval(
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name cannot be parameterized, but is sanitized.
 				$wpdb->get_var(
 					$wpdb->prepare(
 						'SELECT COUNT(*) FROM %i WHERE status = %s',
@@ -569,6 +572,7 @@ class Database {
 		}
 
 		return intval(
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name cannot be parameterized, but is sanitized.
 			$wpdb->get_var(
 				$wpdb->prepare(
 					'SELECT COUNT(*) FROM %i',

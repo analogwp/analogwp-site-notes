@@ -152,7 +152,7 @@ class Extensions {
 			'tabs'          => self::get_ext_tabs(),
 		);
 
-		wp_localize_script( 'agwp-sn-admin', 'agwpSnExt', $ext_data );
+		wp_localize_script( 'agwp-sn-admin', 'agwp_sn_ext', $ext_data );
 	}
 
 	/**

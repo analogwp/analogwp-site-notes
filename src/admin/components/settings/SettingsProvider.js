@@ -165,14 +165,14 @@ export const SettingsProvider = ({ children }) => {
     const loadSettings = async () => {
         try {
             setLoading(true);
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_get_settings',
-                    nonce: agwpSnAjax.nonce
+                    nonce: agwp_sn_ajax.nonce
                 })
             });
 
@@ -215,14 +215,14 @@ export const SettingsProvider = ({ children }) => {
             const categoriesToUse = categoriesToSave !== null ? categoriesToSave : categories;
             const prioritiesToUse = prioritiesToSave !== null ? prioritiesToSave : priorities;
             
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_save_settings',
-                    nonce: agwpSnAjax.nonce,
+                    nonce: agwp_sn_ajax.nonce,
                     settings: JSON.stringify(settings),
                     categories: JSON.stringify(categoriesToUse),
                     priorities: JSON.stringify(prioritiesToUse)

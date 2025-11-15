@@ -47,14 +47,14 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 
     const loadPages = async () => {
         try {
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_get_pages',
-                    nonce: agwpSnAjax.nonce
+                    nonce: agwp_sn_ajax.nonce
                 })
             });
 
@@ -70,14 +70,14 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
     const loadAdminData = async () => {
         setLoading(true);
         try {
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_get_admin_data',
-                    nonce: agwpSnAjax.nonce
+                    nonce: agwp_sn_ajax.nonce
                 })
             });
 
@@ -132,14 +132,14 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 
     const handleAddComment = async (newComment) => {
         try {
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_add_comment',
-                    nonce: agwpSnAjax.nonce,
+                    nonce: agwp_sn_ajax.nonce,
                     comment: JSON.stringify(newComment)
                 })
             });
@@ -157,14 +157,14 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 
     const handleAddTask = async (taskData) => {
         try {
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_add_new_task',
-                    nonce: agwpSnAjax.nonce,
+                    nonce: agwp_sn_ajax.nonce,
                     ...taskData
                 })
             });
@@ -187,14 +187,14 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
         logger.debug('Updating comment with ID:', commentId);
         logger.debug('Updates to apply:', updates);
         try {
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_update_comment',
-                    nonce: agwpSnAjax.nonce,
+                    nonce: agwp_sn_ajax.nonce,
                     comment_id: commentId,
                     updates: JSON.stringify(updates)
                 })
@@ -246,14 +246,14 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
         }
 
         try {
-            const response = await fetch(agwpSnAjax.ajaxUrl, {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
                     action: 'agwp_sn_delete_comment',
-                    nonce: agwpSnAjax.nonce,
+                    nonce: agwp_sn_ajax.nonce,
                     comment_id: commentId
                 })
             });

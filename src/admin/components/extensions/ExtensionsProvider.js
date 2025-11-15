@@ -50,7 +50,7 @@ export const ExtensionsProvider = ({ children }) => {
 
     const checkExtPluginStatus = () => {
         // Check if ext plugin is active via global flag or AJAX
-        const extActive = window.agwpSnAjax?.isExtActive || false;
+        const extActive = window.agwp_sn_ajax?.isExtActive || false;
         setIsExtActive(extActive);
     };
 

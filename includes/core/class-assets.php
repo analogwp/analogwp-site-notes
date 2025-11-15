@@ -71,7 +71,7 @@ class Assets {
 		// Localize script with data.
 		wp_localize_script(
 			'agwp-sn-frontend',
-			'agwpSnAjax',
+			'agwp_sn_ajax',
 			$this->get_frontend_localized_data()
 		);
 	}
@@ -122,7 +122,7 @@ class Assets {
 		// Localize script with data.
 		wp_localize_script(
 			'agwp-sn-admin',
-			'agwpSnAjax',
+			'agwp_sn_ajax',
 			$this->get_admin_localized_data()
 		);
 	}

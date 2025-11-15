@@ -76,7 +76,7 @@ final class Plugin {
 			 *
 			 * @since 1.0.2
 			 */
-			do_action( 'analog_site_notes_loaded' );
+			do_action( 'agwp_sn_notes_loaded' );
 		}
 
 		return self::$instance;
@@ -107,19 +107,6 @@ final class Plugin {
 		register_deactivation_hook( AGWP_SN_PLUGIN_FILE, array( $this, 'deactivate' ) );
 	}
 
-
-
-	/**
-	 * Loads the translation files.
-	 *
-	 * @since 1.0.2
-	 * @access public
-	 * @return void
-	 */
-	public function lang() {
-		load_plugin_textdomain( 'analogwp-site-notes', false, AGWP_SN_PLUGIN_PATH . 'languages' );
-	}
-
 	/**
 	 * Include required files.
 	 *
@@ -141,9 +128,6 @@ final class Plugin {
 	 * @since 1.0.0
 	 */
 	public function setup() {
-		// Load translation files.
-		$this->lang();
-
 		// Include required files.
 		$this->includes();
 
@@ -163,6 +147,10 @@ final class Plugin {
 	public function activate( $network_wide = false ) {
 		// Create database tables.
 		if ( ! $this->database ) {
+			if ( ! class_exists( Database::class ) ) {
+				require_once AGWP_SN_PLUGIN_PATH . 'includes/utils/trait-instance.php';
+				require_once AGWP_SN_PLUGIN_PATH . 'includes/core/data/class-database.php';
+			}
 			$this->database = Database::get_instance();
 		}
 

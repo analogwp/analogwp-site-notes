@@ -22,7 +22,7 @@ const LEVEL_NAMES = {
  * Get current log level from settings
  */
 const getCurrentLogLevel = () => {
-    const config = window.agwpSnAjax || {};
+    const config = window.agwp_sn_ajax || {};
     const levelName = config.logLevel || 'error';
     return LEVEL_NAMES[levelName] ?? LOG_LEVELS.ERROR;
 };
@@ -31,7 +31,7 @@ const getCurrentLogLevel = () => {
  * Check if debug mode is enabled
  */
 const isDebugEnabled = () => {
-    return window.agwpSnAjax?.debug === true;
+    return window.agwp_sn_ajax?.debug === true;
 };
 
 /**

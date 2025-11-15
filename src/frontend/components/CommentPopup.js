@@ -286,7 +286,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
             // Don't add border to screenshots anymore
             
             // Get screenshot quality from settings
-            const settings = window.agwpSnAjax?.settings || {};
+            const settings = window.agwp_sn_ajax?.settings || {};
             const screenshotQuality = settings.general?.screenshot_quality ?? 0.8;
             
             // Convert to data URL
@@ -401,7 +401,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                 );
 
                 // Get screenshot quality from settings
-                const settings = window.agwpSnAjax?.settings || {};
+                const settings = window.agwp_sn_ajax?.settings || {};
                 const screenshotQuality = settings.general?.screenshot_quality ?? 0.8;
 
                 const fallbackDataURL = croppedCanvas.toDataURL('image/png', screenshotQuality);
@@ -432,11 +432,11 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
         
         try {
             // Get settings from localized data
-            const settings = window.agwpSnAjax?.settings || {};
+            const settings = window.agwp_sn_ajax?.settings || {};
             const autoScreenshot = settings.general?.auto_screenshot ?? true;
             
             logger.debug('Screenshot settings:', {
-                settings: window.agwpSnAjax?.settings,
+                settings: window.agwp_sn_ajax?.settings,
                 autoScreenshot,
                 generalSettings: settings.general
             });
