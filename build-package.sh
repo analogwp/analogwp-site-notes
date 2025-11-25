@@ -1,9 +1,12 @@
 #!/bin/bash
 
-# AnalogWP Site Notes - Build and Package Script
-# For internal testing releases
+# AnalogWP Site Notes - WordPress.org Package Builder
+# Creates a clean distribution package ready for WordPress.org submission
 
 set -e  # Exit on any error
+
+echo "🎯 Building AnalogWP Site Notes for WordPress.org"
+echo "===================================================="
 
 # Get plugin directory and version
 PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -16,11 +19,9 @@ if [ -z "$VERSION" ]; then
     exit 1
 fi
 
-echo "🚀 Building AnalogWP Site Notes Toolkit v${VERSION} for Internal Testing"
-echo "================================================================"
-
-BUILD_DIR="$PLUGIN_DIR/build-package"
-PACKAGE_NAME="$PLUGIN_SLUG-v${VERSION}-testing"
+BUILD_DIR="$PLUGIN_DIR/build"
+PACKAGE_NAME="$PLUGIN_SLUG"
+PACKAGE_PATH="$BUILD_DIR/$PACKAGE_NAME"
 
 # Colors for output
 RED='\033[0;31m'
@@ -49,237 +50,318 @@ print_error() {
 print_step "Cleaning previous builds..."
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
+mkdir -p "$PACKAGE_PATH"
 print_success "Build directory cleaned"
 
-# Step 2: Install dependencies and build
-print_step "Installing dependencies..."
-if [ -f "$PLUGIN_DIR/package.json" ]; then
-    cd "$PLUGIN_DIR"
-    
-    # Check if node_modules exists
-    if [ ! -d "node_modules" ]; then
-        print_warning "node_modules not found, running npm install..."
-        npm install
-    fi
-    
-    print_step "Building production assets..."
-    npm run build
-    print_success "Assets built successfully"
-else
-    print_error "package.json not found!"
-    exit 1
-fi
-
-# Step 3: Copy plugin files
-print_step "Copying plugin files..."
+# Step 2: Build production assets
+print_step "Building production assets..."
 cd "$PLUGIN_DIR"
 
-# Create the package directory
-PACKAGE_PATH="$BUILD_DIR/$PACKAGE_NAME"
-mkdir -p "$PACKAGE_PATH"
+if [ ! -d "node_modules" ]; then
+    print_warning "node_modules not found, running npm install..."
+    npm install
+fi
 
-# Copy main plugin files
+npm run build
+print_success "Production assets built"
+
+# Step 3: Copy files respecting .distignore
+print_step "Copying plugin files (respecting .distignore)..."
+
+# Function to check if path should be ignored
+should_ignore() {
+    local path="$1"
+    local filename=$(basename "$path")
+    
+    # Read .distignore and check each pattern
+    while IFS= read -r pattern; do
+        # Skip empty lines and comments
+        [[ -z "$pattern" || "$pattern" =~ ^# ]] && continue
+        
+        # Remove leading/trailing whitespace
+        pattern=$(echo "$pattern" | xargs)
+        
+        # Check if path matches pattern
+        if [[ "$path" == $pattern || "$path" =~ $pattern || "$filename" == $pattern ]]; then
+            return 0  # Should ignore
+        fi
+    done < "$PLUGIN_DIR/.distignore"
+    
+    return 1  # Should not ignore
+}
+
+# Copy all files and directories, excluding those in .distignore
+cd "$PLUGIN_DIR"
+
+# Copy main plugin file
 cp analogwp-site-notes.php "$PACKAGE_PATH/"
-cp README.md "$PACKAGE_PATH/"
-cp CHANGELOG.md "$PACKAGE_PATH/"
-cp TESTING_GUIDE.md "$PACKAGE_PATH/"
-cp DEPLOYMENT_CHECKLIST.md "$PACKAGE_PATH/"
+
+# Copy readme.txt (WordPress.org format)
+if [ -f "readme.txt" ]; then
+    cp readme.txt "$PACKAGE_PATH/"
+else
+    print_warning "readme.txt not found - you'll need to create this for WordPress.org"
+fi
+
+# Copy license
+if [ -f "license.txt" ]; then
+    cp license.txt "$PACKAGE_PATH/"
+fi
 
 # Copy includes directory
 if [ -d "includes" ]; then
     mkdir -p "$PACKAGE_PATH/includes"
-    cp -r includes/* "$PACKAGE_PATH/includes/"
+    rsync -av --exclude='*.log' includes/ "$PACKAGE_PATH/includes/"
     print_success "Includes directory copied"
-else
-    print_error "Includes directory not found!"
-    exit 1
 fi
 
-# Copy src directory (source files)
-if [ -d "src" ]; then
-    mkdir -p "$PACKAGE_PATH/src"
-    cp -r src/* "$PACKAGE_PATH/src/"
-    print_success "Source files copied"
-else
-    print_error "Source directory not found!"
-    exit 1
-fi
-
-# Copy build directory (compiled assets)
-if [ -d "build" ]; then
-    mkdir -p "$PACKAGE_PATH/build"
-    cp -r build/* "$PACKAGE_PATH/build/"
+# Copy build directory (compiled assets) - REQUIRED
+if [ -d "assets/js/app" ]; then
+    mkdir -p "$PACKAGE_PATH/assets/js/app"
+    cp -r assets/js/app/* "$PACKAGE_PATH/assets/js/app/"
     print_success "Compiled assets copied"
 else
-    print_error "Build directory not found! Make sure 'npm run build' completed successfully."
+    print_error "Build directory not found! Run 'npm run build' first."
     exit 1
 fi
 
-# Copy package.json for reference
-cp package.json "$PACKAGE_PATH/"
+# Copy source files - REQUIRED by WordPress.org for plugins with build processes
+if [ -d "src" ]; then
+    mkdir -p "$PACKAGE_PATH/src"
+    rsync -av --exclude='*.log' --exclude='*.tmp' src/ "$PACKAGE_PATH/src/"
+    print_success "Source files copied (required for WordPress.org review)"
+fi
 
-print_success "Plugin files copied"
+# Copy other necessary files
+if [ -f "uninstall.php" ]; then
+    cp uninstall.php "$PACKAGE_PATH/"
+    print_success "uninstall.php copied"
+fi
 
-# Step 4: Create package information
-print_step "Creating package information..."
+# Copy languages directory if exists
+if [ -d "languages" ]; then
+    mkdir -p "$PACKAGE_PATH/languages"
+    cp -r languages/* "$PACKAGE_PATH/languages/"
+    print_success "Languages directory copied"
+fi
 
-cat > "$PACKAGE_PATH/PACKAGE_INFO.txt" << EOF
-AnalogWP Site Notes - Internal Testing Package
-================================================
+# Copy assets/images directory (for plugin logo, etc.)
+if [ -d "assets/images" ]; then
+    mkdir -p "$PACKAGE_PATH/assets/images"
+    cp -r assets/images/* "$PACKAGE_PATH/assets/images/"
+    print_success "Asset images copied"
+fi
 
-Version: ${VERSION}
-Build Date: $(date)
-Package Type: Internal Testing Release
+print_success "Plugin files copied (excluding development files)"
 
-🆕 FEATURES IN v${VERSION}:
-- Task editing functionality
-- Persistent timesheet system  
-- Modern toast notifications
-- Enhanced UI/UX improvements
-
-📋 TESTING INSTRUCTIONS:
-1. Read TESTING_GUIDE.md for comprehensive testing scenarios
-2. Install on WordPress 6.0+ with PHP 7.4+
-3. Test all new features thoroughly
-4. Report bugs using the template in TESTING_GUIDE.md
-
-🔧 INSTALLATION:
-1. Upload to /wp-content/plugins/analogwp-site-notes/
-2. Activate plugin (database will auto-upgrade)
-3. Navigate to Site Notes dashboard
-4. Start testing!
-
-⚠️  IMPORTANT NOTES:
-- This is a testing release, not for production
-- Always backup your database before installation
-- Plugin automatically adds 'timesheet' column to comments table
-- Rollback instructions available in DEPLOYMENT_CHECKLIST.md
-
-📞 SUPPORT:
-- GitHub Issues: Create detailed bug reports
-- Slack: #site-notes-testing
-- Emergency: Contact @lushkant directly
-
-Built on: $(hostname)
-Build Path: $PACKAGE_PATH
-EOF
-
-print_success "Package information created"
-
-# Step 5: Verify critical files
+# Step 4: Verify critical files
 print_step "Verifying package contents..."
 
 REQUIRED_FILES=(
     "analogwp-site-notes.php"
-    "README.md"
-    "CHANGELOG.md"
-    "TESTING_GUIDE.md"
-    "includes/class-database.php"
-    "build/admin.js"
-    "build/admin.css"
-    "src/admin/components/TaskDetail.js"
-    "src/admin/components/ToastProvider.js"
+    "includes/core/data/class-database.php"
+    "assets/js/app/admin.js"
+    "assets/js/app/admin.css"
+    "assets/js/app/frontend.js"
+    "assets/js/app/frontend.css"
 )
 
+MISSING_FILES=0
 for file in "${REQUIRED_FILES[@]}"; do
     if [ -f "$PACKAGE_PATH/$file" ]; then
-        print_success "✓ $file"
+        echo "   ✓ $file"
     else
-        print_error "✗ Missing: $file"
-        exit 1
+        print_error "   ✗ Missing: $file"
+        MISSING_FILES=$((MISSING_FILES + 1))
     fi
 done
 
-# Step 6: Check file sizes
-print_step "Checking file sizes..."
-ADMIN_JS_SIZE=$(stat -f%z "$PACKAGE_PATH/build/admin.js" 2>/dev/null || stat -c%s "$PACKAGE_PATH/build/admin.js" 2>/dev/null)
-ADMIN_CSS_SIZE=$(stat -f%z "$PACKAGE_PATH/build/admin.css" 2>/dev/null || stat -c%s "$PACKAGE_PATH/build/admin.css" 2>/dev/null)
-
-echo "   - admin.js: $(echo "scale=2; $ADMIN_JS_SIZE/1024" | bc)KB"
-echo "   - admin.css: $(echo "scale=2; $ADMIN_CSS_SIZE/1024" | bc)KB"
-
-# Warn if files are too large
-if [ "$ADMIN_JS_SIZE" -gt 100000 ]; then
-    print_warning "admin.js is quite large (>100KB). Consider code splitting for production."
+if [ $MISSING_FILES -gt 0 ]; then
+    print_error "Missing $MISSING_FILES required files!"
+    exit 1
 fi
 
-print_success "File sizes verified"
+print_success "All required files present"
+
+# Step 5: Check for development artifacts
+print_step "Checking for development artifacts..."
+
+DEV_ARTIFACTS=(
+    "node_modules"
+    "src"
+    "package.json"
+    ".git"
+    ".gitignore"
+    "composer.json"
+    "webpack.config.js"
+		"tailwind.config.js"
+)
+
+FOUND_ARTIFACTS=0
+for artifact in "${DEV_ARTIFACTS[@]}"; do
+    if [ -e "$PACKAGE_PATH/$artifact" ]; then
+        print_warning "Found development artifact: $artifact"
+        FOUND_ARTIFACTS=$((FOUND_ARTIFACTS + 1))
+    fi
+done
+
+if [ $FOUND_ARTIFACTS -eq 0 ]; then
+    print_success "No development artifacts found (clean package!)"
+fi
+
+# Step 6: Check file sizes
+print_step "Checking asset sizes..."
+
+if [ -f "$PACKAGE_PATH/assets/js/app/admin.js" ]; then
+    ADMIN_JS_SIZE=$(stat -f%z "$PACKAGE_PATH/assets/js/app/admin.js" 2>/dev/null || stat -c%s "$PACKAGE_PATH/assets/js/app/admin.js" 2>/dev/null)
+    ADMIN_JS_KB=$(echo "scale=2; $ADMIN_JS_SIZE/1024" | bc)
+    echo "   admin.js: ${ADMIN_JS_KB}KB"
+    
+    if [ "$ADMIN_JS_SIZE" -gt 200000 ]; then
+        print_warning "admin.js is quite large (>${ADMIN_JS_KB}KB). WordPress.org prefers smaller assets."
+    fi
+fi
+
+if [ -f "$PACKAGE_PATH/assets/js/app/frontend.js" ]; then
+    FRONTEND_JS_SIZE=$(stat -f%z "$PACKAGE_PATH/assets/js/app/frontend.js" 2>/dev/null || stat -c%s "$PACKAGE_PATH/assets/js/app/frontend.js" 2>/dev/null)
+    FRONTEND_JS_KB=$(echo "scale=2; $FRONTEND_JS_SIZE/1024" | bc)
+    echo "   frontend.js: ${FRONTEND_JS_KB}KB"
+fi
+
+# Calculate total package size
+TOTAL_SIZE=$(du -sh "$PACKAGE_PATH" | awk '{print $1}')
+echo "   Total package size: $TOTAL_SIZE"
+
+print_success "Asset sizes checked"
 
 # Step 7: Create ZIP package
-print_step "Creating distribution package..."
+print_step "Creating WordPress.org distribution package..."
 cd "$BUILD_DIR"
 
-# Create ZIP file
+ZIP_NAME="${PLUGIN_SLUG}.${VERSION}.zip"
+
 if command -v zip &> /dev/null; then
-    zip -r "$PACKAGE_NAME.zip" "$PACKAGE_NAME/" -x "*.DS_Store" "*/node_modules/*" "*/.git/*"
-    print_success "ZIP package created: $BUILD_DIR/$PACKAGE_NAME.zip"
+    zip -r "$ZIP_NAME" "$PACKAGE_NAME/" -x "*.DS_Store" "*/\.*"
+    print_success "ZIP package created: $BUILD_DIR/$ZIP_NAME"
+    
+    ZIP_SIZE=$(du -sh "$ZIP_NAME" | awk '{print $1}')
+    echo "   ZIP file size: $ZIP_SIZE"
 else
-    print_warning "ZIP command not available, creating tar.gz instead"
-    tar -czf "$PACKAGE_NAME.tar.gz" "$PACKAGE_NAME/"
-    print_success "TAR package created: $BUILD_DIR/$PACKAGE_NAME.tar.gz"
+    print_error "ZIP command not available!"
+    exit 1
 fi
 
-# Step 8: Generate testing checklist
-print_step "Generating testing checklist..."
+# Step 8: Generate submission checklist
+print_step "Generating WordPress.org submission checklist..."
 
-cat > "$BUILD_DIR/TESTING_CHECKLIST.md" << EOF
-# Testing Checklist for v1.1.0
+cat > "$BUILD_DIR/WPORG_SUBMISSION_CHECKLIST.txt" << EOF
+WordPress.org Submission Checklist for v${VERSION}
+================================================
 
-## Pre-Installation
-- [ ] WordPress 6.0+ environment ready
-- [ ] PHP 7.4+ confirmed
-- [ ] Database backup created
-- [ ] Previous version deactivated
+Package: ${ZIP_NAME}
+Location: ${BUILD_DIR}/${ZIP_NAME}
+Size: ${ZIP_SIZE}
 
-## Installation Testing
-- [ ] Plugin uploaded to correct directory
-- [ ] Plugin activates without errors
-- [ ] Database upgrade completes successfully
-- [ ] No PHP errors in logs
-- [ ] Admin dashboard accessible
+PRE-SUBMISSION CHECKLIST:
+========================
 
-## Feature Testing
-- [ ] Task editing functionality works
-- [ ] Timesheet system operational
-- [ ] Toast notifications positioned correctly
-- [ ] Edit buttons appear on existing tasks
-- [ ] No edit button on new task modal
+Plugin Requirements:
+□ GPL-compatible license (GPL v2 or later) ✓
+□ No obfuscated code ✓
+□ No "powered by" links ✓
+□ No external dependencies requiring API keys
+□ Compatible with latest WordPress version
 
-## Browser Testing
-- [ ] Chrome (latest)
-- [ ] Firefox (latest)
-- [ ] Safari (latest)
-- [ ] Edge (latest)
+Code Quality:
+□ No console.log statements in production ✓ (using conditional logger)
+□ No PHP errors or warnings
+□ Follows WordPress Coding Standards
+□ All text is internationalized (i18n)
+□ Nonces used for all forms
+□ Data sanitized and validated
+□ SQL uses \$wpdb->prepare()
 
-## Data Persistence
-- [ ] Timesheet data survives page refresh
-- [ ] Each task has separate timesheet
-- [ ] Edit changes persist
-- [ ] No data loss during operations
+Documentation:
+□ readme.txt file present and complete
+□ Valid plugin headers in main file
+□ Screenshots added (recommended)
+□ Banner and icon images (recommended)
+□ FAQ section in readme.txt
+□ Changelog up to date
 
-## Issue Reporting
-Use the bug report template in TESTING_GUIDE.md for any issues found.
+Testing:
+□ Tested on WordPress ${VERSION%.*}+
+□ Tested with PHP 7.4+
+□ No JavaScript errors in console (debug mode OFF)
+□ Works with default WordPress themes
+□ Compatible with major page builders (if applicable)
+□ Multisite compatible (tested)
+
+SUBMISSION STEPS:
+================
+
+1. Create WordPress.org account (if needed)
+   → https://wordpress.org/support/register.php
+
+2. Submit plugin for review
+   → https://wordpress.org/plugins/developers/add/
+
+3. Upload plugin information:
+   - Plugin Name: Site Notes
+   - Plugin URL: https://analogwp.com/
+   - Description: (Use short description from readme.txt)
+
+4. Upload ZIP file: ${ZIP_NAME}
+
+5. Wait for review (typically 2-14 days)
+   - Check email for review feedback
+   - Be ready to make changes if requested
+
+6. After approval:
+   - Set up SVN repository
+   - Add assets (.wordpress-org folder contents)
+   - Tag first version
+   - Submit for final review
+
+POST-APPROVAL:
+=============
+
+□ Upload banner-772x250.png to assets/
+□ Upload banner-1544x500.png to assets/ (retina)
+□ Upload icon-128x128.png to assets/
+□ Upload icon-256x256.png to assets/ (retina)
+□ Add screenshots to assets/
+□ Create first SVN tag (${VERSION})
+
+IMPORTANT NOTES:
+===============
+
+• This is a WordPress.org clean build
+• No development files included
+• Uses conditional logging (WordPress.org compliant)
+• Ready for submission
+• Make sure readme.txt validates at:
+  https://wordpress.org/plugins/developers/readme-validator/
+
+Built on: $(date)
+Package: ${ZIP_NAME}
 EOF
 
-print_success "Testing checklist created"
+print_success "Submission checklist created"
 
 # Step 9: Final summary
 echo ""
-echo "🎉 Package Build Complete!"
-echo "========================="
+echo "🎉 WordPress.org Package Build Complete!"
+echo "========================================"
 echo ""
-echo "📦 Package Location: $BUILD_DIR/$PACKAGE_NAME"
-if [ -f "$BUILD_DIR/$PACKAGE_NAME.zip" ]; then
-    echo "🗜️  ZIP File: $BUILD_DIR/$PACKAGE_NAME.zip"
-fi
-echo "📋 Testing Checklist: $BUILD_DIR/TESTING_CHECKLIST.md"
+echo "📦 Package: $BUILD_DIR/$ZIP_NAME"
+echo "📊 Size: $ZIP_SIZE"
+echo "🏷️  Version: $VERSION"
 echo ""
-echo "📨 Ready for Distribution!"
+echo "📋 Next Steps:"
+echo "   1. Review: $BUILD_DIR/WPORG_SUBMISSION_CHECKLIST.txt"
+echo "   2. Validate readme.txt at: https://wordpress.org/plugins/developers/readme-validator/"
+echo "   3. Test the ZIP on a clean WordPress install"
+echo "   4. Submit to WordPress.org when ready"
 echo ""
-echo "Next Steps:"
-echo "1. Share the ZIP file with internal testing team"
-echo "2. Provide link to testing documentation"
-echo "3. Set up communication channels for feedback"
-echo "4. Monitor for bug reports and issues"
-echo ""
-print_success "Build script completed successfully! 🚀"
+print_success "Ready for WordPress.org submission! 🚀"

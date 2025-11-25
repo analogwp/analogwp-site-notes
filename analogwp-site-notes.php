@@ -3,7 +3,7 @@
  * Plugin Name: AnalogWP Site Notes
  * Plugin URI: https://github.com/analogwp/analogwp-site-notes
  * Description: A comprehensive solution for agency-client transitions with visual commenting system, maintenance scheduling, and client-friendly editing mode.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: AnalogWP
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Define plugin constants.
-define( 'AGWP_SN_VERSION', '1.0.2' );
+define( 'AGWP_SN_VERSION', '1.0.3' );
 define( 'AGWP_SN_PLUGIN_FILE', __FILE__ );
 define( 'AGWP_SN_PLUGIN_URL', plugin_dir_url( AGWP_SN_PLUGIN_FILE ) );
 define( 'AGWP_SN_PLUGIN_PATH', plugin_dir_path( AGWP_SN_PLUGIN_FILE ) );

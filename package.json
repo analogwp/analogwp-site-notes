@@ -1,6 +1,6 @@
 {
   "name": "analogwp-site-notes",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A comprehensive solution for agency-client transitions with visual commenting system",
   "main": "index.js",
   "scripts": {
@@ -12,8 +12,7 @@
     "lint:js": "wp-scripts lint-js",
     "packages-update": "wp-scripts packages-update",
     "package": "npm run build && bash build-package.sh",
-    "package:wporg": "npm run build && bash build-wporg.sh",
-    "clean": "rm -rf build build-package *.zip *.tar.gz"
+    "clean": "rm -rf assets/js/app build *.zip *.tar.gz"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.14",

@@ -4,6 +4,7 @@ vendor/
 
 # Build files
 assets/dist/
+assets/js/app
 build/
 dist/
 

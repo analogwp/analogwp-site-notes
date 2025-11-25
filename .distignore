@@ -2,7 +2,9 @@
 # For WordPress.org SVN deployment
 
 # Directories
+/.wordpress-org
 /.git
+/.github
 /.github
 /.vscode
 /.idea
@@ -36,13 +38,14 @@ phpunit.xml.dist
 composer.json
 composer.lock
 
-# Note: package.json, webpack.config.js, postcss.config.js, and tailwind.config.js
-# are included to allow WordPress.org reviewers to rebuild from source
-# package-lock.json and yarn.lock excluded as they're not needed for rebuild
-
+# Not needed in production
+package.json
 package-lock.json
 yarn.lock
 tsconfig.json
+tailwind.config.js
+postcss.config.js
+build-package.sh
 
 # Documentation (not needed in production)
 README.md
