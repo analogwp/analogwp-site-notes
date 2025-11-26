@@ -1,4 +1,4 @@
-=== AnalogWP Site Notes ===
+=== Site Notes: Feedback, Notes with Sitewide Visual Commenting ===
 Contributors: analogwp, lushkant, johnpixle
 Tags: notes, feedback, collaboration, comments, task-management
 Requires at least: 6.2
@@ -120,26 +120,11 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 * Responsive design for mobile compatibility
 * WordPress admin bar integration
 
-
-== Developer Notes ==
-
-This plugin follows WordPress coding standards and best practices:
-
-* Object-oriented architecture with proper separation of concerns
-* Secure AJAX handling with nonce verification
-* Proper data sanitization and validation
-* Translation-ready with proper text domains
-* Clean, modular code structure
-* Comprehensive error handling
-
-The plugin is actively maintained and follows semantic versioning.
-
 == Support ==
 
 For support, feature requests, or bug reports:
 
-* Visit the WordPress.org support forum for this plugin
-* Check the documentation on our website
-* Report issues on our GitHub repository
+* [Visit the WordPress.org support forum for this plugin](https://wordpress.org/support/plugin/analogwp-site-notes/)
+* [Documentation](https://analogwp.com/docs/)
 
 We're committed to providing excellent support and regular updates.
