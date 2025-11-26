@@ -1,5 +1,16 @@
 /* Tailwind CSS v4 - Standard import */
-@import "tailwindcss";
+/* 1) Global Tailwind theme → registers all the CSS vars */
+@import "tailwindcss/theme";
+
+/* 3) Scope the actual styles to your wrapper */
+@scope (#wpbody-content) {
+	/* Scoped preflight (optional) */
+	@import "tailwindcss/preflight";
+
+	/* Scoped utilities */
+	@import "tailwindcss/utilities";
+}
+
 
 /* ====================================
    Minimal Styles Only.
