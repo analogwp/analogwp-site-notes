@@ -487,9 +487,10 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder={__('Comment title (optional)', 'analogwp-site-notes')}
+                            placeholder={__('Title', 'analogwp-site-notes')}
                             className="sn-comment-title"
                             disabled={isLoading}
+                            autoFocus
                         />
                         
                         <textarea
@@ -499,7 +500,6 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                             className="sn-comment-textarea"
                             rows="4"
                             disabled={isLoading}
-                            autoFocus
                         />
                         
                         <div className="sn-priority-selector">

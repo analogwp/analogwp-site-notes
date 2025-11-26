@@ -132,6 +132,11 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
       background: rgba(0, 0, 0, 0.08);
       color: $text-color;
     }
+
+		svg {
+			width: 20px;
+			height: 20px;
+		}
   }
   
   .sn-comments-count {
@@ -1342,7 +1347,6 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
 }
 
 .sn-comment-title {
-  color: #2271b1;
   font-size: 13px;
   margin-bottom: 4px;
 }
@@ -1351,7 +1355,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
 .sn-comment-title {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid $border-color;
   border-radius: 6px;
   font-size: 14px;
   line-height: 1.4;
@@ -1361,10 +1365,6 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     outline: none;
     border-color: $primary-color;
     box-shadow: 0 0 0 1px $primary-color;
-  }
-  
-  &::placeholder {
-    color: #9ca3af;
   }
 }
 
