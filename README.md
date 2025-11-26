@@ -1,9 +1,10 @@
-# Site Notes Toolkit for WordPress
+# Site Notes: Feedback, Notes with Sitewide Visual Commenting
 
-[![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg)](https://wordpress.org/)
+[![WordPress plugin](https://img.shields.io/wordpress/plugin/dt/analogwp-site-notes.svg?style=flat)](https://wordpress.org/plugins/analogwp-site-notes/)
+[![Installs](https://img.shields.io/wordpress/plugin/installs/analogwp-site-notes.svg)](https://wordpress.org/plugins/analogwp-site-notes/)
 [![PHP](https://img.shields.io/badge/PHP-7.4%2B-purple.svg)](https://php.net/)
 [![License](https://img.shields.io/badge/License-GPL%20v2%2B-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
-[![Version](https://img.shields.io/badge/Version-1.1.0-orange.svg)](https://github.com/analogwp/analogwp-site-notes)
+[![WordPress plugin](https://img.shields.io/wordpress/plugin/v/analogwp-site-notes.svg?style=flat)](https://wordpress.org/plugins/analogwp-site-notes/)
 
 **Transform client feedback into action.** Your clients click on any website element to leave comments. You manage everything through a beautiful admin dashboard. No more confusing emails or vague "fix the blue thing" requests.
 
