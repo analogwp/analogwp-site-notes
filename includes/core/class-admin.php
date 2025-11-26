@@ -62,7 +62,7 @@ class Admin {
 			'read', // Use 'read' capability which all logged-in users have.
 			'agwp-sn-dashboard',
 			array( $this, 'render_admin_page' ),
-			'dashicons-feedback',
+			AGWP_SN_PLUGIN_URL . 'assets/images/icon-skeleton.svg',
 			30
 		);
 

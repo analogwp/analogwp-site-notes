@@ -45,7 +45,7 @@ class Assets {
 			return;
 		}
 
-		$asset_file = AGWP_SN_PLUGIN_PATH . 'assets/app/frontend.asset.php';
+		$asset_file = AGWP_SN_PLUGIN_PATH . 'assets/js/app/frontend.asset.php';
 
 		if ( ! file_exists( $asset_file ) ) {
 			return;
@@ -55,7 +55,7 @@ class Assets {
 
 		wp_enqueue_script(
 			'agwp-sn-frontend',
-			AGWP_SN_PLUGIN_URL . 'assets/app/frontend.js',
+			AGWP_SN_PLUGIN_URL . 'assets/js/app/frontend.js',
 			$asset['dependencies'],
 			$asset['version'],
 			true
@@ -63,7 +63,7 @@ class Assets {
 
 		wp_enqueue_style(
 			'agwp-sn-frontend',
-			AGWP_SN_PLUGIN_URL . 'assets/app/frontend.css',
+			AGWP_SN_PLUGIN_URL . 'assets/js/app/frontend.css',
 			array(),
 			$asset['version']
 		);
@@ -88,7 +88,7 @@ class Assets {
 			return;
 		}
 
-		$asset_file = AGWP_SN_PLUGIN_PATH . 'assets/app/admin.asset.php';
+		$asset_file = AGWP_SN_PLUGIN_PATH . 'assets/js/app/admin.asset.php';
 
 		if ( ! file_exists( $asset_file ) ) {
 			return;
@@ -98,7 +98,7 @@ class Assets {
 
 		wp_enqueue_script(
 			'agwp-sn-admin',
-			AGWP_SN_PLUGIN_URL . 'assets/app/admin.js',
+			AGWP_SN_PLUGIN_URL . 'assets/js/app/admin.js',
 			$asset['dependencies'],
 			$asset['version'],
 			true
@@ -114,7 +114,7 @@ class Assets {
 
 		wp_enqueue_style(
 			'agwp-sn-admin',
-			AGWP_SN_PLUGIN_URL . 'assets/app/admin.css',
+			AGWP_SN_PLUGIN_URL . 'assets/js/app/admin.css',
 			array( 'wp-components' ),
 			$asset['version']
 		);
