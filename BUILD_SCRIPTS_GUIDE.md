@@ -2,15 +2,9 @@
 
 ## Overview
 
-This plugin includes two build scripts for different distribution purposes:
+This plugin includes the following build scripts for different distribution purposes:
 
-### 1. `build-package.sh` - Internal Testing Releases
-- Creates packages for internal testing and QA
-- Includes development documentation (TESTING_GUIDE.md, etc.)
-- Includes source files for debugging
-- Adds package information and testing checklists
-
-### 2. `build-wporg.sh` - WordPress.org Distribution
+### 2. `build-package.sh` - WordPress.org Distribution
 - Creates clean packages for WordPress.org submission
 - Respects `.distignore` file (excludes dev files)
 - Validates required files
@@ -28,34 +22,12 @@ Added to `package.json`:
     "start": "wp-scripts start",                     // Development with hot reload
     "dev": "wp-scripts start",                       // Alias for start
     "package": "npm run build && bash build-package.sh",      // Internal testing package
-    "package:wporg": "npm run build && bash build-wporg.sh",  // WordPress.org package
     "clean": "rm -rf build build-package dist *.zip *.tar.gz" // Clean all builds
   }
 }
 ```
 
 ## Usage
-
-### For Internal Testing
-
-```bash
-# Build and create testing package
-npm run package
-
-# Output:
-# - build-package/analogwp-site-notes-v1.0.0-testing/
-# - build-package/analogwp-site-notes-v1.0.0-testing.zip
-# - build-package/TESTING_CHECKLIST.md
-```
-
-**Includes:**
-- ✅ Main plugin file
-- ✅ README.md, CHANGELOG.md
-- ✅ TESTING_GUIDE.md, DEPLOYMENT_CHECKLIST.md
-- ✅ Source files (`src/`)
-- ✅ Compiled assets (`build/`)
-- ✅ Package information
-- ✅ Testing checklist
 
 ### For WordPress.org Submission
 
@@ -64,9 +36,9 @@ npm run package
 npm run package:wporg
 
 # Output:
-# - dist/analogwp-site-notes/
-# - dist/analogwp-site-notes.1.0.0.zip
-# - dist/WPORG_SUBMISSION_CHECKLIST.txt
+# - build/analogwp-site-notes/
+# - build/analogwp-site-notes.1.0.0.zip
+# - build/WPORG_SUBMISSION_CHECKLIST.txt
 ```
 
 **Includes:**
@@ -112,18 +84,6 @@ Created `.distignore` following WordPress.org standards. This file tells the Wor
 
 ## Build Script Features
 
-### build-package.sh (Internal Testing)
-1. ✅ Automatically extracts version from plugin file
-2. ✅ Installs dependencies if needed
-3. ✅ Builds production assets
-4. ✅ Copies all relevant files including source
-5. ✅ Creates package information
-6. ✅ Verifies critical files
-7. ✅ Checks file sizes with warnings
-8. ✅ Creates ZIP package
-9. ✅ Generates testing checklist
-10. ✅ Provides deployment summary
-
 ### build-wporg.sh (WordPress.org)
 1. ✅ Automatically extracts version from plugin file
 2. ✅ Builds production assets
@@ -137,21 +97,6 @@ Created `.distignore` following WordPress.org standards. This file tells the Wor
 10. ✅ Provides submission guidance
 
 ## File Structure
-
-### Internal Testing Package
-```
-analogwp-site-notes-v1.0.0-testing/
-├── analogwp-site-notes.php
-├── README.md
-├── CHANGELOG.md
-├── TESTING_GUIDE.md
-├── DEPLOYMENT_CHECKLIST.md
-├── PACKAGE_INFO.txt
-├── includes/
-├── src/                    ← Source files included
-├── build/                  ← Compiled assets
-└── package.json           ← Reference
-```
 
 ### WordPress.org Package
 ```
@@ -191,21 +136,6 @@ Before running `npm run package:wporg`:
 - [ ] Check all features work as expected
 - [ ] Create screenshots (optional but recommended)
 - [ ] Create banner and icon (optional but recommended)
-
-## WordPress.org Assets
-
-For best presentation on WordPress.org, add these to `.wordpress-org/` directory:
-
-```
-.wordpress-org/
-├── banner-772x250.png      (required for plugin page header)
-├── banner-1544x500.png     (retina version)
-├── icon-128x128.png        (required for plugin card)
-├── icon-256x256.png        (retina version)
-├── screenshot-1.png        (optional, shows in plugin page)
-├── screenshot-2.png
-└── screenshot-3.png
-```
 
 These are automatically included in the WordPress.org package.
 

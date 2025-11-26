@@ -1,10 +1,10 @@
 === AnalogWP Site Notes ===
 Contributors: analogwp, lushkant, johnpixle
-Tags: comments, feedback, collaboration, handoff, task-management
+Tags: notes, feedback, collaboration, comments, task-management
 Requires at least: 6.2
-Tested up to: 6.8
+Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,6 +41,10 @@ Site Notes streamlines the process of handing over websites from agencies to cli
 4. **Track Progress** - Monitor status from Open to In Progress to Resolved
 5. **Collaborate** - Add replies and updates to comments
 6. **Manage** - Use the admin dashboard for overview and bulk actions
+
+---
+
+**From the team at AnalogWP** – creators of [Style Kits for Elementor](https://analogwp.com/style-kits/), trusted by thousands of designers worldwide.
 
 == Installation ==
 
@@ -79,7 +83,7 @@ Yes, the plugin is fully translation-ready with proper internationalization supp
 
 = What are the minimum requirements? =
 
-WordPress 5.0+, PHP 7.4+, and a modern web browser with JavaScript enabled.
+WordPress 6.2+, PHP 7.4+, and a modern web browser with JavaScript enabled.
 
 = Does it work with any theme? =
 
@@ -88,12 +92,15 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 == Screenshots ==
 
 1. Visual commenting interface on the frontend
-2. Admin dashboard with comments overview
-3. Comment details sidebar with screenshot
-4. Task management interface
+2. Comment details sidebar with screenshot
+3. Admin dashboard with Task management interface
+4. Comment/note details page inside Admin dashboard
 5. Admin settings page
 
 == Changelog ==
+
+= 1.0.3 =
+* WP.org release
 
 = 1.0.2 =
 * Fix WP Plugin Review Team warnings
