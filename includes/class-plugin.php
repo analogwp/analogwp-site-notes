@@ -128,6 +128,9 @@ final class Plugin {
 	 * @since 1.0.0
 	 */
 	public function setup() {
+		// Register plugin action links.
+		add_filter( 'plugin_action_links_' . plugin_basename( AGWP_SN_PLUGIN_FILE ), array( self::$instance, 'plugin_action_links' ) );
+
 		// Include required files.
 		$this->includes();
 
@@ -269,6 +272,27 @@ final class Plugin {
 	public static function frontend_comments_enabled() {
 		$settings = get_option( 'agwp_sn_settings', array() );
 		return isset( $settings['general']['enable_frontend_comments'] ) ? (bool) $settings['general']['enable_frontend_comments'] : true;
+	}
+
+	/**
+	 * Plugin action links.
+	 *
+	 * Adds action links to the plugin list table
+	 *
+	 * Fired by `plugin_action_links` filter.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array $links An array of plugin action links.
+	 *
+	 * @return array An array of plugin action links.
+	 */
+	public function plugin_action_links( $links ) {
+		$settings_link = sprintf( '<a href="%1$s">%2$s</a>', admin_url( 'admin.php?page=agwp-sn-settings' ), __( 'Settings', 'analogwp-site-notes' ) );
+
+		array_unshift( $links, $settings_link );
+
+		return $links;
 	}
 
 	/**
