@@ -63,6 +63,7 @@ if [ ! -d "node_modules" ]; then
 fi
 
 npm run build
+npm run composer-public-prepare
 print_success "Production assets built"
 
 # Step 3: Copy files respecting .distignore
@@ -145,6 +146,13 @@ if [ -d "languages" ]; then
     print_success "Languages directory copied"
 fi
 
+# Copy languages directory if exists
+if [ -d "vendor" ]; then
+    mkdir -p "$PACKAGE_PATH/vendor"
+    cp -r vendor/* "$PACKAGE_PATH/vendor/"
+    print_success "Composer Vendor directory copied"
+fi
+
 # Copy assets/images directory (for plugin logo, etc.)
 if [ -d "assets/images" ]; then
     mkdir -p "$PACKAGE_PATH/assets/images"
@@ -159,6 +167,7 @@ print_step "Verifying package contents..."
 
 REQUIRED_FILES=(
     "analogwp-site-notes.php"
+		"vendor/autoload.php"
     "includes/core/data/class-database.php"
     "assets/js/app/admin.js"
     "assets/js/app/admin.css"
