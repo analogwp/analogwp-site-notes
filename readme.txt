@@ -99,6 +99,11 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 
 == Changelog ==
 
+= 1.1.0 =
+* Added Freemius SDK
+* Added Plugin Settings action link
+* Other minor changes
+
 = 1.0.3 =
 * WP.org release
 
