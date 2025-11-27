@@ -48,11 +48,6 @@ uploads/
 error_log
 debug.log
 
-# Package managers
-package-lock.json
-yarn.lock
-composer.lock
-
 # Testing and documentation generated files
 TESTING_CHECKLIST.md
 DISTRIBUTION_READY.md
