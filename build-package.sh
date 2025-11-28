@@ -63,7 +63,6 @@ if [ ! -d "node_modules" ]; then
 fi
 
 npm run build
-npm run composer-public-prepare
 print_success "Production assets built"
 
 # Step 3: Copy files respecting .distignore
