@@ -79,6 +79,8 @@ yarn-debug.log*
 yarn-error.log*
 DOCKER_ENV
 docker_tag
+webpack.config.js
+BUILD_SCRIPTS_GUIDE.md
 
 # Package files
 *.zip
