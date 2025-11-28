@@ -9,9 +9,9 @@
 /.vscode
 /.idea
 /node_modules
-/vendor
 /tests
 /bin
+/build
 /build-package
 
 # Note: /src is included as required by WordPress.org for plugins with build processes
@@ -77,6 +77,8 @@ error_log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+DOCKER_ENV
+docker_tag
 
 # Package files
 *.zip
