@@ -4,7 +4,7 @@ Tags: notes, feedback, collaboration, comments, task-management
 Requires at least: 6.2
 Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.0.3
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,11 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 5. Admin settings page
 
 == Changelog ==
+
+= 1.1.0 =
+* Added Freemius SDK
+* Added Plugin Settings action link
+* Other minor changes
 
 = 1.0.3 =
 * WP.org release

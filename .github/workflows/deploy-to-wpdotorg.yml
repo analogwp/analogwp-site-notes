@@ -12,6 +12,13 @@ jobs:
         steps:
             - uses: actions/checkout@master
 
+            - name: Install Composer dependencies
+              uses: php-actions/composer@v6
+              with:
+                  version: 2
+                  php_version: '8.0'
+                  dev: no
+
             - name: Setup Node
               uses: actions/setup-node@v1
               with:

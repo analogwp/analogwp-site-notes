@@ -1,0 +1,40 @@
+{
+    "name": "analogwp/analogwp-site-notes",
+    "description": "A comprehensive solution for agency-client transitions with visual commenting system, maintenance scheduling, and client-friendly editing mode.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0",
+    "authors": [
+		{
+			"name": "AnalogWP",
+			"email": "hello@analogwp.com"
+		},
+		{
+			"name": "Krishna Kant Chourasiya",
+			"email": "lushkant@gmail.com"
+		},
+		{
+			"name": "John Fraskos",
+			"email": "jfraskos@gmail.com"
+		}
+    ],
+    "minimum-stability": "dev",
+  	"prefer-stable": true,
+  	"config": {
+	  "sort-packages": true,
+			"allow-plugins": {
+					"civicrm/composer-downloads-plugin": true,
+					"ergebnis/composer-normalize": true
+			}
+	},
+	"require": {
+			"freemius/wordpress-sdk": "^2.10"
+	},
+	"require-dev": {
+			"civicrm/composer-downloads-plugin": "*",
+			"ergebnis/composer-normalize": "*",
+			"flow/jsonpath": "*"
+	},
+	"extra": {
+	},
+  "scripts": {}
+}
