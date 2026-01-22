@@ -27,8 +27,8 @@
 			}
 	},
 	"require": {
-			"freemius/wordpress-sdk": "^2.10"
-	},
+        "freemius/wordpress-sdk": "^2.13"
+    },
 	"require-dev": {
 			"civicrm/composer-downloads-plugin": "*",
 			"ergebnis/composer-normalize": "*",

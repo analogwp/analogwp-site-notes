@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { 
+	__,
+	sprintf
+} from '@wordpress/i18n';
 
 /**
  * External dependencies

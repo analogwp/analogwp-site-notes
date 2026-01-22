@@ -1,15 +1,15 @@
 <?php
 /**
  * Plugin Name: Site Notes
- * Plugin URI: https://github.com/analogwp/analogwp-site-notes
+ * Plugin URI: https://analogwp.com/site-notes/
  * Description: A comprehensive solution for agency-client transitions with visual commenting system, maintenance scheduling, and client-friendly editing mode.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: AnalogWP
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: analogwp-site-notes
  * Requires at least: 6.2
- * Tested up to: 6.8.3
+ * Tested up to: 6.9
  * Requires PHP: 7.4
  *
  * @package AnalogWP_Site_Notes
@@ -19,7 +19,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Define plugin constants.
-define( 'AGWP_SN_VERSION', '1.1.1' );
+define( 'AGWP_SN_VERSION', '1.1.2' );
 define( 'AGWP_SN_PLUGIN_FILE', __FILE__ );
 define( 'AGWP_SN_PLUGIN_URL', plugin_dir_url( AGWP_SN_PLUGIN_FILE ) );
 define( 'AGWP_SN_PLUGIN_PATH', plugin_dir_path( AGWP_SN_PLUGIN_FILE ) );
@@ -49,13 +49,13 @@ if ( ! function_exists( 'agwp_sn_fs' ) ) {
 
 			$agwp_sn_fs = fs_dynamic_init(
 				array(
-					'id'                  => '22009',
-					'slug'                => 'analogwp-site-notes',
-					'type'                => 'plugin',
-					'public_key'          => 'pk_7c9e9f440cfa3b8d5efd79736df85',
-					'is_premium'          => false,
-					'has_addons'          => false,
-					'has_paid_plans'      => false,
+					'id'             => '22009',
+					'slug'           => 'analogwp-site-notes',
+					'type'           => 'plugin',
+					'public_key'     => 'pk_7c9e9f440cfa3b8d5efd79736df85',
+					'is_premium'     => false,
+					'has_addons'     => false,
+					'has_paid_plans' => false,
 					'menu'           => array(
 						'slug'           => 'agwp-sn-dashboard',
 						'override_exact' => true,

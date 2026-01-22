@@ -1,6 +1,6 @@
 {
 	"name": "analogwp-site-notes",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"description": "A comprehensive solution for agency-client transitions with visual commenting system",
 	"main": "index.js",
 	"scripts": {
