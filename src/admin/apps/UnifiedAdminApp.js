@@ -352,7 +352,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
     };
 
     return (
-        <div className="sn-admin-app-wp">
+        <div className="sn-admin-app-wp max-w-[1600px]">
             {/* Global Admin Header */}
             <AdminHeader 
                 currentPage={currentPage}

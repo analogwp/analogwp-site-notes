@@ -15,7 +15,7 @@ const AdminHeader = ({
     const logoUrl = window.agwp_sn_ajax?.pluginUrl ? `${window.agwp_sn_ajax.pluginUrl}assets/images/analog-logo.svg` : '';
 
     return (
-        <div className="mb-5 border-b border-b-gray-300">
+        <div className=''>
             <div className="flex items-center justify-between py-6">
                 <div className="flex items-center gap-4">
                     <h1 
@@ -24,27 +24,6 @@ const AdminHeader = ({
                     >
                         {__('Site Notes', 'analogwp-site-notes')}
                     </h1>
-										<svg 
-                        className="w-4! h-4! text-gray-700" 
-                        width="24" 
-                        height="24" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                    >
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                    {logoUrl && (
-                        <img 
-                            src={logoUrl} 
-                            alt="Analog Logo" 
-                            className="h-6! w-auto"
-                        />
-                    )}
                 </div>
                 <div className="flex gap-3 text-base">
                     <Button 
