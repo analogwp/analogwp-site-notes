@@ -4,7 +4,7 @@ Tags: notes, feedback, collaboration, comments, task-management
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,13 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 5. Admin settings page
 
 == Changelog ==
+
+= 1.2.0 =
+* Added settings sidebar for feedback/support requests
+* Improved settings header to match with app ui
+* Set max content width for the app
+* Removed AnalogWP logo from admin app header
+* Other minor changes
 
 = 1.1.2 =
 * Fix settings page not loading due to an undefined sprintf function usage
