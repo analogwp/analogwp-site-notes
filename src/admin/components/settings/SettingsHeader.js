@@ -88,57 +88,24 @@ const SettingsHeader = ({ activeTab, onTabChange }) => {
     };
 
     return (
-        <div className="bg-white rounded-t-lg mb-6 shadow-sm">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <div className="flex flex-col">
-                    <h1 className="text-2xl font-bold text-gray-900 m-0">{__('Settings', 'analogwp-site-notes')}</h1>
-                    <div className="mt-1">
-                        {hasUnsavedChanges && (
-                            <span className="inline-flex items-center text-sm text-amber-600">
-                                <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
-                                {__('Unsaved changes', 'analogwp-site-notes')}
-                            </span>
-                        )}
-                        {lastSaved && !hasUnsavedChanges && (
-                            <span className="inline-flex items-center text-sm text-blue-600">
-                                <CheckCircleIcon className="w-4 h-4 mr-1" />
-                                {sprintf(__('Last saved: %s', 'analogwp-site-notes'), formatLastSaved(lastSaved))}
-                            </span>
-                        )}
-                    </div>
-                </div>
-                
-                <div className="flex">
-                    <Button
-                        onClick={handleSave}
-                        disabled={saving || !hasUnsavedChanges}
-                        loading={saving}
-                        variant="primary"
-                        size="default"
-                        icon={saving ? null : <CheckCircleIcon className="w-6!" />}
-                    >
-                        {saving ? __('Saving...', 'analogwp-site-notes') : __('Save Changes', 'analogwp-site-notes')}
-                    </Button>
-                </div>
-            </div>
-
+        <div className="rounded-t-lg mb-6">
             <nav className="p-0">
-                <div className="flex">
+                <div className="flex gap-4">
                     {tabs.map(tab => {
                         const IconComponent = tab.icon;
                         
                         return (
                             <button
                                 key={tab.id}
-                                className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-all duration-200 cursor-pointer ${
+                                className={`flex items-center px-4 py-2 text-sm transition-all duration-200 cursor-pointer rounded-full ${
                                     activeTab === tab.id 
-                                        ? 'text-blue-700 border-blue-700 bg-blue-50' 
-                                        : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
+                                        ? 'text-white bg-blue-600' 
+                                        : 'text-black bg-white hover:text-blue-600'
                                 }`}
                                 onClick={() => onTabChange(tab.id)}
                                 title={tab.description}
                             >
-                                <IconComponent className="w-5 h-5 mr-2" />
+                                {/* <IconComponent className="w-5 h-5 mr-2" /> */}
                                 <span>
                                     {tab.label}
                                 </span>
