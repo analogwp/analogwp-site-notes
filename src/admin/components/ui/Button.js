@@ -62,10 +62,12 @@ const Button = ({
 
     // Additional custom classes for our styling
     const buttonClasses = classnames(
-        'sn-button rounded-full! text-[14px]!', // Base class for our custom styling
+        'sn-button text-[14px]!', // Base class for our custom styling
         {		
-						'px-6! py-2.5! h-auto!': variant !== 'link',
-						'border-none! outline-none! shadow-sm! bg-white/40! text-gray-700!': variant === 'secondary',
+						'bg-blue-600! hover:bg-blue-700! rounded-full': variant === 'primary',
+						'text-blue-700 bg-white border border-blue-700 rounded-lg px-4 py-2.5 hover:bg-blue-700 hover:text-white!': variant === 'default',
+						'px-6! py-2.5! h-auto!': variant !== 'link' && variant !== 'default',
+						'rounded-full border-none! outline-none! shadow-sm! bg-white/40! text-gray-700!': variant === 'secondary',
 						'text-gray-700! ': variant === 'tertiary',
 						'text-red-800! border! border-red-800! hover:text-red-600! hover:border-red-600!': variant === 'danger',
             [`sn-button--${variant}`]: variant !== 'default',
