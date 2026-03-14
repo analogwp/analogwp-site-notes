@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -52,17 +53,17 @@ export const FieldDescription = ({ children, type = 'info', className = '' }) =>
     };
     
     const typeStyles = {
-        info: 'bg-blue-50 border-blue-200 text-blue-800',
-        warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-        success: 'bg-green-50 border-green-200 text-green-800'
+        info: 'text-gray-500',
+        warning: 'text-yellow-800',
+        success: 'text-green-800'
     };
     
     const IconComponent = icons[type] || icons.info;
     const styles = typeStyles[type] || typeStyles.info;
     
     return (
-        <div className={`flex items-start gap-2 p-3 rounded-md border text-sm ${styles} ${className}`}>
-            <IconComponent className="w-5 h-5 flex-shrink-0 mt-0.5" />
+        <div className={`flex items-center gap-2 py-3 rounded-md text-sm ${styles} ${className}`}>
+            <IconComponent className="w-5 h-5 flex-shrink-0 mt-0" />
             <span>{children}</span>
         </div>
     );
@@ -75,18 +76,20 @@ export const ToggleField = ({
     disabled = false, 
     label, 
     description,
-    className = '' 
-}) => (
-    <FieldGroup className={className}>
-        <Toggle
-            label={label}
-            help={description}
-            checked={checked}
-            onChange={onChange}
-            disabled={disabled}
-        />
-    </FieldGroup>
-);
+    className = ''
+}) => {
+	return (
+			<FieldGroup className={className}>
+					<Toggle
+							label={label}
+							help={description}
+							checked={checked}
+							onChange={onChange}
+							disabled={disabled}
+					/>
+			</FieldGroup>
+	);
+}
 
 export const SelectField = ({ 
     id, 
@@ -121,29 +124,41 @@ export const NumberInput = ({
     label, 
     description,
     unit,
-    className = '' 
-}) => (
-    <FieldGroup className={className}>
-        {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
-        <div className="relative">
-            <input
-                type="number"
-                id={id}
-                className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-12 text-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500"
-                value={value}
-                onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-                min={min}
-                max={max}
-                step={step}
-                disabled={disabled}
-            />
-            {unit && <span className="absolute right-3 top-2 text-sm text-gray-500">{unit}</span>}
-        </div>
-        {description && (
-            <FieldDescription>{description}</FieldDescription>
-        )}
-    </FieldGroup>
-);
+    className = 'flex gap-8',
+		variant = 'default'
+}) => {
+	
+	// Additional custom classes for our styling
+	const inputClasses = classnames(
+			'sn-number-input block rounded-md border-gray-300 py-2 pl-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500', // Base class for our custom styling
+			{		
+					'w-[100px]': variant === 'default',
+			}
+	);
+	
+	return (
+    	<FieldGroup className={className}>
+					{label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
+					<div className="relative flex flex-col">
+							<input
+									type="number"
+									id={id}
+									className={inputClasses}
+									value={value}
+									onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+									min={min}
+									max={max}
+									step={step}
+									disabled={disabled}
+							/>
+							{unit && <span className="inline-block ml-2 text-sm text-gray-500">{unit}</span>}
+							{description && (
+							<FieldDescription>{description}</FieldDescription>
+					)}
+					</div>
+			</FieldGroup>
+	);
+}
 
 export const TextInputField = ({ 
     id, 
@@ -307,34 +322,38 @@ export const FileUpload = ({
     label, 
     description,
     className = '' 
-}) => (
-    <FieldGroup className={className}>
-        {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
-        <div className="sn-file-upload">
+}) => {
+    const inputClasses = classnames(
+        'block w-full rounded-md bg-white text-sm text-gray-700',
+        'file:mr-4 file:rounded-lg file:border file:border-blue-700 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700',
+        'hover:file:bg-blue-700 hover:file:text-white hover:file:cursor-pointer focus:border-indigo-500 focus:ring-indigo-500',
+        'disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed disabled:file:bg-gray-100 disabled:file:text-gray-400'
+    );
+
+    return (
+        <FieldGroup className={className}>
+            {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
             <input
                 type="file"
                 id={id}
-                className="sn-file-input"
+                className={inputClasses}
                 onChange={(e) => onChange(e.target.files[0])}
                 accept={accept}
                 disabled={disabled}
             />
-            <label htmlFor={id} className="sn-file-label">
-                {__('Choose file...', 'analogwp-site-notes')}
-            </label>
-        </div>
-        {description && (
-            <FieldDescription>{description}</FieldDescription>
-        )}
-    </FieldGroup>
-);
+            {description && (
+                <FieldDescription>{description}</FieldDescription>
+            )}
+        </FieldGroup>
+    );
+};
 
 export const SettingsSection = ({ title, description, children, className = '' }) => (
     <div className={`mb-8 ${className}`}>
         {(title || description) && (
             <div className="mb-6">
                 {title && <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>}
-                {description && <p className="text-sm text-gray-600">{description}</p>}
+                {description && <p className="text-sm text-gray-500">{description}</p>}
             </div>
         )}
         <div className="space-y-6">
@@ -344,11 +363,11 @@ export const SettingsSection = ({ title, description, children, className = '' }
 );
 
 export const SettingsCard = ({ title, children, className = '' }) => (
-    <div className={`bg-white rounded-lg border border-gray-200 shadow-sm ${className}`}>
-        {title && <div className="px-6 py-4 border-b border-gray-200">
+    <div className={`border-t border-gray-200 ${className}`}>
+        {title && <div className="">
             <h4 className="text-lg font-medium text-gray-900">{title}</h4>
         </div>}
-        <div className="px-6 py-6 space-y-6">
+        <div className="space-y-10">
             {children}
         </div>
     </div>

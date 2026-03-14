@@ -41,7 +41,6 @@ const GeneralSettings = () => {
                         min={0.1}
                         max={1.0}
                         step={0.1}
-                        unit="%"
                     />
                 </SettingsCard>
 
@@ -55,16 +54,6 @@ const GeneralSettings = () => {
                         min={5}
                         max={100}
                         step={5}
-                    />
-                </SettingsCard>
-
-                <SettingsCard title={__('Auto-save Settings', 'analogwp-site-notes')}>
-                    <ToggleField
-                        id="auto_save_drafts"
-                        label={__('Enable Auto-save', 'analogwp-site-notes')}
-                        description={__('Automatically save settings changes every 5 seconds to prevent data loss.', 'analogwp-site-notes')}
-                        checked={settings.general?.auto_save_drafts ?? true}
-                        onChange={(value) => updateSetting('general.auto_save_drafts', value)}
                     />
                 </SettingsCard>
             </SettingsSection>

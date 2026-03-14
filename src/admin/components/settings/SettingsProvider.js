@@ -29,8 +29,7 @@ const defaultSettings = {
         auto_screenshot: true,
         screenshot_quality: 0.8,
         comments_per_page: 20,
-        enable_frontend_comments: true,
-        auto_save_drafts: true
+        enable_frontend_comments: true
     },
     advanced: {
         enable_debug_mode: false,
@@ -45,8 +44,7 @@ const settingsSchema = {
         auto_screenshot: { type: 'boolean', required: true },
         screenshot_quality: { type: 'number', min: 0.1, max: 1, required: true },
         comments_per_page: { type: 'number', min: 5, max: 100, required: true },
-        enable_frontend_comments: { type: 'boolean', required: true },
-        auto_save_drafts: { type: 'boolean', required: true }
+        enable_frontend_comments: { type: 'boolean', required: true }
     },
     advanced: {
         enable_debug_mode: { type: 'boolean', required: true },
@@ -150,17 +148,6 @@ export const SettingsProvider = ({ children }) => {
     useEffect(() => {
         loadSettings();
     }, []);
-
-    // Auto-save functionality (if enabled)
-    useEffect(() => {
-        if (hasUnsavedChanges && settings.general?.auto_save_drafts) {
-            const autoSaveTimer = setTimeout(() => {
-                saveSettings(true); // silent save
-            }, 5000);
-            
-            return () => clearTimeout(autoSaveTimer);
-        }
-    }, [hasUnsavedChanges, settings.general?.auto_save_drafts]);
 
     const loadSettings = async () => {
         try {
@@ -291,8 +278,7 @@ export const SettingsProvider = ({ children }) => {
                 auto_screenshot: settings.general?.auto_screenshot ?? defaultSettings.general.auto_screenshot,
                 screenshot_quality: settings.general?.screenshot_quality ?? defaultSettings.general.screenshot_quality,
                 comments_per_page: settings.general?.comments_per_page ?? defaultSettings.general.comments_per_page,
-                theme_mode: settings.general?.theme_mode ?? defaultSettings.general.theme_mode,
-                auto_save_drafts: settings.general?.auto_save_drafts ?? defaultSettings.general.auto_save_drafts
+                theme_mode: settings.general?.theme_mode ?? defaultSettings.general.theme_mode
             },
             advanced: {
                 enable_debug_mode: settings.advanced?.enable_debug_mode ?? defaultSettings.advanced.enable_debug_mode,

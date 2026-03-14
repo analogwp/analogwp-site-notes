@@ -77,24 +77,24 @@ const AdvancedSettings = () => {
             >
                 <SettingsCard title={__('Import/Export Settings', 'analogwp-site-notes')}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-4">
-                            <div className="border-l-4 border-blue-500 pl-4">
-                                <h4 className="text-lg font-medium text-gray-900 mb-2">{__('Export Settings', 'analogwp-site-notes')}</h4>
-                                <p className="text-sm text-gray-600 mb-4">{__('Download all your settings as a JSON file for backup or transfer to another site.', 'analogwp-site-notes')}</p>
+                        <div className="border border-gray-200 rounded-xl p-6 space-y-4">
+                            <div className="">
+                                <h4 className="text-base font-medium text-gray-900 m-0 mb-2">{__('Export Settings', 'analogwp-site-notes')}</h4>
+                                <p className="text-sm text-gray-500 mb-4">{__('Download all your settings as a JSON file for backup or transfer to another site.', 'analogwp-site-notes')}</p>
                                 <Button
                                     onClick={exportSettings}
-                                    variant="secondary"
+                                    variant="default"
                                     size="default"
                                 >
-                                    {__('Download Settings', 'analogwp-site-notes')}
+                                    {__('Export Settings', 'analogwp-site-notes')}
                                 </Button>
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            <div className="border-l-4 border-green-500 pl-4">
-                                <h4 className="text-lg font-medium text-gray-900 mb-2">{__('Import Settings', 'analogwp-site-notes')}</h4>
-                                <p className="text-sm text-gray-600 mb-4">{__('Upload a settings file to restore or transfer settings from another installation.', 'analogwp-site-notes')}</p>
+                        <div className="border border-gray-200 rounded-xl p-6 space-y-4">
+                            <div className="">
+                                <h4 className="text-base font-medium text-gray-900 m-0 mb-2">{__('Import Settings', 'analogwp-site-notes')}</h4>
+                                <p className="text-sm text-gray-500 mb-4">{__('Upload a settings file to restore or transfer settings from another installation.', 'analogwp-site-notes')}</p>
                                 <FileUpload
                                     id="import_settings"
                                     accept=".json"
