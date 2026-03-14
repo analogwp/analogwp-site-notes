@@ -207,9 +207,7 @@ class Admin {
 		<?php
 	}
 
-	/**
-	 * Render comments page.
-	 *
+
 	/**
 	 * Render settings page.
 	 *
