@@ -14,6 +14,7 @@ import {
     ShieldCheckIcon,
     CommandLineIcon,
     TagIcon,
+    Squares2X2Icon,
     CheckCircleIcon,
     ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
@@ -45,11 +46,18 @@ const SettingsHeader = ({ activeTab, onTabChange }) => {
             description: __('Manage user permissions and access', 'analogwp-site-notes'),
             isExt: false
         },
-        { 
-            id: 'labels-filters', 
-            label: __('Labels & Filters', 'analogwp-site-notes'),
+        {
+            id: 'task-priorities',
+            label: __('Task Priorities', 'analogwp-site-notes'),
             icon: TagIcon,
-            description: __('Manage categories and priorities', 'analogwp-site-notes'),
+            description: __('Manage task priority levels and colors', 'analogwp-site-notes'),
+            isExt: false
+        },
+        {
+            id: 'categories',
+            label: __('Categories', 'analogwp-site-notes'),
+            icon: Squares2X2Icon,
+            description: __('Manage reusable task categories', 'analogwp-site-notes'),
             isExt: false
         },
         { 
