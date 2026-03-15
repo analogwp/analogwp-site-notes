@@ -264,6 +264,38 @@ final class Plugin {
 	}
 
 	/**
+	 * Check if anonymous frontend comments are enabled.
+	 *
+	 * @since 1.0.0
+	 * @return bool True if anonymous frontend comments are enabled.
+	 */
+	public static function anonymous_frontend_comments_enabled() {
+		$settings = get_option( 'agwp_sn_settings', array() );
+
+		return isset( $settings['general']['allow_anonymous_frontend_comments'] )
+			? (bool) $settings['general']['allow_anonymous_frontend_comments']
+			: false;
+	}
+
+	/**
+	 * Check if the current visitor can access frontend comments.
+	 *
+	 * @since 1.0.0
+	 * @return bool True if the current visitor can access frontend comments.
+	 */
+	public static function current_visitor_can_access_frontend_comments() {
+		if ( ! self::frontend_comments_enabled() ) {
+			return false;
+		}
+
+		if ( self::user_has_access() ) {
+			return true;
+		}
+
+		return self::anonymous_frontend_comments_enabled();
+	}
+
+	/**
 	 * Check if frontend comments are enabled.
 	 *
 	 * @since 1.0.0
@@ -271,7 +303,7 @@ final class Plugin {
 	 */
 	public static function frontend_comments_enabled() {
 		$settings = get_option( 'agwp_sn_settings', array() );
-		return isset( $settings['general']['enable_frontend_comments'] ) ? (bool) $settings['general']['enable_frontend_comments'] : true;
+		return isset( $settings['general']['enable_frontend_comments'] ) ? (bool) $settings['general']['enable_frontend_comments'] : false;
 	}
 
 	/**

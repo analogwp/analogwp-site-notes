@@ -37,7 +37,7 @@ class Database {
 		$prefix = 'agwp_sn_';
 
 		$tables = array(
-			'comments' => array(
+			'comments'        => array(
 				'name'        => $wpdb->prefix . $prefix . 'comments',
 				'export_name' => $prefix . 'comments',
 				'query'       => "
@@ -117,7 +117,7 @@ class Database {
 		try {
 			// Use prepare to safely include the table name in the query.
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name cannot be parameterized, but is sanitized.
-			$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
+			$found  = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
 			$result = ( strtolower( $table_name ) === strtolower( $found ) );
 		} catch ( \Exception $e ) {
 			$result = false;
@@ -183,8 +183,8 @@ class Database {
 		$charset_collate = $wpdb->get_charset_collate();
 
 		foreach ( self::tables() as $table ) {
-			$table_name = $table['name'];
-			$table_query  = $table['query'];
+			$table_name  = $table['name'];
+			$table_query = $table['query'];
 
 			if ( ! self::table_exists( $table_name ) ) {
 				$sql = "CREATE TABLE $table_name (
@@ -282,6 +282,9 @@ class Database {
 
 		// Get replies for each comment.
 		foreach ( $comments as $comment ) {
+			$comment->display_name = ! empty( $comment->user_name ) ? $comment->user_name : __( 'Guest', 'analogwp-site-notes' );
+			$comment->user_email   = ! empty( $comment->user_email ) ? $comment->user_email : '';
+
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Replies fetched per comment, part of parent query result.
 			$comment->replies = $wpdb->get_results(
 				$wpdb->prepare(
@@ -298,6 +301,9 @@ class Database {
 			// Add avatar URLs to replies.
 			if ( is_array( $comment->replies ) ) {
 				foreach ( $comment->replies as $reply ) {
+					$reply->display_name = ! empty( $reply->display_name ) ? $reply->display_name : __( 'Guest', 'analogwp-site-notes' );
+					$reply->user_email   = ! empty( $reply->user_email ) ? $reply->user_email : '';
+
 					if ( ! empty( $reply->user_id ) ) {
 						$reply->avatar = get_avatar_url( $reply->user_id, array( 'size' => 80 ) );
 					} elseif ( ! empty( $reply->user_email ) ) {
@@ -310,7 +316,7 @@ class Database {
 
 			// Decode categories from JSON.
 			if ( ! empty( $comment->category ) ) {
-				$decoded_categories = json_decode( $comment->category, true );
+				$decoded_categories  = json_decode( $comment->category, true );
 				$comment->categories = is_array( $decoded_categories ) ? $decoded_categories : array();
 			} else {
 				$comment->categories = array();
@@ -338,7 +344,7 @@ class Database {
 			return false;
 		}
 
-		$has_text = ! empty( $data['comment_text'] );
+		$has_text  = ! empty( $data['comment_text'] );
 		$has_title = ! empty( $data['comment_title'] );
 		if ( ! $has_text && ! $has_title ) {
 			return false;
@@ -348,7 +354,7 @@ class Database {
 
 		$insert_data = array(
 			'post_id'          => isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0,
-			'user_id'          => get_current_user_id(), // Always set to current user (creator).
+			'user_id'          => get_current_user_id(),
 			'assigned_to'      => isset( $data['assigned_to'] ) ? intval( $data['assigned_to'] ) : 0,
 			'comment_title'    => isset( $data['comment_title'] ) ? sanitize_text_field( wp_unslash( $data['comment_title'] ) ) : '',
 			'comment_text'     => sanitize_textarea_field( wp_unslash( $data['comment_text'] ) ),

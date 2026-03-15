@@ -139,13 +139,8 @@ class Assets {
 			return false;
 		}
 
-		// Check if frontend comments are enabled in settings.
-		if ( ! Plugin::frontend_comments_enabled() ) {
-			return false;
-		}
-
-		// Check if current user has access.
-		if ( ! Plugin::user_has_access() ) {
+		// Check if the current visitor can access the frontend commenting UI.
+		if ( ! Plugin::current_visitor_can_access_frontend_comments() ) {
 			return false;
 		}
 
@@ -188,7 +183,7 @@ class Assets {
 		$settings         = wp_parse_args( $saved_settings, $default_settings );
 
 		$debug_enabled = isset( $settings['advanced']['enable_debug_mode'] ) ? $settings['advanced']['enable_debug_mode'] : false;
-		$log_level = isset( $settings['advanced']['log_level'] ) ? $settings['advanced']['log_level'] : 'error';
+		$log_level     = isset( $settings['advanced']['log_level'] ) ? $settings['advanced']['log_level'] : 'error';
 
 		return array(
 			'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
@@ -196,6 +191,7 @@ class Assets {
 			'postId'            => get_the_ID(),
 			'pageUrl'           => get_permalink(),
 			'currentUser'       => $this->get_current_user_data(),
+			'canAddComments'    => Plugin::current_visitor_can_access_frontend_comments(),
 			'canManageComments' => Plugin::user_has_access(),
 			'settings'          => $settings,
 			'strings'           => $this->get_frontend_strings(),
@@ -211,9 +207,9 @@ class Assets {
 	 * @return array Localized data.
 	 */
 	private function get_admin_localized_data() {
-		$settings = get_option( 'agwp_sn_settings', array() );
+		$settings      = get_option( 'agwp_sn_settings', array() );
 		$debug_enabled = isset( $settings['advanced']['enable_debug_mode'] ) ? $settings['advanced']['enable_debug_mode'] : false;
-		$log_level = isset( $settings['advanced']['log_level'] ) ? $settings['advanced']['log_level'] : 'error';
+		$log_level     = isset( $settings['advanced']['log_level'] ) ? $settings['advanced']['log_level'] : 'error';
 
 		return array(
 			'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
@@ -257,20 +253,20 @@ class Assets {
 	 */
 	private function get_frontend_strings() {
 		return array(
-			'addComment'         => __( 'Add Comment', 'analogwp-site-notes' ),
-			'saveComment'        => __( 'Save Comment', 'analogwp-site-notes' ),
-			'cancel'             => __( 'Cancel', 'analogwp-site-notes' ),
-			'reply'              => __( 'Reply', 'analogwp-site-notes' ),
-			'delete'             => __( 'Delete', 'analogwp-site-notes' ),
-			'confirmDelete'      => __( 'Are you sure you want to delete this comment?', 'analogwp-site-notes' ),
-			'commentSaved'       => __( 'Comment saved successfully!', 'analogwp-site-notes' ),
-			'errorSaving'        => __( 'Error saving comment', 'analogwp-site-notes' ),
-			'statusUpdated'      => __( 'Status updated successfully!', 'analogwp-site-notes' ),
+			'addComment'          => __( 'Add Comment', 'analogwp-site-notes' ),
+			'saveComment'         => __( 'Save Comment', 'analogwp-site-notes' ),
+			'cancel'              => __( 'Cancel', 'analogwp-site-notes' ),
+			'reply'               => __( 'Reply', 'analogwp-site-notes' ),
+			'delete'              => __( 'Delete', 'analogwp-site-notes' ),
+			'confirmDelete'       => __( 'Are you sure you want to delete this comment?', 'analogwp-site-notes' ),
+			'commentSaved'        => __( 'Comment saved successfully!', 'analogwp-site-notes' ),
+			'errorSaving'         => __( 'Error saving comment', 'analogwp-site-notes' ),
+			'statusUpdated'       => __( 'Status updated successfully!', 'analogwp-site-notes' ),
 			'errorUpdatingStatus' => __( 'Error updating status', 'analogwp-site-notes' ),
-			'replyAdded'         => __( 'Reply added successfully!', 'analogwp-site-notes' ),
-			'errorAddingReply'   => __( 'Error adding reply', 'analogwp-site-notes' ),
-			'commentDeleted'     => __( 'Comment deleted successfully!', 'analogwp-site-notes' ),
-			'errorDeleting'      => __( 'Error deleting comment', 'analogwp-site-notes' ),
+			'replyAdded'          => __( 'Reply added successfully!', 'analogwp-site-notes' ),
+			'errorAddingReply'    => __( 'Error adding reply', 'analogwp-site-notes' ),
+			'commentDeleted'      => __( 'Comment deleted successfully!', 'analogwp-site-notes' ),
+			'errorDeleting'       => __( 'Error deleting comment', 'analogwp-site-notes' ),
 		);
 	}
 
@@ -282,19 +278,19 @@ class Assets {
 	 */
 	private function get_admin_strings() {
 		return array(
-			'dashboard'     => __( 'Dashboard', 'analogwp-site-notes' ),
-			'comments'      => __( 'Comments', 'analogwp-site-notes' ),
-			'tasks'         => __( 'Tasks', 'analogwp-site-notes' ),
-			'settings'      => __( 'Settings', 'analogwp-site-notes' ),
-			'open'          => __( 'Open', 'analogwp-site-notes' ),
-			'inProgress'    => __( 'In Progress', 'analogwp-site-notes' ),
-			'resolved'      => __( 'Resolved', 'analogwp-site-notes' ),
-			'high'          => __( 'High', 'analogwp-site-notes' ),
-			'medium'        => __( 'Medium', 'analogwp-site-notes' ),
-			'low'           => __( 'Low', 'analogwp-site-notes' ),
-			'loading'       => __( 'Loading...', 'analogwp-site-notes' ),
-			'noComments'    => __( 'No comments found', 'analogwp-site-notes' ),
-			'errorLoading'  => __( 'Error loading data', 'analogwp-site-notes' ),
+			'dashboard'    => __( 'Dashboard', 'analogwp-site-notes' ),
+			'comments'     => __( 'Comments', 'analogwp-site-notes' ),
+			'tasks'        => __( 'Tasks', 'analogwp-site-notes' ),
+			'settings'     => __( 'Settings', 'analogwp-site-notes' ),
+			'open'         => __( 'Open', 'analogwp-site-notes' ),
+			'inProgress'   => __( 'In Progress', 'analogwp-site-notes' ),
+			'resolved'     => __( 'Resolved', 'analogwp-site-notes' ),
+			'high'         => __( 'High', 'analogwp-site-notes' ),
+			'medium'       => __( 'Medium', 'analogwp-site-notes' ),
+			'low'          => __( 'Low', 'analogwp-site-notes' ),
+			'loading'      => __( 'Loading...', 'analogwp-site-notes' ),
+			'noComments'   => __( 'No comments found', 'analogwp-site-notes' ),
+			'errorLoading' => __( 'Error loading data', 'analogwp-site-notes' ),
 		);
 	}
 }

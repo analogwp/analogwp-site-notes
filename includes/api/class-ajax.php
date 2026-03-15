@@ -119,8 +119,8 @@ class Ajax {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
 
-		// Check permissions - user must have access to site notes.
-		if ( ! Plugin::user_has_access() ) {
+		// Check permissions for frontend comment participation.
+		if ( ! Plugin::current_visitor_can_access_frontend_comments() ) {
 			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
@@ -175,12 +175,12 @@ class Ajax {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
 
-		// Check permissions - user must have access to site notes.
-		if ( ! Plugin::user_has_access() ) {
+		// Check permissions for frontend comment participation.
+		if ( ! Plugin::current_visitor_can_access_frontend_comments() ) {
 			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
-		$page_url  = isset( $_POST['page_url'] ) ? sanitize_url( wp_unslash( $_POST['page_url'] ) ) : '';
+		$page_url = isset( $_POST['page_url'] ) ? sanitize_url( wp_unslash( $_POST['page_url'] ) ) : '';
 
 		if ( empty( $page_url ) ) {
 			$this->send_error( __( 'Page URL is required', 'analogwp-site-notes' ) );
@@ -279,8 +279,8 @@ class Ajax {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
 
-		// Check permissions - user must have access to site notes.
-		if ( ! Plugin::user_has_access() ) {
+		// Check permissions for frontend comment participation.
+		if ( ! Plugin::current_visitor_can_access_frontend_comments() ) {
 			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
@@ -465,7 +465,7 @@ class Ajax {
 		}
 
 		// Get categories (we can use post categories or create custom ones later).
-		$categories = get_categories( array( 'hide_empty' => false ) );
+		$categories           = get_categories( array( 'hide_empty' => false ) );
 		$formatted_categories = array();
 		foreach ( $categories as $category ) {
 			$formatted_categories[] = array(
@@ -479,9 +479,9 @@ class Ajax {
 		$stats = $this->database->get_dashboard_stats();
 		if ( ! is_array( $stats ) ) {
 			$stats = array(
-				'open_count'     => 0,
-				'resolved_count' => 0,
-				'total_count'    => 0,
+				'open_count'      => 0,
+				'resolved_count'  => 0,
+				'total_count'     => 0,
 				'recent_comments' => array(),
 			);
 		}
@@ -618,16 +618,16 @@ class Ajax {
 		);
 
 		// Get custom post types.
-		$post_types = get_post_types(
+		$post_types   = get_post_types(
 			array(
-				'public' => true,
+				'public'   => true,
 				'_builtin' => false,
 			),
 			'objects'
 		);
 		$custom_posts = array();
 		foreach ( $post_types as $post_type ) {
-			$type_posts = get_posts(
+			$type_posts   = get_posts(
 				array(
 					'numberposts' => 20, // Limit custom post types to avoid too many entries.
 					'post_status' => 'publish',
@@ -782,17 +782,18 @@ class Ajax {
 
 		// Get default settings.
 		$default_settings = array(
-			'general' => array(
-				'allowed_roles'             => array( 'administrator', 'editor' ),
-				'enable_frontend_comments'  => true,
-				'auto_screenshot'           => true,
-				'screenshot_quality'        => 0.8,
-				'comments_per_page'         => 20,
-				'auto_save_drafts'          => true,
+			'general'  => array(
+				'allowed_roles'                     => array( 'administrator', 'editor' ),
+				'enable_frontend_comments'          => false,
+				'allow_anonymous_frontend_comments' => false,
+				'auto_screenshot'                   => true,
+				'screenshot_quality'                => 0.8,
+				'comments_per_page'                 => 20,
+				'auto_save_drafts'                  => true,
 			),
 			'advanced' => array(
-				'enable_debug_mode'         => false,
-				'log_level'                 => 'error',
+				'enable_debug_mode' => false,
+				'log_level'         => 'error',
 			),
 		);
 
@@ -824,7 +825,7 @@ class Ajax {
 				'color' => '#10b981',
 			),
 		);
-		$priorities = get_option( 'agwp_sn_priorities', $default_priorities );
+		$priorities         = get_option( 'agwp_sn_priorities', $default_priorities );
 
 		$this->send_success(
 			array(
@@ -862,12 +863,13 @@ class Ajax {
 
 		// Sanitize general settings.
 		if ( isset( $settings['general'] ) ) {
-			$settings['general']['allowed_roles']              = isset( $settings['general']['allowed_roles'] ) ? array_map( 'sanitize_text_field', (array) $settings['general']['allowed_roles'] ) : array();
-			$settings['general']['enable_frontend_comments']   = isset( $settings['general']['enable_frontend_comments'] ) ? (bool) $settings['general']['enable_frontend_comments'] : true;
-			$settings['general']['auto_screenshot']            = isset( $settings['general']['auto_screenshot'] ) ? (bool) $settings['general']['auto_screenshot'] : false;
-			$settings['general']['screenshot_quality']         = isset( $settings['general']['screenshot_quality'] ) ? floatval( $settings['general']['screenshot_quality'] ) : 0.8;
-			$settings['general']['comments_per_page']          = isset( $settings['general']['comments_per_page'] ) ? intval( $settings['general']['comments_per_page'] ) : 20;
-			$settings['general']['auto_save_drafts']           = isset( $settings['general']['auto_save_drafts'] ) ? (bool) $settings['general']['auto_save_drafts'] : true;
+			$settings['general']['allowed_roles']                     = isset( $settings['general']['allowed_roles'] ) ? array_map( 'sanitize_text_field', (array) $settings['general']['allowed_roles'] ) : array();
+			$settings['general']['enable_frontend_comments']          = isset( $settings['general']['enable_frontend_comments'] ) ? (bool) $settings['general']['enable_frontend_comments'] : false;
+			$settings['general']['allow_anonymous_frontend_comments'] = isset( $settings['general']['allow_anonymous_frontend_comments'] ) ? (bool) $settings['general']['allow_anonymous_frontend_comments'] : false;
+			$settings['general']['auto_screenshot']                   = isset( $settings['general']['auto_screenshot'] ) ? (bool) $settings['general']['auto_screenshot'] : false;
+			$settings['general']['screenshot_quality']                = isset( $settings['general']['screenshot_quality'] ) ? floatval( $settings['general']['screenshot_quality'] ) : 0.8;
+			$settings['general']['comments_per_page']                 = isset( $settings['general']['comments_per_page'] ) ? intval( $settings['general']['comments_per_page'] ) : 20;
+			$settings['general']['auto_save_drafts']                  = isset( $settings['general']['auto_save_drafts'] ) ? (bool) $settings['general']['auto_save_drafts'] : true;
 		}
 
 		// Sanitize advanced settings.
