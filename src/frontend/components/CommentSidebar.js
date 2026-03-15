@@ -22,6 +22,7 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
     const [showReplyForms, setShowReplyForms] = useState({});
     const [isSubmittingReply, setIsSubmittingReply] = useState({});
     const [collapsedGroups, setCollapsedGroups] = useState({});
+    const [replyHoney, setReplyHoney] = useState({});
 
     // Group comments by status
     const groupedComments = {
@@ -47,8 +48,9 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
 
         setIsSubmittingReply(prev => ({ ...prev, [commentId]: true }));
         try {
-            await onAddReply(commentId, replyText.trim());
+            await onAddReply(commentId, replyText.trim(), replyHoney[commentId] || '');
             setReplyTexts(prev => ({ ...prev, [commentId]: '' }));
+            setReplyHoney(prev => ({ ...prev, [commentId]: '' }));
             setShowReplyForms(prev => ({ ...prev, [commentId]: false }));
         } catch (error) {
             logger.error('Error submitting reply:', error);
@@ -232,6 +234,16 @@ const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComment
                                                             className="sn-reply-textarea"
                                                             rows="3"
                                                         />
+                                                <input
+                                                    type="text"
+                                                    name="website"
+                                                    value={replyHoney[comment.id] || ''}
+                                                    onChange={(e) => setReplyHoney(prev => ({ ...prev, [comment.id]: e.target.value }))}
+                                                    tabIndex="-1"
+                                                    autoComplete="off"
+                                                    style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }}
+                                                    aria-hidden="true"
+                                                />
                                                         <div className="sn-reply-actions">
                                                             <Button
                                                                 type="submit"

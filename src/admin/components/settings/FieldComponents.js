@@ -62,7 +62,7 @@ export const FieldDescription = ({ children, type = 'info', className = '' }) =>
     const styles = typeStyles[type] || typeStyles.info;
     
     return (
-        <div className={`flex items-center gap-2 py-3 rounded-md text-sm ${styles} ${className}`}>
+        <div className={`flex gap-2 py-3 rounded-md text-sm ${styles} ${className}`}>
             <IconComponent className="w-5 h-5 flex-shrink-0 mt-0" />
             <span>{children}</span>
         </div>

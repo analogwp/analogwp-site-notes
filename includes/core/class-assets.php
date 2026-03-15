@@ -172,6 +172,8 @@ class Assets {
 	 * @return array Localized data.
 	 */
 	private function get_frontend_localized_data() {
+		$current_page_url = $this->get_current_request_url();
+
 		// Get plugin settings.
 		$default_settings = array(
 			'general' => array(
@@ -186,18 +188,34 @@ class Assets {
 		$log_level     = isset( $settings['advanced']['log_level'] ) ? $settings['advanced']['log_level'] : 'error';
 
 		return array(
-			'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
-			'nonce'             => wp_create_nonce( 'agwp_sn_nonce' ),
-			'postId'            => get_the_ID(),
-			'pageUrl'           => get_permalink(),
-			'currentUser'       => $this->get_current_user_data(),
-			'canAddComments'    => Plugin::current_visitor_can_access_frontend_comments(),
-			'canManageComments' => Plugin::user_has_access(),
-			'settings'          => $settings,
-			'strings'           => $this->get_frontend_strings(),
-			'debug'             => $debug_enabled,
-			'logLevel'          => $log_level,
+			'ajaxUrl'              => admin_url( 'admin-ajax.php' ),
+			'nonce'                => wp_create_nonce( 'agwp_sn_nonce' ),
+			'postId'               => get_the_ID(),
+			'pageUrl'              => $current_page_url,
+			'pageToken'            => wp_create_nonce( 'agwp_sn_page_' . $current_page_url ),
+			'renderTimestamp'      => time(),
+			'currentUser'          => $this->get_current_user_data(),
+			'canAddComments'       => Plugin::current_visitor_can_access_frontend_comments(),
+			'canManageComments'    => Plugin::user_has_access(),
+			'canUploadScreenshots' => Plugin::user_has_access(),
+			'settings'             => $settings,
+			'strings'              => $this->get_frontend_strings(),
+			'debug'                => $debug_enabled,
+			'logLevel'             => $log_level,
 		);
+	}
+
+	/**
+	 * Get the current frontend request URL.
+	 *
+	 * @since 1.0.0
+	 * @return string Current request URL.
+	 */
+	private function get_current_request_url() {
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '/';
+		$request_uri = '/' . ltrim( $request_uri, '/' );
+
+		return home_url( $request_uri );
 	}
 
 	/**

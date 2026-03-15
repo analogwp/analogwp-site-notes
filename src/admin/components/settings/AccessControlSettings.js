@@ -103,7 +103,7 @@ const AccessControlSettings = () => {
                     />
 
                     <FieldDescription>
-                        {__('Keep this disabled if frontend comments should remain limited to the allowed WordPress roles above.', 'analogwp-site-notes')}
+                        {__('Keep anonymous comments disabled if frontend comments should remain limited to the allowed WordPress roles above. And is also recommended to be only used for internal testing or specific scenarios.', 'analogwp-site-notes')}
                     </FieldDescription>
                 </SettingsCard>
             </SettingsSection>

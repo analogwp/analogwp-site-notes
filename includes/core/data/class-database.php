@@ -327,6 +327,32 @@ class Database {
 	}
 
 	/**
+	 * Get a single comment by ID.
+	 *
+	 * @since 1.0.0
+	 * @param int $comment_id Comment ID.
+	 * @return object|null Comment row or null.
+	 */
+	public function get_comment( $comment_id ) {
+		global $wpdb;
+
+		if ( empty( $comment_id ) ) {
+			return null;
+		}
+
+		$table_name = self::tables( 'comments', 'name' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Single row lookup for authorization checks.
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				'SELECT * FROM %i WHERE id = %d',
+				$table_name,
+				$comment_id
+			)
+		);
+	}
+
+	/**
 	 * Save a new comment.
 	 *
 	 * @since 1.0.0

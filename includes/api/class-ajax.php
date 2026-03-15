@@ -109,6 +109,199 @@ class Ajax {
 	}
 
 	/**
+	 * Determine whether the current request is using anonymous-style frontend access.
+	 *
+	 * @since 1.0.0
+	 * @return bool True when the visitor is not allowed to manage Site Notes.
+	 */
+	private function is_public_frontend_request() {
+		return ! Plugin::user_has_access();
+	}
+
+	/**
+	 * Normalize a page URL for signature and comparison checks.
+	 *
+	 * @since 1.0.0
+	 * @param string $page_url Page URL.
+	 * @return string Normalized URL.
+	 */
+	private function normalize_page_url( $page_url ) {
+		$page_url = sanitize_url( wp_unslash( $page_url ) );
+
+		if ( empty( $page_url ) ) {
+			return '';
+		}
+
+		$parts = wp_parse_url( $page_url );
+
+		if ( empty( $parts['scheme'] ) || empty( $parts['host'] ) ) {
+			return '';
+		}
+
+		$normalized = strtolower( $parts['scheme'] ) . '://' . strtolower( $parts['host'] );
+
+		if ( ! empty( $parts['port'] ) ) {
+			$normalized .= ':' . intval( $parts['port'] );
+		}
+
+		$path        = isset( $parts['path'] ) ? $parts['path'] : '/';
+		$path        = '/' . ltrim( $path, '/' );
+		$normalized .= '/' === $path ? '/' : untrailingslashit( $path );
+
+		if ( ! empty( $parts['query'] ) ) {
+			parse_str( $parts['query'], $query_args );
+			ksort( $query_args );
+			$query_string = http_build_query( $query_args, '', '&', PHP_QUERY_RFC3986 );
+			if ( '' !== $query_string ) {
+				$normalized .= '?' . $query_string;
+			}
+		}
+
+		return $normalized;
+	}
+
+	/**
+	 * Verify that a page-bound frontend request came from a rendered page instance.
+	 *
+	 * @since 1.0.0
+	 * @param string $page_url   Submitted page URL.
+	 * @param string $page_token Submitted page token.
+	 * @return string Normalized page URL.
+	 */
+	private function verify_page_request( $page_url, $page_token ) {
+		$normalized_page_url = $this->normalize_page_url( $page_url );
+
+		if ( empty( $normalized_page_url ) ) {
+			$this->send_error( __( 'Invalid page URL.', 'analogwp-site-notes' ), 400 );
+		}
+
+		$home_parts = wp_parse_url( home_url() );
+		$page_parts = wp_parse_url( $normalized_page_url );
+
+		if ( empty( $home_parts['host'] ) || empty( $page_parts['host'] ) || strtolower( $home_parts['host'] ) !== strtolower( $page_parts['host'] ) ) {
+			$this->send_error( __( 'Invalid page request.', 'analogwp-site-notes' ), 403 );
+		}
+
+		if ( empty( $page_token ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $page_token ) ), 'agwp_sn_page_' . $normalized_page_url ) ) {
+			$this->send_error( __( 'Page verification failed.', 'analogwp-site-notes' ), 403 );
+		}
+
+		return $normalized_page_url;
+	}
+
+	/**
+	 * Validate basic anti-bot fields for anonymous-style frontend requests.
+	 *
+	 * @since 1.0.0
+	 * @param string $honeypot      Honeypot field value.
+	 * @param int    $rendered_at   Page render timestamp.
+	 * @param string $action_suffix Logical action suffix.
+	 */
+	private function enforce_public_submission_checks( $honeypot, $rendered_at, $action_suffix ) {
+		if ( ! $this->is_public_frontend_request() ) {
+			return;
+		}
+
+		if ( ! empty( $honeypot ) ) {
+			$this->send_error( __( 'Spam check failed.', 'analogwp-site-notes' ), 400 );
+		}
+
+		$current_time = time();
+		$rendered_at  = absint( $rendered_at );
+
+		if ( empty( $rendered_at ) || $rendered_at > $current_time || ( $current_time - $rendered_at ) < 3 || ( $current_time - $rendered_at ) > DAY_IN_SECONDS ) {
+			$this->send_error( __( 'Submission verification failed.', 'analogwp-site-notes' ), 400 );
+		}
+
+		$this->enforce_public_rate_limit( $action_suffix );
+	}
+
+	/**
+	 * Enforce transient-backed rate limits for anonymous-style requests.
+	 *
+	 * @since 1.0.0
+	 * @param string $action_suffix Logical action suffix.
+	 */
+	private function enforce_public_rate_limit( $action_suffix ) {
+		$client_hash = md5( $this->get_client_address() );
+		$transient   = 'agwp_sn_rl_' . md5( $action_suffix . '|' . $client_hash );
+		$state       = get_transient( $transient );
+		$now         = time();
+
+		if ( ! is_array( $state ) || empty( $state['window_started'] ) || ( $now - absint( $state['window_started'] ) ) >= HOUR_IN_SECONDS ) {
+			$state = array(
+				'window_started' => $now,
+				'count'          => 0,
+				'last_request'   => 0,
+			);
+		}
+
+		if ( ! empty( $state['last_request'] ) && ( $now - absint( $state['last_request'] ) ) < 15 ) {
+			$this->send_error( __( 'Please wait before submitting again.', 'analogwp-site-notes' ), 429 );
+		}
+
+		if ( absint( $state['count'] ) >= 20 ) {
+			$this->send_error( __( 'Submission limit reached. Please try again later.', 'analogwp-site-notes' ), 429 );
+		}
+
+		$state['count']        = absint( $state['count'] ) + 1;
+		$state['last_request'] = $now;
+
+		set_transient( $transient, $state, HOUR_IN_SECONDS );
+	}
+
+	/**
+	 * Get a client address string for rate limiting.
+	 *
+	 * @since 1.0.0
+	 * @return string Client address.
+	 */
+	private function get_client_address() {
+		$remote_addr = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
+
+		return (string) apply_filters( 'agwp_sn_client_address', $remote_addr );
+	}
+
+	/**
+	 * Enforce a max character length.
+	 *
+	 * @since 1.0.0
+	 * @param string $value   Input value.
+	 * @param int    $max     Max length.
+	 * @param string $message Error message.
+	 */
+	private function enforce_max_length( $value, $max, $message ) {
+		if ( mb_strlen( (string) $value ) > $max ) {
+			$this->send_error( $message, 400 );
+		}
+	}
+
+	/**
+	 * Strip sensitive fields from public comment payloads.
+	 *
+	 * @since 1.0.0
+	 * @param array $comments Comments array.
+	 * @return array Sanitized comments.
+	 */
+	private function sanitize_public_comments_response( $comments ) {
+		if ( ! is_array( $comments ) || Plugin::user_has_access() ) {
+			return $comments;
+		}
+
+		foreach ( $comments as $comment ) {
+			unset( $comment->user_email, $comment->assigned_email, $comment->user_id, $comment->assigned_to, $comment->assigned_name );
+
+			if ( ! empty( $comment->replies ) && is_array( $comment->replies ) ) {
+				foreach ( $comment->replies as $reply ) {
+					unset( $reply->user_email, $reply->user_id );
+				}
+			}
+		}
+
+		return $comments;
+	}
+
+	/**
 	 * Handle save comment AJAX request.
 	 *
 	 * @since 1.0.0
@@ -124,9 +317,34 @@ class Ajax {
 			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
+		$submitted_page_url   = isset( $_POST['page_url'] ) ? sanitize_text_field( wp_unslash( $_POST['page_url'] ) ) : '';
+		$submitted_page_token = isset( $_POST['page_token'] ) ? sanitize_text_field( wp_unslash( $_POST['page_token'] ) ) : '';
+
+		$page_url = $this->verify_page_request(
+			$submitted_page_url,
+			$submitted_page_token
+		);
+
+		$this->enforce_public_submission_checks(
+			isset( $_POST['website'] ) ? sanitize_text_field( wp_unslash( $_POST['website'] ) ) : '',
+			isset( $_POST['rendered_at'] ) ? absint( wp_unslash( $_POST['rendered_at'] ) ) : 0,
+			'comment'
+		);
+
+		$comment_title = isset( $_POST['comment_title'] ) ? sanitize_text_field( wp_unslash( $_POST['comment_title'] ) ) : '';
+		$comment_text  = isset( $_POST['comment_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comment_text'] ) ) : '';
+		$priority      = isset( $_POST['priority'] ) ? sanitize_key( wp_unslash( $_POST['priority'] ) ) : 'medium';
+
+		$this->enforce_max_length( $comment_title, 255, __( 'Comment title is too long.', 'analogwp-site-notes' ) );
+		$this->enforce_max_length( $comment_text, 5000, __( 'Comment text is too long.', 'analogwp-site-notes' ) );
+
+		if ( ! in_array( $priority, array( 'low', 'medium', 'high' ), true ) ) {
+			$priority = 'medium';
+		}
+
 		// Sanitize and handle screenshot URL if provided.
 		$screenshot_url = '';
-		if ( ! empty( $_POST['screenshot_url'] ) ) {
+		if ( Plugin::user_has_access() && ! empty( $_POST['screenshot_url'] ) ) {
 			$sanitized_screenshot_url = sanitize_text_field( wp_unslash( $_POST['screenshot_url'] ) );
 			if ( 0 === strpos( $sanitized_screenshot_url, 'data:image' ) ) {
 				$screenshot_url = $this->save_screenshot_from_data_url( $sanitized_screenshot_url );
@@ -138,15 +356,15 @@ class Ajax {
 		// Prepare comment data.
 		$comment_data = array(
 			'post_id'          => isset( $_POST['post_id'] ) ? absint( wp_unslash( $_POST['post_id'] ) ) : 0,
-			'comment_title'    => isset( $_POST['comment_title'] ) ? sanitize_text_field( wp_unslash( $_POST['comment_title'] ) ) : '',
-			'comment_text'     => isset( $_POST['comment_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comment_text'] ) ) : '',
+			'comment_title'    => $comment_title,
+			'comment_text'     => $comment_text,
 			'element_selector' => isset( $_POST['element_selector'] ) ? sanitize_text_field( wp_unslash( $_POST['element_selector'] ) ) : '',
 			'screenshot_url'   => $screenshot_url,
 			'x_position'       => isset( $_POST['x_position'] ) ? absint( wp_unslash( $_POST['x_position'] ) ) : 0,
 			'y_position'       => isset( $_POST['y_position'] ) ? absint( wp_unslash( $_POST['y_position'] ) ) : 0,
-			'page_url'         => isset( $_POST['page_url'] ) ? sanitize_text_field( wp_unslash( $_POST['page_url'] ) ) : '',
-			'status'           => isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : 'open',
-			'priority'         => isset( $_POST['priority'] ) ? sanitize_text_field( wp_unslash( $_POST['priority'] ) ) : 'medium',
+			'page_url'         => $page_url,
+			'status'           => 'open',
+			'priority'         => $priority,
 		);
 
 		// Save comment.
@@ -180,13 +398,20 @@ class Ajax {
 			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
-		$page_url = isset( $_POST['page_url'] ) ? sanitize_url( wp_unslash( $_POST['page_url'] ) ) : '';
+		$submitted_page_url   = isset( $_POST['page_url'] ) ? sanitize_text_field( wp_unslash( $_POST['page_url'] ) ) : '';
+		$submitted_page_token = isset( $_POST['page_token'] ) ? sanitize_text_field( wp_unslash( $_POST['page_token'] ) ) : '';
+
+		$page_url = $this->verify_page_request(
+			$submitted_page_url,
+			$submitted_page_token
+		);
 
 		if ( empty( $page_url ) ) {
 			$this->send_error( __( 'Page URL is required', 'analogwp-site-notes' ) );
 		}
 
 		$comments = $this->database->get_comments( $page_url );
+		$comments = $this->sanitize_public_comments_response( $comments );
 
 		if ( null === $comments ) {
 			$this->send_error( __( 'Failed to retrieve comments', 'analogwp-site-notes' ) );
@@ -284,10 +509,34 @@ class Ajax {
 			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
+		$submitted_page_url   = isset( $_POST['page_url'] ) ? sanitize_text_field( wp_unslash( $_POST['page_url'] ) ) : '';
+		$submitted_page_token = isset( $_POST['page_token'] ) ? sanitize_text_field( wp_unslash( $_POST['page_token'] ) ) : '';
+
+		$page_url = $this->verify_page_request(
+			$submitted_page_url,
+			$submitted_page_token
+		);
+
+		$this->enforce_public_submission_checks(
+			isset( $_POST['website'] ) ? sanitize_text_field( wp_unslash( $_POST['website'] ) ) : '',
+			isset( $_POST['rendered_at'] ) ? absint( wp_unslash( $_POST['rendered_at'] ) ) : 0,
+			'reply'
+		);
+
 		// Sanitized before use.
+		$comment_id = isset( $_POST['comment_id'] ) ? absint( wp_unslash( $_POST['comment_id'] ) ) : 0;
+		$reply_text = isset( $_POST['reply_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['reply_text'] ) ) : '';
+
+		$this->enforce_max_length( $reply_text, 2000, __( 'Reply text is too long.', 'analogwp-site-notes' ) );
+
+		$comment = $this->database->get_comment( $comment_id );
+		if ( empty( $comment ) || $this->normalize_page_url( $comment->page_url ) !== $page_url ) {
+			$this->send_error( __( 'Invalid comment target.', 'analogwp-site-notes' ), 403 );
+		}
+
 		$reply_data = array(
-			'comment_id' => isset( $_POST['comment_id'] ) ? absint( wp_unslash( $_POST['comment_id'] ) ) : 0,
-			'reply_text' => isset( $_POST['reply_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['reply_text'] ) ) : '',
+			'comment_id' => $comment_id,
+			'reply_text' => $reply_text,
 		);
 
 		if ( empty( $reply_data['comment_id'] ) || empty( $reply_data['reply_text'] ) ) {
@@ -726,34 +975,50 @@ class Ajax {
 				return '';
 			}
 
+			$header = $data_parts[0];
+			if ( ! preg_match( '#^data:image/(png|jpeg|jpg|webp);base64$#i', $header ) ) {
+				return '';
+			}
+
 			$encoded_data = $data_parts[1];
-			$decoded_data = base64_decode( $encoded_data );
+			$decoded_data = base64_decode( $encoded_data, true );
 
 			if ( false === $decoded_data ) {
 				return '';
 			}
 
+			if ( strlen( $decoded_data ) > 2 * MB_IN_BYTES ) {
+				return '';
+			}
+
+			$image_info    = function_exists( 'getimagesizefromstring' ) ? getimagesizefromstring( $decoded_data ) : false;
+			$detected_mime = is_array( $image_info ) && ! empty( $image_info['mime'] ) ? $image_info['mime'] : '';
+			if ( empty( $detected_mime ) || ! in_array( $detected_mime, array( 'image/png', 'image/jpeg', 'image/webp' ), true ) ) {
+				return '';
+			}
+
 			// Create upload directory.
 			$upload_dir = wp_upload_dir();
-			$plugin_dir = $upload_dir['basedir'] . '/agwp-sn-screenshots/';
-
-			if ( ! wp_mkdir_p( $plugin_dir ) ) {
+			if ( ! empty( $upload_dir['error'] ) ) {
 				return '';
 			}
 
 			// Generate filename.
-			$filename = 'screenshot_' . time() . '_' . wp_generate_password( 8, false ) . '.png';
-			$filepath = $plugin_dir . $filename;
+			$extension_map = array(
+				'image/png'  => 'png',
+				'image/jpeg' => 'jpg',
+				'image/webp' => 'webp',
+			);
+			$filename      = 'screenshot_' . time() . '_' . wp_generate_password( 8, false ) . '.' . $extension_map[ $detected_mime ];
 
 			// Save file.
-			$bytes_written = file_put_contents( $filepath, $decoded_data );
-			if ( false === $bytes_written ) {
+			$file = wp_upload_bits( $filename, null, $decoded_data );
+			if ( ! empty( $file['error'] ) || empty( $file['url'] ) ) {
 				return '';
 			}
 
 			// Return public URL.
-			$file_url = $upload_dir['baseurl'] . '/agwp-sn-screenshots/' . $filename;
-			return $file_url;
+			return sanitize_url( $file['url'] );
 
 		} catch ( \Exception $e ) {
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
