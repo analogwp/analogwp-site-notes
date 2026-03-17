@@ -18,6 +18,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
     const [priority, setPriority] = useState('medium');
     const [isLoading, setIsLoading] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
+    const [website, setWebsite] = useState('');
 
     // Calculate popup position to keep it within viewport
     const getPopupStyle = () => {
@@ -433,7 +434,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
         try {
             // Get settings from localized data
             const settings = window.agwp_sn_ajax?.settings || {};
-            const autoScreenshot = settings.general?.auto_screenshot ?? true;
+            const autoScreenshot = (settings.general?.auto_screenshot ?? true) && !!window.agwp_sn_ajax?.canUploadScreenshots;
             
             logger.debug('Screenshot settings:', {
                 settings: window.agwp_sn_ajax?.settings,
@@ -447,7 +448,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
             logger.debug('Screenshot captured:', screenshotUrl ? 'Yes' : 'No (disabled or failed)');
             
             // Save comment with title
-            await onSave(comment.trim(), screenshotUrl, priority, title.trim());
+            await onSave(comment.trim(), screenshotUrl, priority, title.trim(), website.trim());
             
         } catch (error) {
             logger.error('Error saving comment:', error);
@@ -500,6 +501,17 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                             className="sn-comment-textarea"
                             rows="4"
                             disabled={isLoading}
+                        />
+
+                        <input
+                            type="text"
+                            name="website"
+                            value={website}
+                            onChange={(e) => setWebsite(e.target.value)}
+                            tabIndex="-1"
+                            autoComplete="off"
+                            style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }}
+                            aria-hidden="true"
                         />
                         
                         <div className="sn-priority-selector">

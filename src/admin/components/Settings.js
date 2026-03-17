@@ -13,6 +13,7 @@ import SettingsHeader from './settings/SettingsHeader';
 import GeneralSettings from './settings/GeneralSettings';
 import AccessControlSettings from './settings/AccessControlSettings';
 import LabelsAndFiltersSettings from './settings/LabelsAndFiltersSettings';
+import CategoriesSettings from './settings/CategoriesSettings';
 import AdvancedSettings from './settings/AdvancedSettings';
 import { Button } from './ui';
 
@@ -25,9 +26,13 @@ const TAB_META = {
         title: __('Access Control', 'analogwp-site-notes'),
         description: __('Define who can access and manage notes within your WordPress admin.', 'analogwp-site-notes')
     },
-    'labels-filters': {
-        title: __('Labels & Filters', 'analogwp-site-notes'),
-        description: __('Organize workflows with custom priorities and categories.', 'analogwp-site-notes')
+    'task-priorities': {
+        title: __('Task Priorities', 'analogwp-site-notes'),
+        description: __('Define priority levels and colors used across tasks.', 'analogwp-site-notes')
+    },
+    categories: {
+        title: __('Categories', 'analogwp-site-notes'),
+        description: __('Organize tasks into reusable categories for filtering and management.', 'analogwp-site-notes')
     },
     advanced: {
         title: __('Advanced Settings', 'analogwp-site-notes'),
@@ -66,8 +71,10 @@ const SettingsContent = ({ activeTab, setActiveTab }) => {
                 return <GeneralSettings />;
             case 'access-control':
                 return <AccessControlSettings />;
-            case 'labels-filters':
+            case 'task-priorities':
                 return <LabelsAndFiltersSettings />;
+            case 'categories':
+                return <CategoriesSettings />;
             case 'advanced':
                 return <AdvancedSettings />;
             default:

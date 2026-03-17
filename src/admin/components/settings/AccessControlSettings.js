@@ -90,9 +90,21 @@ const AccessControlSettings = () => {
                         id="enable_frontend_comments"
                         label={__('Enable Frontend Comments', 'analogwp-site-notes')}
                         description={__('Allow users to add comments directly on the frontend of your website.', 'analogwp-site-notes')}
-                        checked={settings.general?.enable_frontend_comments ?? true}
+                        checked={settings.general?.enable_frontend_comments ?? false}
                         onChange={(value) => updateSetting('general.enable_frontend_comments', value)}
                     />
+
+                    <ToggleField
+                        id="allow_anonymous_frontend_comments"
+                        label={__('Allow Anonymous Frontend Comments', 'analogwp-site-notes')}
+                        description={__('Let visitors who are not logged in, or who do not have Site Notes access, view and add frontend comments.', 'analogwp-site-notes')}
+                        checked={settings.general?.allow_anonymous_frontend_comments ?? false}
+                        onChange={(value) => updateSetting('general.allow_anonymous_frontend_comments', value)}
+                    />
+
+                    <FieldDescription>
+                        {__('Keep anonymous comments disabled if frontend comments should remain limited to the allowed WordPress roles above. And is also recommended to be only used for internal testing or specific scenarios.', 'analogwp-site-notes')}
+                    </FieldDescription>
                 </SettingsCard>
             </SettingsSection>
         </div>

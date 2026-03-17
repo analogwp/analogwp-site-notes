@@ -1,10 +1,10 @@
 === Site Notes: Feedback, Notes with Sitewide Visual Commenting ===
 Contributors: analogwp, lushkant, johnpixle
 Tags: notes, feedback, collaboration, comments, task-management
-Requires at least: 6.2
+Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,12 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 5. Admin settings page
 
 == Changelog ==
+
+= 1.3.0 =
+* Add anonymous/logged-out front-end comments support
+* Added security measures to strengthen anonymous frontend comments
+* Move categories in its own tab at settings
+* Other minor changes
 
 = 1.2.0 =
 * Added settings sidebar for feedback/support requests

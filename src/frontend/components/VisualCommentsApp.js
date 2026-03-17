@@ -21,6 +21,9 @@ const VisualCommentsApp = () => {
     const [selectedElement, setSelectedElement] = useState(null);
     const [showCommentForm, setShowCommentForm] = useState(false);
     const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
+    const pageUrl = agwp_sn_ajax.pageUrl || window.location.href;
+    const pageToken = agwp_sn_ajax.pageToken || '';
+    const renderedAt = agwp_sn_ajax.renderTimestamp || 0;
 
     // Load existing comments on mount and when page changes
     useEffect(() => {
@@ -142,7 +145,8 @@ const VisualCommentsApp = () => {
                 body: new URLSearchParams({
                     action: 'agwp_sn_get_comments',
                     nonce: agwp_sn_ajax.nonce,
-                    page_url: window.location.href
+                    page_url: pageUrl,
+                    page_token: pageToken
                 })
             });
 
@@ -154,7 +158,7 @@ const VisualCommentsApp = () => {
             logger.error('Error loading comments:', error);
         }
     };    // Save new comment
-    const saveComment = async (commentText, screenshotUrl = '', priority = 'medium', commentTitle = '') => {
+    const saveComment = async (commentText, screenshotUrl = '', priority = 'medium', commentTitle = '', website = '') => {
         if (!selectedElement) return;
 
         try {
@@ -173,7 +177,10 @@ const VisualCommentsApp = () => {
                     screenshot_url: screenshotUrl,
                     x_position: Math.round(selectedElement.x),
                     y_position: Math.round(selectedElement.y),
-                    page_url: window.location.href,
+                    page_url: pageUrl,
+                    page_token: pageToken,
+                    rendered_at: renderedAt,
+                    website: website,
                     priority: priority
                 })
             });
@@ -196,7 +203,7 @@ const VisualCommentsApp = () => {
     };
 
     // Add reply to comment
-    const addReply = async (commentId, replyText) => {
+    const addReply = async (commentId, replyText, website = '') => {
         try {
             const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
@@ -207,7 +214,11 @@ const VisualCommentsApp = () => {
                     action: 'agwp_sn_add_reply',
                     nonce: agwp_sn_ajax.nonce,
                     comment_id: commentId,
-                    reply_text: replyText
+                    reply_text: replyText,
+                    page_url: pageUrl,
+                    page_token: pageToken,
+                    rendered_at: renderedAt,
+                    website: website
                 })
             });
 
