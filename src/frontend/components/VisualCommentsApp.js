@@ -194,7 +194,7 @@ const VisualCommentsApp = () => {
                 // Show success message
                 showNotification(__('Comment saved successfully!', 'analogwp-site-notes'), 'success');
             } else {
-                showNotification(__('Error saving comment', 'analogwp-site-notes'), 'error');
+                showNotification(data.data?.message || __('Error saving comment', 'analogwp-site-notes'), 'error');
             }
         } catch (error) {
             logger.error('Error saving comment:', error);
@@ -227,7 +227,7 @@ const VisualCommentsApp = () => {
                 await loadComments(); // Reload comments
                 showNotification(__('Reply added successfully!', 'analogwp-site-notes'), 'success');
             } else {
-                showNotification(__('Error adding reply', 'analogwp-site-notes'), 'error');
+                showNotification(data.data?.message || __('Error adding reply', 'analogwp-site-notes'), 'error');
             }
         } catch (error) {
             logger.error('Error adding reply:', error);

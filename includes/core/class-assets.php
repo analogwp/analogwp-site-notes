@@ -198,7 +198,7 @@ class Assets {
 			'currentUser'          => $this->get_current_user_data(),
 			'canAddComments'       => Plugin::current_visitor_can_access_frontend_comments(),
 			'canManageComments'    => Plugin::user_has_access(),
-			'canUploadScreenshots' => Plugin::user_has_access(),
+			'canUploadScreenshots' => Plugin::current_visitor_can_access_frontend_comments(),
 			'settings'             => $settings,
 			'strings'              => $this->get_frontend_strings(),
 			'debug'                => $debug_enabled,

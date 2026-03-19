@@ -344,7 +344,7 @@ class Ajax {
 
 		// Sanitize and handle screenshot URL if provided.
 		$screenshot_url = '';
-		if ( Plugin::user_has_access() && ! empty( $_POST['screenshot_url'] ) ) {
+		if ( ! empty( $_POST['screenshot_url'] ) ) {
 			$sanitized_screenshot_url = sanitize_text_field( wp_unslash( $_POST['screenshot_url'] ) );
 			if ( 0 === strpos( $sanitized_screenshot_url, 'data:image' ) ) {
 				$screenshot_url = $this->save_screenshot_from_data_url( $sanitized_screenshot_url );
