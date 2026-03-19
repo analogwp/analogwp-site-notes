@@ -8,6 +8,7 @@
 
 namespace AnalogWP\SiteNotes\Core;
 
+use AnalogWP\SiteNotes\API\Ajax;
 use AnalogWP\SiteNotes\Plugin;
 use AnalogWP\SiteNotes\Utils\Has_Instance;
 
@@ -172,7 +173,7 @@ class Assets {
 	 * @return array Localized data.
 	 */
 	private function get_frontend_localized_data() {
-		$current_page_url = $this->get_current_request_url();
+		$current_page_url = Ajax::normalize_page_url( $this->get_current_request_url() );
 
 		// Get plugin settings.
 		$default_settings = array(

@@ -125,7 +125,7 @@ class Ajax {
 	 * @param string $page_url Page URL.
 	 * @return string Normalized URL.
 	 */
-	private function normalize_page_url( $page_url ) {
+	public static function normalize_page_url( $page_url ) {
 		$page_url = sanitize_url( wp_unslash( $page_url ) );
 
 		if ( empty( $page_url ) ) {
@@ -169,7 +169,7 @@ class Ajax {
 	 * @return string Normalized page URL.
 	 */
 	private function verify_page_request( $page_url, $page_token ) {
-		$normalized_page_url = $this->normalize_page_url( $page_url );
+		$normalized_page_url = self::normalize_page_url( $page_url );
 
 		if ( empty( $normalized_page_url ) ) {
 			$this->send_error( __( 'Invalid page URL.', 'analogwp-site-notes' ), 400 );
@@ -530,7 +530,7 @@ class Ajax {
 		$this->enforce_max_length( $reply_text, 2000, __( 'Reply text is too long.', 'analogwp-site-notes' ) );
 
 		$comment = $this->database->get_comment( $comment_id );
-		if ( empty( $comment ) || $this->normalize_page_url( $comment->page_url ) !== $page_url ) {
+		if ( empty( $comment ) || self::normalize_page_url( $comment->page_url ) !== $page_url ) {
 			$this->send_error( __( 'Invalid comment target.', 'analogwp-site-notes' ), 403 );
 		}
 
