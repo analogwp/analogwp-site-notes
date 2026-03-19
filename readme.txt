@@ -4,7 +4,7 @@ Tags: notes, feedback, collaboration, comments, task-management
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,13 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 5. Admin settings page
 
 == Changelog ==
+
+= 1.4.0 =
+* Fix page url verification fail
+* Fix anonymous front-end comments not saving screenshots
+* Fix anonymous front-end comments rate limit/server error messages not shown
+* Fix access control logic for logged-in users and anonymous users
+* Other minor changes
 
 = 1.3.0 =
 * Add anonymous/logged-out front-end comments support
