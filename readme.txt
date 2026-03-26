@@ -8,7 +8,7 @@ Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Site Notes is a one-stop solution for agency-client transitions with visual commenting, task management, and collaborative features. Site Notes helps you get easy Site feedback.
+Site Notes is a one-stop solution for agency-client transitions with visual commenting and task management. Site Notes helps you get easy Site feedback.
 
 == Description ==
 
