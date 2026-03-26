@@ -1,6 +1,6 @@
 === Site Notes: Site Feedback, Site Notes with Sitewide Visual Commenting ===
 Contributors: analogwp, lushkant, johnpixle
-Tags: notes, feedback, user-feedback, website-feedback, task management
+Tags: notes, feedback, user feedback, website feedback, task management
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 7.4
@@ -8,7 +8,7 @@ Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Site Notes is a one-stop solution for agency-client transitions with visual commenting and task management. Site Notes helps you get easy Site feedback.
+Site Notes is a one-stop solution for agency-client transitions with visual commenting and task management. Site Notes helps get easy Site feedback.
 
 == Description ==
 
