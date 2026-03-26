@@ -1,6 +1,6 @@
 === Site Notes: Site Feedback, Site Notes with Sitewide Visual Commenting ===
 Contributors: analogwp, lushkant, johnpixle
-Tags: notes, feedback, feedback, comments, task management
+Tags: notes, feedback, user-feedback, website-feedback, task management
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 7.4
