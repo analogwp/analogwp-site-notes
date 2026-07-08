@@ -10,12 +10,14 @@ import { __ } from '@wordpress/i18n';
 import { showToast } from '../ToastProvider';
 import { useSettings } from '../settings/SettingsProvider';
 import logger from '../../../shared/utils/logger';
+import { getStatusByKey } from '../../../shared/constants/taskStatuses';
 import {
     CalendarIcon,
     ClockCircleIcon,
     CloseIcon,
     CloseSmallIcon,
 } from '../../../shared/icons';
+import TaskSidebarBadgeSelect from './TaskSidebarBadgeSelect';
 
 const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, statuses = [], isSidebar = false }) => {
     const { categories, priorities } = useSettings();
@@ -31,6 +33,64 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
         priority: 'medium',
         description: ''
     });
+    const [activeTab, setActiveTab] = useState('details');
+    const [pendingTimeEntries, setPendingTimeEntries] = useState([]);
+
+    const priorityOptions = priorities && priorities.length > 0
+        ? priorities
+        : [
+            { id: 1, key: 'high', name: __('High', 'analogwp-site-notes'), color: '#ef4444' },
+            { id: 2, key: 'medium', name: __('Medium', 'analogwp-site-notes'), color: '#f59e0b' },
+            { id: 3, key: 'low', name: __('Low', 'analogwp-site-notes'), color: '#10b981' },
+        ];
+
+    const getStatusBadgeStyle = (statusKey) => {
+        const status = getStatusByKey(statusKey);
+        if (!status) {
+            return {};
+        }
+        return {
+            backgroundColor: status.color,
+            color: status.textColor,
+        };
+    };
+
+    const getPriorityBadgeStyle = (priorityKey) => {
+        const priority = priorityOptions.find((item) => item.key === priorityKey);
+        const color = priority?.color || '#6b7280';
+        return {
+            backgroundColor: `color-mix(in srgb, ${color} 22%, white)`,
+            color: color,
+        };
+    };
+
+    const getExistingTimeEntries = () => {
+        if (!editTask?.timesheet) {
+            return [];
+        }
+        try {
+            return JSON.parse(editTask.timesheet);
+        } catch {
+            return [];
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({
+            taskTitle: '',
+            status: 'open',
+            assignedUser: '',
+            categories: [],
+            pageId: '',
+            dueDate: '',
+            timeHours: '',
+            timeMinutes: '',
+            priority: 'medium',
+            description: ''
+        });
+        setActiveTab('details');
+        setPendingTimeEntries([]);
+    };
 
     useEffect(() => {
         if (editTask && isOpen) {
@@ -81,19 +141,10 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                 priority: editTask.priority || 'medium',
                 description: editTask.comment_text || ''
             });
+            setActiveTab('details');
+            setPendingTimeEntries([]);
         } else {
-            setFormData({
-                taskTitle: '',
-                status: 'open',
-                assignedUser: '',
-                categories: [],
-                pageId: '',
-                dueDate: '',
-                timeHours: '',
-                timeMinutes: '',
-                priority: 'medium',
-                description: ''
-            });
+            resetForm();
         }
     }, [editTask, isOpen, pages]);
 
@@ -105,17 +156,95 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
     };
 
     const handleCategoryToggle = (categoryName) => {
-        setFormData(prev => {
+        setFormData((prev) => {
             const currentCategories = prev.categories || [];
             const isSelected = currentCategories.includes(categoryName);
 
             return {
                 ...prev,
                 categories: isSelected
-                    ? currentCategories.filter(cat => cat !== categoryName)
-                    : [...currentCategories, categoryName]
+                    ? currentCategories.filter((cat) => cat !== categoryName)
+                    : [...currentCategories, categoryName],
             };
         });
+    };
+
+    const handleCategorySelect = (categoryName) => {
+        if (!categoryName) {
+            return;
+        }
+        setFormData((prev) => {
+            if (prev.categories.includes(categoryName)) {
+                return prev;
+            }
+            return {
+                ...prev,
+                categories: [...prev.categories, categoryName],
+            };
+        });
+    };
+
+    const buildTimeEntry = (hours, minutes, description) => ({
+        id: Date.now() + Math.random(),
+        hours,
+        minutes,
+        description,
+        date: new Date().toISOString().split('T')[0],
+    });
+
+    const handleAddTime = () => {
+        const hours = parseInt(formData.timeHours, 10) || 0;
+        const minutes = parseInt(formData.timeMinutes, 10) || 0;
+
+        if (hours <= 0 && minutes <= 0) {
+            showToast.error(__('Please enter hours or minutes', 'analogwp-site-notes'));
+            return;
+        }
+
+        if (hours < 0 || minutes < 0 || minutes >= 60) {
+            showToast.error(__('Please enter valid time values', 'analogwp-site-notes'));
+            return;
+        }
+
+        setPendingTimeEntries((prev) => [
+            ...prev,
+            buildTimeEntry(
+                hours,
+                minutes,
+                editTask
+                    ? __('Time entry from task update', 'analogwp-site-notes')
+                    : __('Initial time entry', 'analogwp-site-notes')
+            ),
+        ]);
+
+        setFormData((prev) => ({
+            ...prev,
+            timeHours: '',
+            timeMinutes: '',
+        }));
+    };
+
+    const buildTimesheetData = () => {
+        const entries = [...pendingTimeEntries];
+        const hours = parseInt(formData.timeHours, 10) || 0;
+        const minutes = parseInt(formData.timeMinutes, 10) || 0;
+
+        if ((hours > 0 || minutes > 0) && hours >= 0 && minutes >= 0 && minutes < 60) {
+            entries.push(buildTimeEntry(
+                hours,
+                minutes,
+                editTask
+                    ? __('Time entry from task update', 'analogwp-site-notes')
+                    : __('Initial time entry', 'analogwp-site-notes')
+            ));
+        }
+
+        if (entries.length === 0) {
+            return null;
+        }
+
+        const existingEntries = getExistingTimeEntries();
+        return JSON.stringify([...existingEntries, ...entries]);
     };
 
     const handleSave = async () => {
@@ -140,36 +269,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
             }
         }
 
-        let timesheetData = null;
-        if ((formData.timeHours && parseInt(formData.timeHours) > 0) ||
-            (formData.timeMinutes && parseInt(formData.timeMinutes) > 0)) {
-
-            const hours = parseInt(formData.timeHours) || 0;
-            const minutes = parseInt(formData.timeMinutes) || 0;
-
-            if (hours >= 0 && minutes >= 0 && minutes < 60) {
-                const timeEntry = {
-                    id: Date.now(),
-                    hours,
-                    minutes,
-                    description: editTask ?
-                        __('Time entry from task update', 'analogwp-site-notes') :
-                        __('Initial time entry', 'analogwp-site-notes'),
-                    date: new Date().toISOString().split('T')[0]
-                };
-
-                if (editTask && editTask.timesheet) {
-                    try {
-                        const existingEntries = JSON.parse(editTask.timesheet);
-                        timesheetData = JSON.stringify([...existingEntries, timeEntry]);
-                    } catch {
-                        timesheetData = JSON.stringify([timeEntry]);
-                    }
-                } else {
-                    timesheetData = JSON.stringify([timeEntry]);
-                }
-            }
-        }
+        let timesheetData = buildTimesheetData();
 
         const taskData = {
             comment_title: formData.taskTitle || formData.description,
@@ -195,18 +295,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
         try {
             await onSave(taskData);
 
-            setFormData({
-                taskTitle: '',
-                status: 'open',
-                assignedUser: '',
-                categories: [],
-                pageId: '',
-                dueDate: '',
-                timeHours: '',
-                timeMinutes: '',
-                priority: 'medium',
-                description: ''
-            });
+            resetForm();
             onClose();
 
             if (timesheetData) {
@@ -227,18 +316,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
     };
 
     const handleCancel = () => {
-        setFormData({
-            taskTitle: '',
-            status: 'open',
-            assignedUser: '',
-            categories: [],
-            pageId: '',
-            dueDate: '',
-            timeHours: '',
-            timeMinutes: '',
-            priority: 'medium',
-            description: ''
-        });
+        resetForm();
         onClose();
     };
 
@@ -288,6 +366,11 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
     if (!isOpen) return null;
 
     if (isSidebar) {
+        const allTimeEntries = [...getExistingTimeEntries(), ...pendingTimeEntries];
+        const availableCategories = categories.filter(
+            (category) => !formData.categories.includes(category.name)
+        );
+
         return (
             <div className="sn-task-sidebar">
                 <div className="sn-task-sidebar__header">
@@ -296,9 +379,9 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                             type="text"
                             value={formData.taskTitle}
                             onChange={(e) => handleInputChange('taskTitle', e.target.value)}
-                            placeholder={editTask ?
-                                __('Edit task title', 'analogwp-site-notes') :
-                                __('Add task title', 'analogwp-site-notes')
+                            placeholder={editTask
+                                ? __('Edit task title', 'analogwp-site-notes')
+                                : __('Add task title', 'analogwp-site-notes')
                             }
                             className="sn-input-inline sn-flex-1"
                         />
@@ -311,141 +394,211 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                             <CloseIcon />
                         </button>
                     </div>
-                    <textarea
-                        value={formData.description}
-                        onChange={(e) => handleInputChange('description', e.target.value)}
-                        placeholder={__('Add a task description here (optional)', 'analogwp-site-notes')}
-                        className="sn-input sn-textarea"
-                        rows="3"
-                    />
                 </div>
 
-                <div className="sn-task-sidebar__body sn-space-y-4">
-                    <div className="sn-task-sidebar__field">
-                        <label className="sn-label">{__('Status', 'analogwp-site-notes')}</label>
-                        <select
-                            value={formData.status}
-                            onChange={(e) => handleInputChange('status', e.target.value)}
-                            className="sn-input"
-                        >
-                            {statuses.map(status => (
-                                <option key={status.key} value={status.key}>
-                                    {status.title}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                <div className="sn-task-sidebar__tabs">
+                    <button
+                        type="button"
+                        className={`sn-task-sidebar__tab ${activeTab === 'details' ? 'sn-task-sidebar__tab--active' : 'sn-task-sidebar__tab--inactive'}`}
+                        onClick={() => setActiveTab('details')}
+                    >
+                        {__('Details', 'analogwp-site-notes')}
+                    </button>
+                    <button
+                        type="button"
+                        className={`sn-task-sidebar__tab ${activeTab === 'timesheet' ? 'sn-task-sidebar__tab--active' : 'sn-task-sidebar__tab--inactive'}`}
+                        onClick={() => setActiveTab('timesheet')}
+                    >
+                        {__('Timesheet', 'analogwp-site-notes')}
+                    </button>
+                </div>
 
-                    <div className="sn-task-sidebar__field">
-                        <label className="sn-label">{__('Assign', 'analogwp-site-notes')}</label>
-                        <select
-                            value={formData.assignedUser}
-                            onChange={(e) => handleInputChange('assignedUser', e.target.value)}
-                            className="sn-input"
-                        >
-                            <option value="">{__('Select User', 'analogwp-site-notes')}</option>
-                            {users.map(user => (
-                                <option key={user.id} value={user.id}>{user.name}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="sn-task-sidebar__field">
-                        <label className="sn-label">{__('Page', 'analogwp-site-notes')}</label>
-                        <select
-                            value={formData.pageId}
-                            onChange={(e) => handleInputChange('pageId', e.target.value)}
-                            className="sn-input"
-                        >
-                            <option value="">{__('Select Page', 'analogwp-site-notes')}</option>
-                            {pages.map(page => (
-                                <option key={page.id} value={page.id}>{page.title}</option>
-                            ))}
-                        </select>
-                        {formData.pageId && (
-                            <div className="sn-task-sidebar__url-preview">
-                                <small>
-                                    {__('URL:', 'analogwp-site-notes')}
-                                    <a
-                                        href={pages.find(p => String(p.id) === String(formData.pageId))?.url || '#'}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="sn-task-sidebar__url-link"
-                                    >
-                                        {pages.find(p => String(p.id) === String(formData.pageId))?.url || ''}
-                                    </a>
-                                </small>
+                <div className="sn-task-sidebar__body">
+                    {activeTab === 'details' ? (
+                        <>
+                            <div className="sn-task-sidebar__row">
+                                <label className="sn-task-sidebar__row-label">{__('Status', 'analogwp-site-notes')}</label>
+                                <div className="sn-task-sidebar__row-control">
+                                    <TaskSidebarBadgeSelect
+                                        value={formData.status}
+                                        onChange={(value) => handleInputChange('status', value)}
+                                        options={statuses.map((status) => ({
+                                            value: status.key,
+                                            label: status.title,
+                                        }))}
+                                        getOptionStyle={getStatusBadgeStyle}
+                                    />
+                                </div>
                             </div>
-                        )}
-                    </div>
 
-                    <div className="sn-task-sidebar__field">
-                        <label className="sn-label">{__('Priority', 'analogwp-site-notes')}</label>
-                        <select
-                            value={formData.priority}
-                            onChange={(e) => handleInputChange('priority', e.target.value)}
-                            className="sn-input"
-                        >
-                            {priorities && priorities.length > 0 ? (
-                                priorities.map(priority => (
-                                    <option key={priority.id} value={priority.key}>
-                                        {priority.name}
-                                    </option>
-                                ))
-                            ) : (
-                                <>
-                                    <option value="low">{__('Low', 'analogwp-site-notes')}</option>
-                                    <option value="medium">{__('Medium', 'analogwp-site-notes')}</option>
-                                    <option value="high">{__('High', 'analogwp-site-notes')}</option>
-                                </>
+                            <div className="sn-task-sidebar__row">
+                                <label className="sn-task-sidebar__row-label">{__('Priority', 'analogwp-site-notes')}</label>
+                                <div className="sn-task-sidebar__row-control">
+                                    <TaskSidebarBadgeSelect
+                                        value={formData.priority}
+                                        onChange={(value) => handleInputChange('priority', value)}
+                                        options={priorityOptions.map((priority) => ({
+                                            value: priority.key,
+                                            label: priority.name,
+                                        }))}
+                                        getOptionStyle={getPriorityBadgeStyle}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sn-task-sidebar__row">
+                                <label className="sn-task-sidebar__row-label">{__('Assign', 'analogwp-site-notes')}</label>
+                                <div className="sn-task-sidebar__row-control">
+                                    <select
+                                        value={formData.assignedUser}
+                                        onChange={(e) => handleInputChange('assignedUser', e.target.value)}
+                                        className="sn-input sn-task-sidebar__select"
+                                    >
+                                        <option value="">{__('Select User', 'analogwp-site-notes')}</option>
+                                        {users.map((user) => (
+                                            <option key={user.id} value={user.id}>{user.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="sn-task-sidebar__row">
+                                <label className="sn-task-sidebar__row-label">{__('Category', 'analogwp-site-notes')}</label>
+                                <div className="sn-task-sidebar__row-control">
+                                    <select
+                                        value=""
+                                        onChange={(e) => handleCategorySelect(e.target.value)}
+                                        className="sn-input sn-task-sidebar__select"
+                                        disabled={availableCategories.length === 0}
+                                    >
+                                        <option value="">{__('Select Category', 'analogwp-site-notes')}</option>
+                                        {availableCategories.map((category) => (
+                                            <option key={category.id} value={category.name}>
+                                                {category.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {formData.categories.length > 0 && (
+                                <div className="sn-task-sidebar__category-tags">
+                                    {formData.categories.map((categoryName, index) => (
+                                        <span key={index} className="sn-tag-removable">
+                                            {categoryName}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleCategoryToggle(categoryName)}
+                                                className="sn-tag-remove-btn"
+                                            >
+                                                <CloseSmallIcon size="sm" />
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
                             )}
-                        </select>
-                    </div>
 
-                    {renderCategoriesField()}
+                            <div className="sn-task-sidebar__row">
+                                <label className="sn-task-sidebar__row-label">{__('Page', 'analogwp-site-notes')}</label>
+                                <div className="sn-task-sidebar__row-control">
+                                    <select
+                                        value={formData.pageId}
+                                        onChange={(e) => handleInputChange('pageId', e.target.value)}
+                                        className="sn-input sn-task-sidebar__select"
+                                    >
+                                        <option value="">{__('Select Page', 'analogwp-site-notes')}</option>
+                                        {pages.map((page) => (
+                                            <option key={page.id} value={page.id}>{page.title}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
 
-                    <div className="sn-task-sidebar__field">
-                        <label className="sn-label">{__('Due Date', 'analogwp-site-notes')}</label>
-                        <div className="sn-task-sidebar__date-wrap">
-                            <input
-                                type="date"
-                                value={formData.dueDate}
-                                onChange={(e) => handleInputChange('dueDate', e.target.value)}
-                                className="sn-input"
-                                placeholder={__('Select Due Date', 'analogwp-site-notes')}
-                            />
-                            <CalendarIcon size="sm" className="sn-task-sidebar__date-icon" />
-                        </div>
-                    </div>
+                            <div className="sn-task-sidebar__row">
+                                <label className="sn-task-sidebar__row-label">{__('Due Date', 'analogwp-site-notes')}</label>
+                                <div className="sn-task-sidebar__row-control">
+                                    <div className="sn-task-sidebar__date-wrap">
+                                        <input
+                                            type="date"
+                                            value={formData.dueDate}
+                                            onChange={(e) => handleInputChange('dueDate', e.target.value)}
+                                            className="sn-input sn-task-sidebar__select"
+                                        />
+                                        <CalendarIcon size="sm" className="sn-task-sidebar__date-icon" />
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div className="sn-task-sidebar__field">
-                        <label className="sn-label">{__('Add time to timesheet', 'analogwp-site-notes')}</label>
-                        <p className="sn-text-s sn-text-secondary sn-mb-2">{__('Time will be added as an entry to the task timesheet', 'analogwp-site-notes')}</p>
-                        <div className="sn-task-sidebar__time-row">
-                            <span className="sn-flex sn-items-center sn-gap-2">
-                                <ClockCircleIcon size="sm" className="sn-text-secondary" />
-                                <input
-                                    type="number"
-                                    value={formData.timeHours}
-                                    onChange={(e) => handleInputChange('timeHours', e.target.value)}
-                                    placeholder="HH"
-                                    className="sn-input sn-number-input--compact"
-                                    min="0"
-                                    max="23"
+                            <div className="sn-task-sidebar__row">
+                                <label className="sn-task-sidebar__row-label">{__('Add time', 'analogwp-site-notes')}</label>
+                                <div className="sn-task-sidebar__row-control">
+                                    <div className="sn-task-sidebar__time-row">
+                                        <ClockCircleIcon size="sm" className="sn-text-secondary" />
+                                        <input
+                                            type="number"
+                                            value={formData.timeHours}
+                                            onChange={(e) => handleInputChange('timeHours', e.target.value)}
+                                            placeholder="HH"
+                                            className="sn-input sn-task-sidebar__time-input"
+                                            min="0"
+                                            max="23"
+                                        />
+                                        <span className="sn-text-m sn-text-secondary">/</span>
+                                        <input
+                                            type="number"
+                                            value={formData.timeMinutes}
+                                            onChange={(e) => handleInputChange('timeMinutes', e.target.value)}
+                                            placeholder="MM"
+                                            className="sn-input sn-task-sidebar__time-input"
+                                            min="0"
+                                            max="59"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="sn-task-sidebar__time-add-btn"
+                                            onClick={handleAddTime}
+                                        >
+                                            {__('Add', 'analogwp-site-notes')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="sn-task-sidebar__description">
+                                <label className="sn-task-sidebar__description-label">
+                                    {__('Description', 'analogwp-site-notes')}
+                                </label>
+                                <textarea
+                                    value={formData.description}
+                                    onChange={(e) => handleInputChange('description', e.target.value)}
+                                    placeholder={__('Add a task description here (optional)', 'analogwp-site-notes')}
+                                    className="sn-input sn-task-sidebar__description-input"
+                                    rows="4"
                                 />
-                            </span>
-                            <span className="sn-text-m sn-text-secondary">/</span>
-                            <input
-                                type="number"
-                                value={formData.timeMinutes}
-                                onChange={(e) => handleInputChange('timeMinutes', e.target.value)}
-                                placeholder="MM"
-                                className="sn-input sn-number-input--compact"
-                                min="0"
-                                max="59"
-                            />
+                            </div>
+                        </>
+                    ) : (
+                        <div className="sn-task-sidebar__timesheet">
+                            {allTimeEntries.length === 0 ? (
+                                <p className="sn-text-m sn-text-secondary">
+                                    {__('No time entries yet.', 'analogwp-site-notes')}
+                                </p>
+                            ) : (
+                                <div className="sn-task-sidebar__timesheet-list">
+                                    {allTimeEntries.map((entry) => (
+                                        <div key={entry.id} className="sn-task-sidebar__timesheet-entry">
+                                            <span className="sn-task-sidebar__timesheet-duration">
+                                                {entry.hours}h {String(entry.minutes).padStart(2, '0')}m
+                                            </span>
+                                            {entry.date && (
+                                                <span className="sn-text-s sn-text-secondary">{entry.date}</span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 <div className="sn-task-sidebar__footer">
