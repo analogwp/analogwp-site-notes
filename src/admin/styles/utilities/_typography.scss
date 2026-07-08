@@ -1,0 +1,64 @@
+/**
+ * Typography utilities and text styles.
+ */
+
+.sn-title-xl {
+	font-size: var(--sn-title-xl-size);
+	line-height: var(--sn-title-xl-line);
+	font-weight: var(--sn-font-weight-semibold);
+	color: var(--sn-text-primary);
+	letter-spacing: -0.025em;
+}
+
+.sn-title-l {
+	font-size: var(--sn-title-l-size);
+	line-height: var(--sn-title-l-line);
+	font-weight: var(--sn-font-weight-semibold);
+	color: var(--sn-text-primary);
+}
+
+.sn-title-m {
+	font-size: var(--sn-title-m-size);
+	line-height: var(--sn-title-m-line);
+	font-weight: var(--sn-font-weight-semibold);
+	color: var(--sn-text-primary);
+}
+
+.sn-title-s {
+	font-size: var(--sn-title-s-size);
+	line-height: var(--sn-title-s-line);
+	font-weight: var(--sn-font-weight-semibold);
+	color: var(--sn-text-primary);
+}
+
+.sn-text-xl { font-size: var(--sn-text-xl-size); line-height: var(--sn-text-xl-line); }
+.sn-text-l { font-size: var(--sn-text-l-size); line-height: var(--sn-text-l-line); }
+.sn-text-m { font-size: var(--sn-text-m-size); line-height: var(--sn-text-m-line); }
+.sn-text-s { font-size: var(--sn-text-s-size); line-height: var(--sn-text-s-line); }
+
+.sn-text-primary { color: var(--sn-text-primary); }
+.sn-text-secondary { color: var(--sn-text-secondary); }
+.sn-text-inverted { color: var(--sn-text-inverted); }
+.sn-text-accent { color: var(--sn-accent); }
+.sn-text-danger { color: var(--sn-color-danger); }
+.sn-text-success { color: var(--sn-color-success-text); }
+.sn-text-warning { color: var(--sn-color-warning-text); }
+
+.sn-font-medium { font-weight: var(--sn-font-weight-medium); }
+.sn-font-semibold { font-weight: var(--sn-font-weight-semibold); }
+.sn-font-mono { font-family: var(--sn-font-family-mono); }
+
+.sn-text-center { text-align: center; }
+.sn-text-right { text-align: right; }
+.sn-uppercase { text-transform: uppercase; letter-spacing: 0.025em; }
+.sn-leading-relaxed { line-height: 1.625; }
+.sn-underline { text-decoration: underline; }
+
+.sn-label {
+	display: block;
+	font-size: var(--sn-label-size);
+	line-height: var(--sn-label-line);
+	font-weight: var(--sn-font-weight-medium);
+	color: var(--sn-text-primary);
+	margin-bottom: var(--sn-space-2xs);
+}

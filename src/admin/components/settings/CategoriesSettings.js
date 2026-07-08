@@ -105,13 +105,13 @@ const CategoriesSettings = () => {
     };
 
     return (
-        <div className="p-6 max-w-4xl">
+        <div className="sn-settings-section">
             <SettingsSection
                 title={__('Categories', 'analogwp-site-notes')}
                 description={__('Organize comments and tasks into categories for better project management.', 'analogwp-site-notes')}
             >
                 <SettingsCard title={__('Add New Category', 'analogwp-site-notes')}>
-                    <div className="space-y-6">
+                    <div className="sn-space-y-6">
                         <TextInputField
                             id="new_category_name"
                             label={__('Category Name', 'analogwp-site-notes')}
@@ -125,7 +125,7 @@ const CategoriesSettings = () => {
                             disabled={!newCategory.name.trim()}
                             variant="primary"
                             size="default"
-                            icon={<PlusIcon className="w-4 h-4" />}
+                            icon={<PlusIcon className="sn-icon" />}
                         >
                             {__('Add Category', 'analogwp-site-notes')}
                         </Button>
@@ -138,22 +138,22 @@ const CategoriesSettings = () => {
                             {__('No categories created yet. Add your first category above.', 'analogwp-site-notes')}
                         </FieldDescription>
                     ) : (
-                        <div className="space-y-3">
+                        <div className="sn-space-y-3">
                             {categories.map((category) => (
-                                <div key={category.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div key={category.id} className="sn-settings-item-list">
                                     {editingCategoryId === category.id ? (
-                                        <div className="space-y-4">
+                                        <div className="sn-space-y-4">
                                             <TextInputField
                                                 value={editCategoryForm.name}
                                                 onChange={(value) => setEditCategoryForm({ ...editCategoryForm, name: value })}
                                                 placeholder={__('Category name...', 'analogwp-site-notes')}
                                             />
-                                            <div className="flex gap-2">
+                                            <div className="sn-flex sn-gap-2">
                                                 <Button
                                                     onClick={saveEditCategory}
                                                     variant="primary"
                                                     size="small"
-                                                    icon={<CheckIcon className="w-4 h-4" />}
+                                                    icon={<CheckIcon className="sn-icon" />}
                                                     title={__('Save changes', 'analogwp-site-notes')}
                                                 >
                                                     {__('Save', 'analogwp-site-notes')}
@@ -162,7 +162,7 @@ const CategoriesSettings = () => {
                                                     onClick={cancelEditCategory}
                                                     variant="secondary"
                                                     size="small"
-                                                    icon={<XMarkIcon className="w-4 h-4" />}
+                                                    icon={<XMarkIcon className="sn-icon" />}
                                                     title={__('Cancel editing', 'analogwp-site-notes')}
                                                 >
                                                     {__('Cancel', 'analogwp-site-notes')}
@@ -170,18 +170,18 @@ const CategoriesSettings = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <span className="font-medium text-gray-900">{category.name}</span>
+                                        <div className="sn-settings-item-row">
+                                            <div className="sn-settings-item-info">
+                                                <span className="sn-settings-item-name">{category.name}</span>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="sn-flex sn-gap-2">
                                                 <Button
                                                     onClick={() => startEditCategory(category)}
                                                     variant="tertiary"
                                                     size="small"
                                                     title={__('Edit category', 'analogwp-site-notes')}
                                                 >
-                                                    <PencilIcon className="w-4 h-4" />
+                                                    <PencilIcon className="sn-icon" />
                                                 </Button>
                                                 <Button
                                                     onClick={() => {
@@ -193,7 +193,7 @@ const CategoriesSettings = () => {
                                                     size="small"
                                                     title={__('Delete category', 'analogwp-site-notes')}
                                                 >
-                                                    <TrashIcon className="w-4 h-4" />
+                                                    <TrashIcon className="sn-icon" />
                                                 </Button>
                                             </div>
                                         </div>

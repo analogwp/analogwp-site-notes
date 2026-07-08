@@ -7,9 +7,9 @@ import { __ } from '@wordpress/i18n';
 /**
  * External dependencies
  */
-import { 
-    PlusIcon, 
-    TrashIcon, 
+import {
+    PlusIcon,
+    TrashIcon,
     PencilIcon,
     XMarkIcon,
     CheckIcon
@@ -20,12 +20,12 @@ import {
  */
 import { Button } from '../ui';
 import { useSettings } from './SettingsProvider';
-import { 
-    SettingsSection, 
-    SettingsCard, 
-    TextInputField, 
+import {
+    SettingsSection,
+    SettingsCard,
+    TextInputField,
     ColorInput,
-    FieldDescription 
+    FieldDescription
 } from './FieldComponents';
 import { showToast } from '../ToastProvider';
 import logger from '../../../shared/utils/logger';
@@ -33,12 +33,10 @@ import logger from '../../../shared/utils/logger';
 const LabelsAndFiltersSettings = () => {
     const { priorities, setPriorities, saveSettings } = useSettings();
 
-    // Priorities state
     const [newPriority, setNewPriority] = useState({ name: '', color: '#3858e9' });
     const [editingPriorityId, setEditingPriorityId] = useState(null);
     const [editPriorityForm, setEditPriorityForm] = useState({ name: '', color: '' });
 
-    // Helper function to update priorities and auto-save
     const updatePriorities = async (newPriorities) => {
         setPriorities(newPriorities);
         try {
@@ -49,7 +47,6 @@ const LabelsAndFiltersSettings = () => {
         }
     };
 
-    // Priority functions
     const addPriority = async () => {
         if (!newPriority.name.trim()) {
             showToast.error(__('Priority name is required', 'analogwp-site-notes'));
@@ -94,12 +91,12 @@ const LabelsAndFiltersSettings = () => {
             return;
         }
 
-        await updatePriorities(priorities.map(pri => 
-            pri.id === editingPriorityId 
+        await updatePriorities(priorities.map(pri =>
+            pri.id === editingPriorityId
                 ? { ...pri, name: editPriorityForm.name.trim(), color: editPriorityForm.color, key: editPriorityForm.name.toLowerCase().replace(/\s+/g, '_') }
                 : pri
         ));
-        
+
         setEditingPriorityId(null);
         setEditPriorityForm({ name: '', color: '' });
         showToast.success(__('Priority updated successfully', 'analogwp-site-notes'));
@@ -111,19 +108,19 @@ const LabelsAndFiltersSettings = () => {
     };
 
     const predefinedColors = [
-        '#3858e9', '#e74c3c', '#2ecc71', '#f39c12', 
+        '#3858e9', '#e74c3c', '#2ecc71', '#f39c12',
         '#9b59b6', '#1abc9c', '#34495e', '#9fa1a3'
     ];
 
     return (
-        <div className="p-6 max-w-4xl">
+        <div className="sn-settings-section">
             <SettingsSection
                 title={__('Task Priorities', 'analogwp-site-notes')}
                 description={__('Define priority levels for tasks with customizable colors.', 'analogwp-site-notes')}
             >
                 <SettingsCard title={__('Add New Priority', 'analogwp-site-notes')}>
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="sn-space-y-6">
+                        <div className="sn-settings-grid-2">
                             <TextInputField
                                 id="new_priority_name"
                                 label={__('Priority Name', 'analogwp-site-notes')}
@@ -131,7 +128,7 @@ const LabelsAndFiltersSettings = () => {
                                 onChange={(value) => setNewPriority({ ...newPriority, name: value })}
                                 placeholder={__('Enter priority name...', 'analogwp-site-notes')}
                             />
-                            
+
                             <ColorInput
                                 id="new_priority_color"
                                 label={__('Priority Color', 'analogwp-site-notes')}
@@ -139,18 +136,15 @@ const LabelsAndFiltersSettings = () => {
                                 onChange={(value) => setNewPriority({ ...newPriority, color: value })}
                             />
                         </div>
-                        
-                        <div className="space-y-3">
-                            <label className="block text-sm font-medium text-gray-700">{__('Quick Colors:', 'analogwp-site-notes')}</label>
-                            <div className="flex flex-wrap gap-2">
+
+                        <div className="sn-space-y-3">
+                            <label className="sn-label">{__('Quick Colors:', 'analogwp-site-notes')}</label>
+                            <div className="sn-color-picker-row">
                                 {predefinedColors.map(color => (
                                     <button
                                         key={color}
-                                        className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
-                                            newPriority.color === color 
-                                                ? 'border-gray-900 ring-2 ring-gray-900 ring-offset-2' 
-                                                : 'border-gray-300 hover:border-gray-400'
-                                        }`}
+                                        type="button"
+                                        className={`sn-color-swatch${newPriority.color === color ? ' sn-color-swatch--selected' : ''}`}
                                         style={{ backgroundColor: color }}
                                         onClick={() => setNewPriority({ ...newPriority, color })}
                                         title={color}
@@ -164,7 +158,7 @@ const LabelsAndFiltersSettings = () => {
                             disabled={!newPriority.name.trim()}
                             variant="primary"
                             size="default"
-                            icon={<PlusIcon className="w-4 h-4" />}
+                            icon={<PlusIcon className="sn-icon" />}
                         >
                             {__('Add Priority', 'analogwp-site-notes')}
                         </Button>
@@ -177,12 +171,12 @@ const LabelsAndFiltersSettings = () => {
                             {__('No priorities created yet. Add your first priority above.', 'analogwp-site-notes')}
                         </FieldDescription>
                     ) : (
-                        <div className="space-y-3">
+                        <div className="sn-space-y-3">
                             {priorities.map(priority => (
-                                <div key={priority.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div key={priority.id} className="sn-settings-item-list">
                                     {editingPriorityId === priority.id ? (
-                                        <div className="space-y-4">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="sn-space-y-4">
+                                            <div className="sn-settings-grid-2">
                                                 <TextInputField
                                                     value={editPriorityForm.name}
                                                     onChange={(value) => setEditPriorityForm({ ...editPriorityForm, name: value })}
@@ -193,12 +187,12 @@ const LabelsAndFiltersSettings = () => {
                                                     onChange={(value) => setEditPriorityForm({ ...editPriorityForm, color: value })}
                                                 />
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="sn-flex sn-gap-2">
                                                 <Button
                                                     onClick={saveEditPriority}
                                                     variant="primary"
                                                     size="small"
-                                                    icon={<CheckIcon className="w-4 h-4" />}
+                                                    icon={<CheckIcon className="sn-icon" />}
                                                     title={__('Save changes', 'analogwp-site-notes')}
                                                 >
                                                     {__('Save', 'analogwp-site-notes')}
@@ -207,7 +201,7 @@ const LabelsAndFiltersSettings = () => {
                                                     onClick={cancelEditPriority}
                                                     variant="secondary"
                                                     size="small"
-                                                    icon={<XMarkIcon className="w-4 h-4" />}
+                                                    icon={<XMarkIcon className="sn-icon" />}
                                                     title={__('Cancel editing', 'analogwp-site-notes')}
                                                 >
                                                     {__('Cancel', 'analogwp-site-notes')}
@@ -215,22 +209,22 @@ const LabelsAndFiltersSettings = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <span 
-                                                    className="w-4 h-4 rounded-full border border-gray-300"
+                                        <div className="sn-settings-item-row">
+                                            <div className="sn-settings-item-info">
+                                                <span
+                                                    className="sn-priority-dot"
                                                     style={{ backgroundColor: priority.color }}
                                                 />
-                                                <span className="font-medium text-gray-900">{priority.name}</span>
+                                                <span className="sn-settings-item-name">{priority.name}</span>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="sn-flex sn-gap-2">
                                                 <Button
                                                     onClick={() => startEditPriority(priority)}
                                                     variant="tertiary"
                                                     size="small"
                                                     title={__('Edit priority', 'analogwp-site-notes')}
                                                 >
-                                                    <PencilIcon className="w-4 h-4" />
+                                                    <PencilIcon className="sn-icon" />
                                                 </Button>
                                                 <Button
                                                     onClick={() => {
@@ -242,7 +236,7 @@ const LabelsAndFiltersSettings = () => {
                                                     size="small"
                                                     title={__('Delete priority', 'analogwp-site-notes')}
                                                 >
-                                                    <TrashIcon className="w-4 h-4" />
+                                                    <TrashIcon className="sn-icon" />
                                                 </Button>
                                             </div>
                                         </div>

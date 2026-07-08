@@ -1,0 +1,61 @@
+/**
+ * Layout utilities — use sparingly; prefer component classes.
+ */
+
+.sn-flex { display: flex; }
+.sn-flex-col { display: flex; flex-direction: column; }
+.sn-flex-1 { flex: 1 1 0%; }
+.sn-flex-none { flex: none; }
+.sn-flex-wrap { flex-wrap: wrap; }
+.sn-inline-flex { display: inline-flex; }
+.sn-block { display: block; }
+.sn-inline-block { display: inline-block; }
+.sn-grid { display: grid; }
+.sn-hidden { display: none; }
+
+.sn-items-start { align-items: flex-start; }
+.sn-items-center { align-items: center; }
+.sn-justify-between { justify-content: space-between; }
+.sn-justify-center { justify-content: center; }
+.sn-justify-end { justify-content: flex-end; }
+
+.sn-relative { position: relative; }
+.sn-absolute { position: absolute; }
+.sn-fixed { position: fixed; }
+.sn-sticky { position: sticky; }
+
+.sn-inset-0 { inset: 0; }
+.sn-top-0 { top: 0; }
+.sn-right-0 { right: 0; }
+.sn-top-16 { top: 4rem; }
+.sn-right-4 { right: var(--sn-space-m); }
+
+.sn-z-10 { z-index: 10; }
+.sn-z-40 { z-index: var(--sn-z-overlay); }
+.sn-z-50 { z-index: var(--sn-z-sidebar); }
+
+.sn-w-full { width: 100%; }
+.sn-w-auto { width: auto; }
+.sn-min-w-0 { min-width: 0; }
+.sn-max-w-full { max-width: 100%; }
+
+.sn-h-full { height: 100%; }
+.sn-h-auto { height: auto; }
+.sn-min-h-screen { min-height: 100vh; }
+
+.sn-overflow-hidden { overflow: hidden; }
+.sn-overflow-y-auto { overflow-y: auto; }
+
+.sn-truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.sn-group:hover .sn-group-hover-visible {
+	opacity: 1;
+}
+
+.sn-divide-y > * + * {
+	border-top: 1px solid var(--sn-border-light);
+}

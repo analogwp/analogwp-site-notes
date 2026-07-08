@@ -12,9 +12,9 @@ import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 /**
  * Internal dependencies
  */
-import TasksListView from './tasks/TasksListView';
-import TasksKanbanView from './tasks/TasksKanbanView';
-import { TASK_STATUSES } from '../constants/taskStatuses';
+import TasksListView from './TasksListView';
+import TasksKanbanView from './TasksKanbanView';
+import { TASK_STATUSES } from '../../constants/taskStatuses';
 
 const TasksView = ({ 
     comments, 

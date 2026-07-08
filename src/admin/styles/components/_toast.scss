@@ -1,0 +1,19 @@
+/**
+ * Toast provider positioning
+ */
+
+.sn-toast-container {
+	top: 52px !important;
+	z-index: var(--sn-z-toast) !important;
+
+	@media (max-width: 782px) {
+		top: 66px !important;
+	}
+}
+
+.sn-toast-anchor {
+	position: fixed;
+	top: 4rem;
+	right: var(--sn-space-m);
+	z-index: var(--sn-z-sidebar);
+}

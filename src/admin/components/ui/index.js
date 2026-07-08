@@ -1,16 +1,11 @@
-/**
- * UI Components index file
- */
-// Export all UI components
-export { Badge, Card, Spinner, Alert } from './Components';
-
-// Export wrapper components over WordPress Components
+export { default as Badge } from './Badge';
+export { default as Card } from './Card';
+export { default as Spinner } from './Spinner';
+export { default as Alert } from './Alert';
 export { default as Button, IconButton } from './Button';
-export { 
-    Select,
-    TextInput,
-    Textarea,
-    Toggle,
-    Range,
-    ColorPicker
-} from './FormControls';
+export { default as Select } from './Select';
+export { default as TextInput } from './TextInput';
+export { default as Textarea } from './Textarea';
+export { default as Toggle } from './Toggle';
+export { default as Range } from './Range';
+export { default as ColorPicker } from './ColorPicker';

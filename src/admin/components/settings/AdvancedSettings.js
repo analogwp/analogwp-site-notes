@@ -8,15 +8,15 @@ import { __ } from '@wordpress/i18n';
  */
 import { Button } from '../ui';
 import { useSettings } from './SettingsProvider';
-import { useExtensions } from '../extensions/ExtensionsProvider';
-import { 
-    SettingsSection, 
-    SettingsCard, 
-    ToggleField, 
-    SelectField, 
+import { useExtensions } from './extensions/ExtensionsProvider';
+import {
+    SettingsSection,
+    SettingsCard,
+    ToggleField,
+    SelectField,
     TextAreaField,
     FileUpload,
-    FieldDescription 
+    FieldDescription
 } from './FieldComponents';
 
 const AdvancedSettings = () => {
@@ -38,13 +38,13 @@ const AdvancedSettings = () => {
     };
 
     return (
-        <div className="p-6 max-w-4xl">
+        <div className="sn-settings-section">
             <SettingsSection
                 title={__('Debug & Logging', 'analogwp-site-notes')}
                 description={__('Configure debugging and logging settings for troubleshooting.', 'analogwp-site-notes')}
             >
                 <SettingsCard title={__('Debug Settings', 'analogwp-site-notes')}>
-                    <div className="space-y-6">
+                    <div className="sn-space-y-6">
                         <ToggleField
                             id="enable_debug_mode"
                             label={__('Enable Debug Mode', 'analogwp-site-notes')}
@@ -76,50 +76,46 @@ const AdvancedSettings = () => {
                 description={__('Import and export settings, manage plugin data.', 'analogwp-site-notes')}
             >
                 <SettingsCard title={__('Import/Export Settings', 'analogwp-site-notes')}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="border border-gray-200 rounded-xl p-6 space-y-4">
-                            <div className="">
-                                <h4 className="text-base font-medium text-gray-900 m-0 mb-2">{__('Export Settings', 'analogwp-site-notes')}</h4>
-                                <p className="text-sm text-gray-500 mb-4">{__('Download all your settings as a JSON file for backup or transfer to another site.', 'analogwp-site-notes')}</p>
-                                <Button
-                                    onClick={exportSettings}
-                                    variant="default"
-                                    size="default"
-                                >
-                                    {__('Export Settings', 'analogwp-site-notes')}
-                                </Button>
-                            </div>
+                    <div className="sn-settings-grid-2">
+                        <div className="sn-settings-advanced-card sn-space-y-4">
+                            <h4 className="sn-title-s sn-m-0 sn-mb-2">{__('Export Settings', 'analogwp-site-notes')}</h4>
+                            <p className="sn-text-m sn-text-secondary sn-mb-4">{__('Download all your settings as a JSON file for backup or transfer to another site.', 'analogwp-site-notes')}</p>
+                            <Button
+                                onClick={exportSettings}
+                                variant="default"
+                                size="default"
+                            >
+                                {__('Export Settings', 'analogwp-site-notes')}
+                            </Button>
                         </div>
 
-                        <div className="border border-gray-200 rounded-xl p-6 space-y-4">
-                            <div className="">
-                                <h4 className="text-base font-medium text-gray-900 m-0 mb-2">{__('Import Settings', 'analogwp-site-notes')}</h4>
-                                <p className="text-sm text-gray-500 mb-4">{__('Upload a settings file to restore or transfer settings from another installation.', 'analogwp-site-notes')}</p>
-                                <FileUpload
-                                    id="import_settings"
-                                    accept=".json"
-                                    onChange={handleImport}
-                                    description={__('Select a JSON settings file to import.', 'analogwp-site-notes')}
-                                />
-                            </div>
+                        <div className="sn-settings-advanced-card sn-space-y-4">
+                            <h4 className="sn-title-s sn-m-0 sn-mb-2">{__('Import Settings', 'analogwp-site-notes')}</h4>
+                            <p className="sn-text-m sn-text-secondary sn-mb-4">{__('Upload a settings file to restore or transfer settings from another installation.', 'analogwp-site-notes')}</p>
+                            <FileUpload
+                                id="import_settings"
+                                accept=".json"
+                                onChange={handleImport}
+                                description={__('Select a JSON settings file to import.', 'analogwp-site-notes')}
+                            />
                         </div>
                     </div>
                 </SettingsCard>
 
                 <SettingsCard title={__('System Information', 'analogwp-site-notes')}>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-                                <div className="text-lg font-semibold text-gray-900">{window.agwp_sn_ajax?.pluginVersion || 'Unknown'}</div>
-                                <div className="text-sm text-gray-500">{__('Plugin Version', 'analogwp-site-notes')}</div>
+                    <div className="sn-settings-item-list">
+                        <div className="sn-settings-grid-3">
+                            <div className="sn-settings-stat-card">
+                                <div className="sn-settings-stat-value">{window.agwp_sn_ajax?.pluginVersion || 'Unknown'}</div>
+                                <div className="sn-settings-stat-label">{__('Plugin Version', 'analogwp-site-notes')}</div>
                             </div>
-                            <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-                                <div className="text-lg font-semibold text-gray-900">{window.agwp_sn_ajax?.wpVersion || 'Unknown'}</div>
-                                <div className="text-sm text-gray-500">{__('WordPress Version', 'analogwp-site-notes')}</div>
+                            <div className="sn-settings-stat-card">
+                                <div className="sn-settings-stat-value">{window.agwp_sn_ajax?.wpVersion || 'Unknown'}</div>
+                                <div className="sn-settings-stat-label">{__('WordPress Version', 'analogwp-site-notes')}</div>
                             </div>
-                            <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-                                <div className="text-lg font-semibold text-gray-900">{window.agwp_sn_ajax?.phpVersion || 'Unknown'}</div>
-                                <div className="text-sm text-gray-500">{__('PHP Version', 'analogwp-site-notes')}</div>
+                            <div className="sn-settings-stat-card">
+                                <div className="sn-settings-stat-value">{window.agwp_sn_ajax?.phpVersion || 'Unknown'}</div>
+                                <div className="sn-settings-stat-label">{__('PHP Version', 'analogwp-site-notes')}</div>
                             </div>
                         </div>
                     </div>

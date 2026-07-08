@@ -7,9 +7,9 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TasksView from '../components/TasksView';
+import TasksView from '../components/tasks';
 import AdminHeader from '../components/AdminHeader';
-import Settings from '../components/Settings';
+import Settings from '../components/settings';
 import { ToastProvider, showToast, showConfirmation } from '../components/ToastProvider';
 import SettingsProvider, { useSettings } from '../components/settings/SettingsProvider';
 import logger from '../../shared/utils/logger';
@@ -352,7 +352,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
     };
 
     return (
-        <div className="sn-admin-app-wp max-w-[1600px]">
+        <div className="sn-admin-app-wp">
             {/* Global Admin Header */}
             <AdminHeader 
                 currentPage={currentPage}

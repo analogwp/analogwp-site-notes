@@ -26,10 +26,8 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
         description: ''
     });
 
-    // Populate form data when editing a task
     useEffect(() => {
         if (editTask && isOpen) {
-            // Handle different possible field names for assignee
             let assignedUserId = '';
             if (editTask.assigned_to) {
                 assignedUserId = editTask.assigned_to;
@@ -39,35 +37,28 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                 assignedUserId = editTask.user_id;
             }
 
-            // Handle page ID - could be string or number, or derive from page_url
             let pageId = '';
-            
-            // First, try to match by URL if available (most reliable for archives/taxonomies)
+
             if (editTask.page_url && pages.length > 0) {
-                // Normalize URLs by removing protocol, trailing slashes, and converting to lowercase
                 const normalizeUrl = (url) => {
                     if (!url) return '';
-                    // Remove protocol and www
                     let normalized = url.replace(/^https?:\/\/(www\.)?/, '');
-                    // Remove trailing slashes
                     normalized = normalized.replace(/\/$/, '');
-                    // Convert to lowercase for case-insensitive comparison
                     return normalized.toLowerCase();
                 };
-                
+
                 const normalizedTaskUrl = normalizeUrl(editTask.page_url);
-                
+
                 const matchingPage = pages.find(page => {
                     const normalizedPageUrl = normalizeUrl(page.url);
                     return normalizedPageUrl === normalizedTaskUrl;
                 });
-                
+
                 if (matchingPage) {
                     pageId = String(matchingPage.id);
                 }
             }
-            
-            // Fallback to post_id if no URL match found and post_id is valid
+
             if (!pageId && editTask.post_id && editTask.post_id !== '0' && editTask.post_id !== 0) {
                 pageId = String(editTask.post_id);
             }
@@ -79,13 +70,12 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                 categories: editTask.categories || [],
                 pageId: pageId,
                 dueDate: editTask.due_date || '',
-                timeHours: '', // Always reset time fields for new entries
-                timeMinutes: '', // Always reset time fields for new entries
+                timeHours: '',
+                timeMinutes: '',
                 priority: editTask.priority || 'medium',
                 description: editTask.comment_text || ''
             });
         } else {
-            // Reset form for new task
             setFormData({
                 taskTitle: '',
                 status: 'open',
@@ -112,10 +102,10 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
         setFormData(prev => {
             const currentCategories = prev.categories || [];
             const isSelected = currentCategories.includes(categoryName);
-            
+
             return {
                 ...prev,
-                categories: isSelected 
+                categories: isSelected
                     ? currentCategories.filter(cat => cat !== categoryName)
                     : [...currentCategories, categoryName]
             };
@@ -123,54 +113,45 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
     };
 
     const handleSave = async () => {
-        // Validation
         if (!formData.taskTitle.trim() && !formData.description.trim()) {
             showToast.error(__('Please enter a task title or description', 'analogwp-site-notes'));
             return;
         }
 
-        // Only require page selection for new tasks, not when editing
         if (!editTask && (!formData.pageId || formData.pageId === '')) {
             showToast.error(__('Please select a page for this task', 'analogwp-site-notes'));
             return;
         }
 
-        // Find selected page to get URL
         const selectedPage = pages.find(page => String(page.id) === String(formData.pageId));
         const pageUrl = selectedPage ? selectedPage.url : '';
 
-        // Handle page ID conversion - some pages have string IDs (like 'blog'), others have numeric IDs
         let postId = 0;
         if (formData.pageId && formData.pageId !== '') {
             const numericId = parseInt(formData.pageId, 10);
             if (!isNaN(numericId)) {
                 postId = numericId;
             }
-            // For string IDs like 'blog', we keep post_id as 0 and rely on page_url
         }
 
-        // Create timesheet entry if time is provided
         let timesheetData = null;
-        if ((formData.timeHours && parseInt(formData.timeHours) > 0) || 
+        if ((formData.timeHours && parseInt(formData.timeHours) > 0) ||
             (formData.timeMinutes && parseInt(formData.timeMinutes) > 0)) {
-            
+
             const hours = parseInt(formData.timeHours) || 0;
             const minutes = parseInt(formData.timeMinutes) || 0;
-            
-            // Validate time values
+
             if (hours >= 0 && minutes >= 0 && minutes < 60) {
                 const timeEntry = {
                     id: Date.now(),
                     hours,
                     minutes,
-                    description: editTask ? 
-                        __('Time entry from task update', 'analogwp-site-notes') : 
+                    description: editTask ?
+                        __('Time entry from task update', 'analogwp-site-notes') :
                         __('Initial time entry', 'analogwp-site-notes'),
                     date: new Date().toISOString().split('T')[0]
                 };
-                
-                // If editing and the task has existing timesheet, add to it
-                // If creating new task, create new timesheet
+
                 if (editTask && editTask.timesheet) {
                     try {
                         const existingEntries = JSON.parse(editTask.timesheet);
@@ -194,11 +175,10 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
             status: formData.status,
             categories: formData.categories,
             due_date: formData.dueDate,
-            time_estimation: formData.timeHours && formData.timeMinutes ? 
+            time_estimation: formData.timeHours && formData.timeMinutes ?
                 `${formData.timeHours}:${String(formData.timeMinutes).padStart(2, '0')}` : ''
         };
 
-        // Add timesheet data if available
         if (timesheetData) {
             taskData.timesheet = timesheetData;
         }
@@ -208,8 +188,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
 
         try {
             await onSave(taskData);
-            
-            // Reset form - always clear time fields after successful save
+
             setFormData({
                 taskTitle: '',
                 status: 'open',
@@ -223,16 +202,15 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                 description: ''
             });
             onClose();
-            
-            // Show success message
+
             if (timesheetData) {
-                showToast.success(editTask ? 
-                    __('Task updated and time entry added to timesheet', 'analogwp-site-notes') : 
+                showToast.success(editTask ?
+                    __('Task updated and time entry added to timesheet', 'analogwp-site-notes') :
                     __('Task created and time entry added to timesheet', 'analogwp-site-notes')
                 );
             } else {
-                showToast.success(editTask ? 
-                    __('Task updated successfully', 'analogwp-site-notes') : 
+                showToast.success(editTask ?
+                    __('Task updated successfully', 'analogwp-site-notes') :
                     __('Task created successfully', 'analogwp-site-notes')
                 );
             }
@@ -243,7 +221,6 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
     };
 
     const handleCancel = () => {
-        // Reset form - always clear all fields including time entries
         setFormData({
             taskTitle: '',
             status: 'open',
@@ -259,31 +236,75 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
         onClose();
     };
 
+    const renderCategoriesField = () => (
+        <div className="sn-task-sidebar__field">
+            <label className="sn-label">{__('Categories', 'analogwp-site-notes')}</label>
+            {categories && categories.length > 0 ? (
+                <div className="sn-task-sidebar__categories">
+                    <div className="sn-space-y-2">
+                        {categories.map(category => (
+                            <label key={category.id} className="sn-task-sidebar__category-item">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.categories.includes(category.name)}
+                                    onChange={() => handleCategoryToggle(category.name)}
+                                    className="sn-checkbox"
+                                />
+                                <span className="sn-text-m sn-text-primary sn-ml-2">{category.name}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <p className="sn-text-m sn-text-secondary sn-task-sidebar__categories">
+                    {__('No categories available. Create categories in Settings.', 'analogwp-site-notes')}
+                </p>
+            )}
+            {formData.categories.length > 0 && (
+                <div className="sn-flex sn-flex-wrap sn-gap-1 sn-mt-2">
+                    {formData.categories.map((categoryName, index) => (
+                        <span key={index} className="sn-tag-removable">
+                            {categoryName}
+                            <button
+                                type="button"
+                                onClick={() => handleCategoryToggle(categoryName)}
+                                className="sn-tag-remove-btn"
+                            >
+                                <svg className="sn-icon sn-icon--sm" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                </svg>
+                            </button>
+                        </span>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+
     if (!isOpen) return null;
 
-    // If used as sidebar, return just the content without modal wrapper
     if (isSidebar) {
         return (
-            <div className="h-full flex flex-col bg-white">
-                {/* Header */}
-                <div className="flex-none border-b border-gray-200 p-4">
-                    <div className="flex items-center justify-between mb-3">
+            <div className="sn-task-sidebar">
+                <div className="sn-task-sidebar__header">
+                    <div className="sn-task-sidebar__header-row">
                         <input
                             type="text"
                             value={formData.taskTitle}
                             onChange={(e) => handleInputChange('taskTitle', e.target.value)}
-                            placeholder={editTask ? 
-                                __('Edit task title', 'analogwp-site-notes') : 
+                            placeholder={editTask ?
+                                __('Edit task title', 'analogwp-site-notes') :
                                 __('Add task title', 'analogwp-site-notes')
                             }
-                            className="flex-1 text-lg font-semibold border-none outline-none bg-transparent placeholder-gray-400 text-gray-900"
+                            className="sn-input-inline sn-flex-1"
                         />
-                        <button 
-                            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors duration-200"
+                        <button
+                            type="button"
+                            className="sn-task-sidebar__close"
                             onClick={handleCancel}
                             title={__('Close', 'analogwp-site-notes')}
                         >
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <svg className="sn-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
                             </svg>
                         </button>
@@ -292,19 +313,18 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         value={formData.description}
                         onChange={(e) => handleInputChange('description', e.target.value)}
                         placeholder={__('Add a task description here (optional)', 'analogwp-site-notes')}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white resize-vertical text-sm"
+                        className="sn-input sn-textarea"
                         rows="3"
                     />
                 </div>
 
-                {/* Simple form content for sidebar */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Status', 'analogwp-site-notes')}</label>
+                <div className="sn-task-sidebar__body sn-space-y-4">
+                    <div className="sn-task-sidebar__field">
+                        <label className="sn-label">{__('Status', 'analogwp-site-notes')}</label>
                         <select
                             value={formData.status}
                             onChange={(e) => handleInputChange('status', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-sm"
+                            className="sn-input"
                         >
                             {statuses.map(status => (
                                 <option key={status.key} value={status.key}>
@@ -314,12 +334,12 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         </select>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Assign', 'analogwp-site-notes')}</label>
+                    <div className="sn-task-sidebar__field">
+                        <label className="sn-label">{__('Assign', 'analogwp-site-notes')}</label>
                         <select
                             value={formData.assignedUser}
                             onChange={(e) => handleInputChange('assignedUser', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-sm"
+                            className="sn-input"
                         >
                             <option value="">{__('Select User', 'analogwp-site-notes')}</option>
                             {users.map(user => (
@@ -328,12 +348,12 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         </select>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Page', 'analogwp-site-notes')}</label>
+                    <div className="sn-task-sidebar__field">
+                        <label className="sn-label">{__('Page', 'analogwp-site-notes')}</label>
                         <select
                             value={formData.pageId}
                             onChange={(e) => handleInputChange('pageId', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-sm"
+                            className="sn-input"
                         >
                             <option value="">{__('Select Page', 'analogwp-site-notes')}</option>
                             {pages.map(page => (
@@ -341,14 +361,14 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                             ))}
                         </select>
                         {formData.pageId && (
-                            <div className="mt-2 p-2 bg-gray-50 rounded-lg">
-                                <small className="text-xs text-gray-600">
-                                    {__('URL:', 'analogwp-site-notes')} 
-                                    <a 
-                                        href={pages.find(p => String(p.id) === String(formData.pageId))?.url || '#'} 
-                                        target="_blank" 
+                            <div className="sn-task-sidebar__url-preview">
+                                <small>
+                                    {__('URL:', 'analogwp-site-notes')}
+                                    <a
+                                        href={pages.find(p => String(p.id) === String(formData.pageId))?.url || '#'}
+                                        target="_blank"
                                         rel="noopener noreferrer"
-                                        className="ml-1 text-indigo-600 hover:text-indigo-500 underline break-all"
+                                        className="sn-task-sidebar__url-link"
                                     >
                                         {pages.find(p => String(p.id) === String(formData.pageId))?.url || ''}
                                     </a>
@@ -357,12 +377,12 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Priority', 'analogwp-site-notes')}</label>
+                    <div className="sn-task-sidebar__field">
+                        <label className="sn-label">{__('Priority', 'analogwp-site-notes')}</label>
                         <select
                             value={formData.priority}
                             onChange={(e) => handleInputChange('priority', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-sm"
+                            className="sn-input"
                         >
                             {priorities && priorities.length > 0 ? (
                                 priorities.map(priority => (
@@ -380,94 +400,50 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         </select>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Categories', 'analogwp-site-notes')}</label>
-                        {categories && categories.length > 0 ? (
-                            <div className="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto bg-white">
-                                <div className="space-y-2">
-                                    {categories.map(category => (
-                                        <label key={category.id} className="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded">
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.categories.includes(category.name)}
-                                                onChange={() => handleCategoryToggle(category.name)}
-                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                            />
-                                            <span className="ml-2 text-sm text-gray-700">{category.name}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                        ) : (
-                            <p className="text-sm text-gray-500 border border-gray-300 rounded-lg p-3 bg-gray-50">
-                                {__('No categories available. Create categories in Settings.', 'analogwp-site-notes')}
-                            </p>
-                        )}
-                        {formData.categories.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2">
-                                {formData.categories.map((categoryName, index) => (
-                                    <span
-                                        key={index}
-                                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
-                                    >
-                                        {categoryName}
-                                        <button
-                                            type="button"
-                                            onClick={() => handleCategoryToggle(categoryName)}
-                                            className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-indigo-200 focus:outline-none"
-                                        >
-                                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    {renderCategoriesField()}
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Due Date', 'analogwp-site-notes')}</label>
-                        <div className="relative">
+                    <div className="sn-task-sidebar__field">
+                        <label className="sn-label">{__('Due Date', 'analogwp-site-notes')}</label>
+                        <div className="sn-task-sidebar__date-wrap">
                             <input
                                 type="date"
                                 value={formData.dueDate}
                                 onChange={(e) => handleInputChange('dueDate', e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-sm"
+                                className="sn-input"
                                 placeholder={__('Select Due Date', 'analogwp-site-notes')}
                             />
-                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" className="absolute right-3 top-3 text-gray-400 pointer-events-none">
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" className="sn-task-sidebar__date-icon">
                                 <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
                             </svg>
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Add time to timesheet', 'analogwp-site-notes')}</label>
-                        <p className="text-xs text-gray-500 mb-2">{__('Time will be added as an entry to the task timesheet', 'analogwp-site-notes')}</p>
-                        <div className="flex items-center gap-3">
-														<span className="flex items-center space-x-2">
-															<svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" className="text-gray-400 ml-1">
-																	<path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-																	<path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-															</svg>
-															<input
-																	type="number"
-																	value={formData.timeHours}
-																	onChange={(e) => handleInputChange('timeHours', e.target.value)}
-																	placeholder="HH"
-																	className="w-16! border border-gray-300 rounded-lg px-2 py-2 text-center focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-sm"
-																	min="0"
-																	max="23"
-															/>
-														</span>
-                            <span className="text-gray-500 text-sm">/</span>
+                    <div className="sn-task-sidebar__field">
+                        <label className="sn-label">{__('Add time to timesheet', 'analogwp-site-notes')}</label>
+                        <p className="sn-text-s sn-text-secondary sn-mb-2">{__('Time will be added as an entry to the task timesheet', 'analogwp-site-notes')}</p>
+                        <div className="sn-task-sidebar__time-row">
+                            <span className="sn-flex sn-items-center sn-gap-2">
+                                <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" className="sn-icon sn-text-secondary">
+                                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                                </svg>
+                                <input
+                                    type="number"
+                                    value={formData.timeHours}
+                                    onChange={(e) => handleInputChange('timeHours', e.target.value)}
+                                    placeholder="HH"
+                                    className="sn-input sn-number-input--compact"
+                                    min="0"
+                                    max="23"
+                                />
+                            </span>
+                            <span className="sn-text-m sn-text-secondary">/</span>
                             <input
                                 type="number"
                                 value={formData.timeMinutes}
                                 onChange={(e) => handleInputChange('timeMinutes', e.target.value)}
                                 placeholder="MM"
-                                className="w-16! border border-gray-300 rounded-lg px-2 py-2 text-center focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-sm"
+                                className="sn-input sn-number-input--compact"
                                 min="0"
                                 max="59"
                             />
@@ -475,17 +451,18 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className="flex-none border-t border-gray-200 p-4">
-                    <div className="flex space-x-3">
-                        <button 
-                            className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors duration-200"
+                <div className="sn-task-sidebar__footer">
+                    <div className="sn-task-sidebar__footer-actions">
+                        <button
+                            type="button"
+                            className="sn-btn-primary-solid"
                             onClick={handleSave}
                         >
                             {editTask ? __('Update Task', 'analogwp-site-notes') : __('Create Task', 'analogwp-site-notes')}
                         </button>
-                        <button 
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+                        <button
+                            type="button"
+                            className="sn-btn-secondary-solid"
                             onClick={handleCancel}
                         >
                             {__('Cancel', 'analogwp-site-notes')}
@@ -497,57 +474,56 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
     }
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
-                <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-lg">
+        <div className="sn-modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
+            <div className="sn-modal">
+                <div className="sn-modal__header">
                     <input
                         type="text"
                         value={formData.taskTitle}
                         onChange={(e) => handleInputChange('taskTitle', e.target.value)}
-                        placeholder={editTask ? 
-                            __('Edit task title', 'analogwp-site-notes') : 
+                        placeholder={editTask ?
+                            __('Edit task title', 'analogwp-site-notes') :
                             __('Add task title', 'analogwp-site-notes')
                         }
-                        className="w-full text-xl font-semibold border-none outline-none bg-transparent placeholder-gray-400 text-gray-900 mb-3"
+                        className="sn-input-inline sn-mb-3"
                     />
                     <textarea
                         value={formData.description}
                         onChange={(e) => handleInputChange('description', e.target.value)}
                         placeholder={__('Add a task description here (optional)', 'analogwp-site-notes')}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white resize-vertical text-sm"
+                        className="sn-input sn-textarea"
                         rows="3"
                     />
-                    <div className="absolute top-4 right-4">
-                        <button 
-                            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors duration-200"
+                    <div className="sn-modal__close">
+                        <button
+                            type="button"
+                            className="sn-task-sidebar__close"
                             onClick={handleCancel}
                             title={__('Close', 'analogwp-site-notes')}
                         >
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <svg className="sn-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
                             </svg>
                         </button>
                     </div>
                 </div>
 
-                <div className="border-b border-gray-200">
-                    <nav className="flex">
-                        <button className="px-6 py-3 text-sm font-medium text-indigo-600 border-b-2 border-indigo-500">
-                            {__('Details', 'analogwp-site-notes')}
-                        </button>
-                        <button className="px-6 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">
-                            {__('Timesheet', 'analogwp-site-notes')}
-                        </button>
-                    </nav>
+                <div className="sn-modal__tabs">
+                    <button type="button" className="sn-modal__tab sn-modal__tab--active">
+                        {__('Details', 'analogwp-site-notes')}
+                    </button>
+                    <button type="button" className="sn-modal__tab sn-modal__tab--inactive">
+                        {__('Timesheet', 'analogwp-site-notes')}
+                    </button>
                 </div>
 
-                <div className="p-6 space-y-6">
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Status', 'analogwp-site-notes')}</label>
+                <div className="sn-modal__body sn-space-y-6">
+                    <div className="sn-space-y-2">
+                        <label className="sn-label">{__('Status', 'analogwp-site-notes')}</label>
                         <select
                             value={formData.status}
                             onChange={(e) => handleInputChange('status', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                            className="sn-input"
                         >
                             {statuses.map(status => (
                                 <option key={status.key} value={status.key}>
@@ -557,12 +533,12 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         </select>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Assign', 'analogwp-site-notes')}</label>
+                    <div className="sn-space-y-2">
+                        <label className="sn-label">{__('Assign', 'analogwp-site-notes')}</label>
                         <select
                             value={formData.assignedUser}
                             onChange={(e) => handleInputChange('assignedUser', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                            className="sn-input"
                         >
                             <option value="">{__('Select User', 'analogwp-site-notes')}</option>
                             {users.map(user => (
@@ -571,12 +547,12 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         </select>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Page', 'analogwp-site-notes')}</label>
+                    <div className="sn-space-y-2">
+                        <label className="sn-label">{__('Page', 'analogwp-site-notes')}</label>
                         <select
                             value={formData.pageId}
                             onChange={(e) => handleInputChange('pageId', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                            className="sn-input"
                         >
                             <option value="">{__('Select Page', 'analogwp-site-notes')}</option>
                             {pages.map(page => (
@@ -584,14 +560,14 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                             ))}
                         </select>
                         {formData.pageId && (
-                            <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                                <small className="text-sm text-gray-600">
-                                    {__('URL:', 'analogwp-site-notes')} 
-                                    <a 
-                                        href={pages.find(p => String(p.id) === String(formData.pageId))?.url || '#'} 
-                                        target="_blank" 
+                            <div className="sn-task-sidebar__url-preview sn-mt-2">
+                                <small className="sn-text-m sn-text-secondary">
+                                    {__('URL:', 'analogwp-site-notes')}
+                                    <a
+                                        href={pages.find(p => String(p.id) === String(formData.pageId))?.url || '#'}
+                                        target="_blank"
                                         rel="noopener noreferrer"
-                                        className="ml-1 text-indigo-600 hover:text-indigo-500 underline"
+                                        className="sn-task-sidebar__url-link"
                                     >
                                         {pages.find(p => String(p.id) === String(formData.pageId))?.url || ''}
                                     </a>
@@ -600,12 +576,12 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Priority', 'analogwp-site-notes')}</label>
+                    <div className="sn-space-y-2">
+                        <label className="sn-label">{__('Priority', 'analogwp-site-notes')}</label>
                         <select
                             value={formData.priority}
                             onChange={(e) => handleInputChange('priority', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                            className="sn-input"
                         >
                             {priorities && priorities.length > 0 ? (
                                 priorities.map(priority => (
@@ -623,111 +599,69 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         </select>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Categories', 'analogwp-site-notes')}</label>
-                        {categories && categories.length > 0 ? (
-                            <div className="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto bg-white">
-                                <div className="space-y-2">
-                                    {categories.map(category => (
-                                        <label key={category.id} className="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded">
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.categories.includes(category.name)}
-                                                onChange={() => handleCategoryToggle(category.name)}
-                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                            />
-                                            <span className="ml-2 text-sm text-gray-700">{category.name}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                        ) : (
-                            <p className="text-sm text-gray-500 border border-gray-300 rounded-lg p-3 bg-gray-50">
-                                {__('No categories available. Create categories in Settings.', 'analogwp-site-notes')}
-                            </p>
-                        )}
-                        {formData.categories.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2">
-                                {formData.categories.map((categoryName, index) => (
-                                    <span
-                                        key={index}
-                                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
-                                    >
-                                        {categoryName}
-                                        <button
-                                            type="button"
-                                            onClick={() => handleCategoryToggle(categoryName)}
-                                            className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-indigo-200 focus:outline-none"
-                                        >
-                                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    {renderCategoriesField()}
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Due Date', 'analogwp-site-notes')}</label>
-                        <div className="relative">
+                    <div className="sn-space-y-2">
+                        <label className="sn-label">{__('Due Date', 'analogwp-site-notes')}</label>
+                        <div className="sn-task-sidebar__date-wrap">
                             <input
                                 type="date"
                                 value={formData.dueDate}
                                 onChange={(e) => handleInputChange('dueDate', e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                                className="sn-input"
                                 placeholder={__('Select Due Date', 'analogwp-site-notes')}
                             />
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="absolute right-3 top-3 text-gray-400 pointer-events-none">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="sn-task-sidebar__date-icon">
                                 <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
                             </svg>
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">{__('Add time to timesheet', 'analogwp-site-notes')}</label>
-                        <p className="text-sm text-gray-500 mb-2">{__('Time will be added as an entry to the task timesheet', 'analogwp-site-notes')}</p>
-                        <div className="flex items-center space-x-2">
+                    <div className="sn-space-y-2">
+                        <label className="sn-label">{__('Add time to timesheet', 'analogwp-site-notes')}</label>
+                        <p className="sn-text-m sn-text-secondary sn-mb-2">{__('Time will be added as an entry to the task timesheet', 'analogwp-site-notes')}</p>
+                        <div className="sn-task-sidebar__time-row">
                             <input
                                 type="number"
                                 value={formData.timeHours}
                                 onChange={(e) => handleInputChange('timeHours', e.target.value)}
                                 placeholder="HH"
-                                className="w-16 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                                className="sn-input sn-number-input--compact"
                                 min="0"
                                 max="23"
                             />
-                            <span className="text-gray-500">/</span>
+                            <span className="sn-text-m sn-text-secondary">/</span>
                             <input
                                 type="number"
                                 value={formData.timeMinutes}
                                 onChange={(e) => handleInputChange('timeMinutes', e.target.value)}
                                 placeholder="MM"
-                                className="w-16 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                                className="sn-input sn-number-input--compact"
                                 min="0"
                                 max="59"
                             />
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="text-gray-400 ml-2">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="sn-icon sn-text-secondary sn-ml-2">
                                 <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
                                 <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
                             </svg>
-                            <button type="button" className="ml-3 px-3 py-1 text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200">
+                            <button type="button" className="sn-btn-ghost sn-ml-3">
                                 {__('Add', 'analogwp-site-notes')}
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 rounded-b-lg flex justify-end space-x-3">
-                    <button 
-                        className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200"
+                <div className="sn-modal__footer">
+                    <button
+                        type="button"
+                        className="sn-btn-ghost"
                         onClick={handleCancel}
                     >
                         {__('Cancel', 'analogwp-site-notes')}
                     </button>
-                    <button 
-                        className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors duration-200"
+                    <button
+                        type="button"
+                        className="sn-btn-primary-solid"
                         onClick={handleSave}
                     >
                         {editTask ? __('Update Task', 'analogwp-site-notes') : __('Save Task', 'analogwp-site-notes')}
