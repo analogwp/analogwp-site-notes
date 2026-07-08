@@ -5,13 +5,14 @@ import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
- * External dependencies
- */
-import { ChevronRightIcon, ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
-
-/**
  * Internal dependencies
  */
+import {
+    ChevronDownIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    ChevronUpIcon,
+} from '../../shared/icons';
 import { TASK_STATUSES, getStatusByKey } from '../constants/taskStatuses';
 import { Button } from './ui';
 import logger from '../../shared/utils/logger';

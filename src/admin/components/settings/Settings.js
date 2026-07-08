@@ -16,6 +16,7 @@ import LabelsAndFiltersSettings from './LabelsAndFiltersSettings';
 import CategoriesSettings from './CategoriesSettings';
 import AdvancedSettings from './AdvancedSettings';
 import { Button } from '../ui';
+import { SiteNotesLogoIcon } from '../../../shared/icons';
 
 const ModernSettings = () => {
 	const [activeTab, setActiveTab] = useState('general');
@@ -89,10 +90,7 @@ const SettingsContent = ({ activeTab, setActiveTab }) => {
 					<div className="sn-settings-panel">
 						<div className="sn-settings-panel__header">
 							<span className="sn-settings-panel__avatar">
-								<svg viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-									<rect width="256" height="256" fill="#3858E9" />
-									<path d="M100.178 128.163L128.163 156.147L184.132 100.178M72.1938 128.163L100.178 156.147M128.163 128.163L156.147 100.178" stroke="white" strokeWidth="5.33764" strokeLinecap="round" strokeLinejoin="round" />
-								</svg>
+								<SiteNotesLogoIcon />
 							</span>
 							<div>
 								<h2 className="sn-settings-panel__title">

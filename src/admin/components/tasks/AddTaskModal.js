@@ -10,6 +10,12 @@ import { __ } from '@wordpress/i18n';
 import { showToast } from '../ToastProvider';
 import { useSettings } from '../settings/SettingsProvider';
 import logger from '../../../shared/utils/logger';
+import {
+    CalendarIcon,
+    ClockCircleIcon,
+    CloseIcon,
+    CloseSmallIcon,
+} from '../../../shared/icons';
 
 const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, statuses = [], isSidebar = false }) => {
     const { categories, priorities } = useSettings();
@@ -270,9 +276,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                                 onClick={() => handleCategoryToggle(categoryName)}
                                 className="sn-tag-remove-btn"
                             >
-                                <svg className="sn-icon sn-icon--sm" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
+                                <CloseSmallIcon size="sm" />
                             </button>
                         </span>
                     ))}
@@ -304,9 +308,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                             onClick={handleCancel}
                             title={__('Close', 'analogwp-site-notes')}
                         >
-                            <svg className="sn-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-                            </svg>
+                            <CloseIcon />
                         </button>
                     </div>
                     <textarea
@@ -412,9 +414,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                                 className="sn-input"
                                 placeholder={__('Select Due Date', 'analogwp-site-notes')}
                             />
-                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" className="sn-task-sidebar__date-icon">
-                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
-                            </svg>
+                            <CalendarIcon size="sm" className="sn-task-sidebar__date-icon" />
                         </div>
                     </div>
 
@@ -423,10 +423,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         <p className="sn-text-s sn-text-secondary sn-mb-2">{__('Time will be added as an entry to the task timesheet', 'analogwp-site-notes')}</p>
                         <div className="sn-task-sidebar__time-row">
                             <span className="sn-flex sn-items-center sn-gap-2">
-                                <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" className="sn-icon sn-text-secondary">
-                                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-                                </svg>
+                                <ClockCircleIcon size="sm" className="sn-text-secondary" />
                                 <input
                                     type="number"
                                     value={formData.timeHours}
@@ -501,9 +498,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                             onClick={handleCancel}
                             title={__('Close', 'analogwp-site-notes')}
                         >
-                            <svg className="sn-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-                            </svg>
+                            <CloseIcon />
                         </button>
                     </div>
                 </div>
@@ -611,9 +606,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                                 className="sn-input"
                                 placeholder={__('Select Due Date', 'analogwp-site-notes')}
                             />
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="sn-task-sidebar__date-icon">
-                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
-                            </svg>
+                            <CalendarIcon className="sn-task-sidebar__date-icon" />
                         </div>
                     </div>
 
@@ -640,10 +633,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                                 min="0"
                                 max="59"
                             />
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className="sn-icon sn-text-secondary sn-ml-2">
-                                <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-                            </svg>
+                            <ClockCircleIcon className="sn-text-secondary sn-ml-2" />
                             <button type="button" className="sn-btn-ghost sn-ml-3">
                                 {__('Add', 'analogwp-site-notes')}
                             </button>

@@ -14,15 +14,11 @@ import {
 	Range,
 	Toggle
 } from '../ui';
-
-/**
- * External dependencies
- */
 import {
-	InformationCircleIcon,
+	CheckCircleIcon,
 	ExclamationTriangleIcon,
-	CheckCircleIcon
-} from '@heroicons/react/24/outline';
+	InformationCircleIcon,
+} from '../../../shared/icons';
 
 export const FieldGroup = ({ children, className = '' }) => (
 	<div className={classnames('sn-space-y-4', className)}>

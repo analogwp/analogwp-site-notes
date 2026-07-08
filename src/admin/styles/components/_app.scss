@@ -38,6 +38,21 @@
 	display: flex;
 	gap: var(--sn-space-s);
 	font-size: var(--sn-text-l-size);
+
+	.sn-button--primary,
+	.components-button.is-primary {
+		.sn-icon {
+			color: inherit;
+		}
+
+		.sn-icon path[fill="currentColor"] {
+			fill: currentColor;
+		}
+
+		.sn-icon path[stroke="currentColor"] {
+			stroke: currentColor;
+		}
+	}
 }
 
 .sn-tasks-controls {
@@ -170,78 +185,3 @@
 	box-shadow: var(--sn-shadow-ui);
 }
 
-/* Sidebar nav (legacy) */
-.sn-sidebar {
-	width: 16rem;
-	background-color: var(--sn-surface-body-ultra-light);
-	border-right: 1px solid var(--sn-border-light);
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-}
-
-.sn-sidebar__header {
-	display: flex;
-	align-items: center;
-	padding: var(--sn-space-m) var(--sn-space-xl);
-	border-bottom: 1px solid var(--sn-border-light);
-}
-
-.sn-sidebar__logo {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 2rem;
-	height: 2rem;
-	background-color: var(--sn-accent);
-	border-radius: var(--sn-radius-button);
-	color: var(--sn-text-inverted);
-	margin-right: var(--sn-space-s);
-}
-
-.sn-sidebar__title {
-	font-size: var(--sn-title-s-size);
-	font-weight: var(--sn-font-weight-semibold);
-	color: var(--sn-text-primary);
-}
-
-.sn-sidebar__nav {
-	flex: 1;
-	padding: var(--sn-space-xl) var(--sn-space-m);
-}
-
-.sn-sidebar__nav-list {
-	display: flex;
-	flex-direction: column;
-	gap: var(--sn-space-xs);
-}
-
-.sn-sidebar__nav-item {
-	display: flex;
-	align-items: center;
-	padding: var(--sn-space-xs) var(--sn-space-s);
-	font-size: var(--sn-text-m-size);
-	font-weight: var(--sn-font-weight-medium);
-	color: var(--sn-text-primary);
-	border-radius: var(--sn-radius-button);
-	transition: background-color var(--sn-transition-base);
-	text-decoration: none;
-	border: none;
-	background: transparent;
-	width: 100%;
-	cursor: pointer;
-
-	&:hover {
-		background-color: var(--sn-surface-body-light);
-	}
-
-	&--active {
-		color: var(--sn-text-inverted);
-		background-color: var(--sn-accent);
-	}
-}
-
-.sn-sidebar__divider {
-	margin: var(--sn-space-m) 0;
-	border-color: var(--sn-border-light);
-}

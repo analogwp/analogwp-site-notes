@@ -1,0 +1,10 @@
+import Icon from './Icon';
+
+const SiteNotesLogoIcon = (props) => (
+	<Icon viewBox="0 0 256 256" fill="none" className="sn-site-notes-logo" {...props}>
+		<rect width="256" height="256" fill="#3858E9" />
+		<path d="M100.178 128.163L128.163 156.147L184.132 100.178M72.1938 128.163L100.178 156.147M128.163 128.163L156.147 100.178" stroke="white" strokeWidth="5.33764" strokeLinecap="round" strokeLinejoin="round" />
+	</Icon>
+);
+
+export default SiteNotesLogoIcon;

@@ -5,19 +5,15 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
- * External dependencies
- */
-import {
-    PlusIcon,
-    TrashIcon,
-    PencilIcon,
-    XMarkIcon,
-    CheckIcon
-} from '@heroicons/react/24/outline';
-
-/**
  * Internal dependencies
  */
+import {
+    CheckIcon,
+    PencilIcon,
+    PlusIcon,
+    TrashIcon,
+    XMarkIcon,
+} from '../../../shared/icons';
 import { Button } from '../ui';
 import { useSettings } from './SettingsProvider';
 import {
