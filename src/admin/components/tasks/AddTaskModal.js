@@ -330,7 +330,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         >
                             {statuses.map(status => (
                                 <option key={status.key} value={status.key}>
-                                    {status.icon} {status.title}
+                                    {status.title}
                                 </option>
                             ))}
                         </select>
@@ -522,7 +522,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave, users, pages, editTask = null, 
                         >
                             {statuses.map(status => (
                                 <option key={status.key} value={status.key}>
-                                    {status.icon} {status.title}
+                                    {status.title}
                                 </option>
                             ))}
                         </select>

@@ -50,6 +50,14 @@
 	--sn-color-neutral-bg: #f3f4f6;
 	--sn-color-neutral-text: #1f2937;
 
+	/* Task board status colors */
+	--sn-status-open: #FFE7B8;
+	--sn-status-open-text: #4D3300;
+	--sn-status-in-progress: #8E6DD4;
+	--sn-status-in-progress-text: #F7F5FC;
+	--sn-status-resolved: #6AAE75;
+	--sn-status-resolved-text: #F8FBF8;
+
 	/* Spacing scale */
 	--sn-space-3xs: 2px;
 	--sn-space-2xs: 4px;

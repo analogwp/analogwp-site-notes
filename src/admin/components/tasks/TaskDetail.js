@@ -22,6 +22,7 @@ import {
     InfoIcon,
     TrashOutlineIcon,
 } from '../../../shared/icons';
+import StatusDot from '../../../shared/components/StatusDot';
 
 const TaskDetail = ({
     comment,
@@ -86,11 +87,6 @@ const TaskDetail = ({
     const getStatusLabel = (status) => {
         const statusObj = getStatusByKey(status);
         return statusObj ? statusObj.title : status;
-    };
-
-    const getStatusIcon = (status) => {
-        const statusObj = getStatusByKey(status);
-        return statusObj ? statusObj.icon : '📋';
     };
 
     const handleStatusChange = async (newStatus) => {
@@ -267,7 +263,7 @@ const TaskDetail = ({
                     >
                         {TASK_STATUSES.map(statusOption => (
                             <option key={statusOption.key} value={statusOption.key}>
-                                {statusOption.icon} {statusOption.title}
+                                {statusOption.title}
                             </option>
                         ))}
                     </select>
@@ -323,7 +319,7 @@ const TaskDetail = ({
                                     </span>
                                 </div>
                                 <div>
-                                    <span className="sn-mr-2">{getStatusIcon(status)}</span>
+                                    <StatusDot statusKey={status} size="md" className="sn-mr-2" />
                                     {getStatusLabel(status)}
                                 </div>
                             </div>

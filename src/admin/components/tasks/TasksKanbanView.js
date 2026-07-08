@@ -8,6 +8,7 @@ import AddTaskModal from './AddTaskModal';
 import TasksControls from './TasksControls';
 import DroppableColumn from './DroppableColumn';
 import { AddIcon } from '../../../shared/icons';
+import StatusDot from '../../../shared/components/StatusDot';
 
 const TasksKanbanView = ({
 	selectedTask,
@@ -68,9 +69,7 @@ const TasksKanbanView = ({
 							<DroppableColumn key={status.key} id={status.key} status={status.key}>
 								<div className="sn-kanban-column-header">
 									<div className="sn-kanban-column-title">
-										<span className="sn-kanban-column-icon" style={{ color: status.color }}>
-											{status.icon}
-										</span>
+										<StatusDot statusKey={status.key} size="md" />
 										<span className="sn-kanban-column-name">{status.title}</span>
 									</div>
 									<div className="sn-kanban-column-count">
