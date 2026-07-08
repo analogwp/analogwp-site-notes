@@ -202,15 +202,10 @@ const TasksListView = ({
                     >
                         <TaskCard
                             comment={draggedItem}
+                            user={draggedItem?.user || getUserById(draggedItem?.user_id)}
                             onCardClick={() => {}}
-                            onStatusChange={() => {}}
-                            onEdit={() => {}}
                             onDelete={() => {}}
-                            statuses={statuses}
-                            priorities={priorities}
-                            getUserById={getUserById}
                             formatDate={formatDate}
-                            isDragging={false}
                         />
                     </div>
                 ) : null}

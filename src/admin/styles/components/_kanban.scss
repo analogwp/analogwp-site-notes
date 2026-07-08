@@ -200,12 +200,26 @@
 .sn-kanban-card-user-row {
 	display: flex;
 	align-items: center;
+	gap: var(--sn-space-xs);
+	min-width: 0;
+}
+
+.sn-kanban-card-user-name {
+	font-size: var(--sn-text-s-size);
+	color: var(--sn-text-secondary);
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .sn-kanban-card-date {
 	font-size: var(--sn-text-s-size);
 	color: var(--sn-text-secondary);
-	margin-top: var(--sn-space-s);
+	margin-left: auto;
+	flex-shrink: 0;
+	white-space: nowrap;
 }
 
 .sn-kanban-add-btn {

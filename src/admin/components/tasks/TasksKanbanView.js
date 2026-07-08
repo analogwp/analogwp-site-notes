@@ -83,11 +83,8 @@ const TasksKanbanView = ({
 											key={comment.id}
 											comment={comment}
 											user={comment.user || getUserById(comment.user_id)}
-											onStatusChange={handleStatusChange}
 											onDelete={handleDelete}
-											onEdit={handleEditTask}
-											onCardClick={handleCardClick}
-											priorities={priorities}
+											onCardClick={handleEditTask}
 											formatDate={formatDate}
 										/>
 									))}
@@ -113,11 +110,8 @@ const TasksKanbanView = ({
 								<TaskCard
 									comment={draggedItem}
 									user={draggedItem.user || getUserById(draggedItem.user_id)}
-									onStatusChange={() => {}}
 									onDelete={() => {}}
-									onEdit={() => {}}
 									onCardClick={() => {}}
-									priorities={priorities}
 									formatDate={formatDate}
 								/>
 							</div>

@@ -9,16 +9,14 @@ import { __ } from '@wordpress/i18n';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import classnames from 'classnames';
-import { DeleteIcon, EditIcon, GlobeIcon } from '../../../shared/icons';
+import { DeleteIcon, GlobeIcon } from '../../../shared/icons';
 
 const TaskCard = ({
 	comment,
 	user,
 	onDelete,
-	onEdit,
 	onCardClick,
 	formatDate,
-	priorities = [],
 }) => {
 	const {
 		attributes,
@@ -39,20 +37,6 @@ const TaskCard = ({
 
 	const getUserInitials = (name) => {
 		return name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
-	};
-
-	const getPriorityColor = (priority) => {
-		const priorityObj = priorities.find(p => p.key === priority);
-		if (priorityObj && priorityObj.color) {
-			return priorityObj.color;
-		}
-
-		switch (priority) {
-			case 'high': return '#ef4444';
-			case 'medium': return '#f59e0b';
-			case 'low': return '#10b981';
-			default: return '#6b7280';
-		}
 	};
 
 	const truncateWords = (text, maxWords = 40) => {
@@ -87,10 +71,6 @@ const TaskCard = ({
 		>
 			<div className="sn-kanban-card-header">
 				<div className="sn-kanban-card-title-row">
-					<div
-						className="sn-priority-dot"
-						style={{ backgroundColor: getPriorityColor(comment.priority) }}
-					/>
 					{comment.id && (
 						<h4 className="sn-kanban-card-id">
 							#{comment.id}
@@ -103,17 +83,6 @@ const TaskCard = ({
 					)}
 				</div>
 				<div className="sn-kanban-card-actions">
-					<button
-						type="button"
-						onClick={(e) => {
-							e.stopPropagation();
-							onEdit && onEdit(comment);
-						}}
-						className="sn-icon-action"
-						title={__('Edit', 'analogwp-site-notes')}
-					>
-						<EditIcon size={12} />
-					</button>
 					<button
 						type="button"
 						onClick={(e) => {
@@ -152,8 +121,11 @@ const TaskCard = ({
 						<small className="sn-kanban-card-user-label">{__('Added by', 'analogwp-site-notes')}</small>
 						<div className="sn-kanban-card-user-row">
 							{renderAvatar(user)}
-							<span className="sn-text-s sn-text-primary">
+							<span className="sn-kanban-card-user-name">
 								{user?.name || __('Unknown User', 'analogwp-site-notes')}
+							</span>
+							<span className="sn-kanban-card-date">
+								{formatDate(comment.created_at)}
 							</span>
 						</div>
 					</div>
@@ -162,15 +134,12 @@ const TaskCard = ({
 							<small className="sn-kanban-card-user-label">{__('Assigned to', 'analogwp-site-notes')}</small>
 							<div className="sn-kanban-card-user-row">
 								{renderAvatar(comment.assignee)}
-								<span className="sn-text-s sn-text-primary">
+								<span className="sn-kanban-card-user-name">
 									{comment.assignee?.name || __('Unknown User', 'analogwp-site-notes')}
 								</span>
 							</div>
 						</div>
 					)}
-				</div>
-				<div className="sn-kanban-card-date">
-					{formatDate(comment.created_at)}
 				</div>
 			</div>
 		</div>
