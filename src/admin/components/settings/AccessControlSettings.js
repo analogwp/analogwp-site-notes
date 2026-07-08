@@ -50,15 +50,14 @@ const AccessControlSettings = () => {
 	}
 
 	return (
-		<div className="sn-settings-section">
-			<SettingsSection
-				title={__('Access Control', 'analogwp-site-notes')}
-				description={__('Manage user permissions and access to the Site Notes functionality.', 'analogwp-site-notes')}
-			>
-				<SettingsCard title={__('User Roles & Permissions', 'analogwp-site-notes')}>
-					<div className="sn-space-y-2">
-						<label className="sn-label">{__('Allowed User Roles', 'analogwp-site-notes')}</label>
-						<div className="sn-space-y-2">
+		<SettingsSection
+			title={__('Access Control', 'analogwp-site-notes')}
+			description={__('Manage user permissions and access to the Site Notes functionality.', 'analogwp-site-notes')}
+		>
+			<SettingsCard title={__('User Roles & Permissions', 'analogwp-site-notes')}>
+				<div className="sn-settings-fields">
+					<label className="sn-label">{__('Allowed User Roles', 'analogwp-site-notes')}</label>
+					<div className="sn-settings-checkbox-list">
 							{roleOptions.map(option => (
 								<label key={option.value} className="sn-settings-role-item">
 									<input
@@ -76,11 +75,11 @@ const AccessControlSettings = () => {
 									</span>
 								</label>
 							))}
-						</div>
-						<div className="sn-text-m sn-text-secondary">
-							{__('Select which user roles can access the site notes functionality. Administrator role is always allowed to prevent lockouts.', 'analogwp-site-notes')}
-						</div>
 					</div>
+					<p className="sn-text-m sn-text-secondary">
+						{__('Select which user roles can access the site notes functionality. Administrator role is always allowed to prevent lockouts.', 'analogwp-site-notes')}
+					</p>
+				</div>
 
 					<ToggleField
 						id="enable_frontend_comments"
@@ -102,8 +101,7 @@ const AccessControlSettings = () => {
 						{__('Keep anonymous comments disabled if frontend comments should remain limited to the allowed WordPress roles above. And is also recommended to be only used for internal testing or specific scenarios.', 'analogwp-site-notes')}
 					</FieldDescription>
 				</SettingsCard>
-			</SettingsSection>
-		</div>
+		</SettingsSection>
 	);
 };
 

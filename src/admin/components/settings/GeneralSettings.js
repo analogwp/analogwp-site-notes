@@ -18,11 +18,10 @@ const GeneralSettings = () => {
 	const { settings, updateSetting } = useSettings();
 
 	return (
-		<div className="sn-settings-section">
-			<SettingsSection
-				title={__('General Configuration', 'analogwp-site-notes')}
-				description={__('Basic settings for the Site Notes plugin functionality.', 'analogwp-site-notes')}
-			>
+		<SettingsSection
+			title={__('General Configuration', 'analogwp-site-notes')}
+			description={__('Basic settings for the Site Notes plugin functionality.', 'analogwp-site-notes')}
+		>
 				<SettingsCard title={__('Screenshot Settings', 'analogwp-site-notes')}>
 					<ToggleField
 						id="auto_screenshot"
@@ -56,8 +55,7 @@ const GeneralSettings = () => {
 						step={5}
 					/>
 				</SettingsCard>
-			</SettingsSection>
-		</div>
+		</SettingsSection>
 	);
 };
 

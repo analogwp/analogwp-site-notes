@@ -109,14 +109,12 @@ const LabelsAndFiltersSettings = () => {
     ];
 
     return (
-        <div className="sn-settings-section">
-            <SettingsSection
-                title={__('Task Priorities', 'analogwp-site-notes')}
-                description={__('Define priority levels for tasks with customizable colors.', 'analogwp-site-notes')}
-            >
-                <SettingsCard title={__('Add New Priority', 'analogwp-site-notes')}>
-                    <div className="sn-space-y-6">
-                        <div className="sn-settings-grid-2">
+        <SettingsSection
+            title={__('Task Priorities', 'analogwp-site-notes')}
+            description={__('Define priority levels for tasks with customizable colors.', 'analogwp-site-notes')}
+        >
+            <SettingsCard title={__('Add New Priority', 'analogwp-site-notes')}>
+                <div className="sn-settings-grid-2">
                             <TextInputField
                                 id="new_priority_name"
                                 label={__('Priority Name', 'analogwp-site-notes')}
@@ -131,11 +129,11 @@ const LabelsAndFiltersSettings = () => {
                                 value={newPriority.color}
                                 onChange={(value) => setNewPriority({ ...newPriority, color: value })}
                             />
-                        </div>
+                </div>
 
-                        <div className="sn-space-y-3">
-                            <label className="sn-label">{__('Quick Colors:', 'analogwp-site-notes')}</label>
-                            <div className="sn-color-picker-row">
+                <div className="sn-settings-fields">
+                    <label className="sn-label">{__('Quick Colors:', 'analogwp-site-notes')}</label>
+                    <div className="sn-color-picker-row">
                                 {predefinedColors.map(color => (
                                     <button
                                         key={color}
@@ -146,10 +144,10 @@ const LabelsAndFiltersSettings = () => {
                                         title={color}
                                     />
                                 ))}
-                            </div>
-                        </div>
+                    </div>
+                </div>
 
-                        <Button
+                <Button
                             onClick={addPriority}
                             disabled={!newPriority.name.trim()}
                             variant="primary"
@@ -157,22 +155,21 @@ const LabelsAndFiltersSettings = () => {
                             icon={<PlusIcon className="sn-icon" />}
                         >
                             {__('Add Priority', 'analogwp-site-notes')}
-                        </Button>
-                    </div>
-                </SettingsCard>
+                </Button>
+            </SettingsCard>
 
-                <SettingsCard title={__('Existing Priorities', 'analogwp-site-notes')}>
-                    {priorities.length === 0 ? (
-                        <FieldDescription>
-                            {__('No priorities created yet. Add your first priority above.', 'analogwp-site-notes')}
-                        </FieldDescription>
-                    ) : (
-                        <div className="sn-space-y-3">
-                            {priorities.map(priority => (
-                                <div key={priority.id} className="sn-settings-item-list">
-                                    {editingPriorityId === priority.id ? (
-                                        <div className="sn-space-y-4">
-                                            <div className="sn-settings-grid-2">
+            <SettingsCard title={__('Existing Priorities', 'analogwp-site-notes')}>
+                {priorities.length === 0 ? (
+                    <FieldDescription>
+                        {__('No priorities created yet. Add your first priority above.', 'analogwp-site-notes')}
+                    </FieldDescription>
+                ) : (
+                    <div className="sn-settings-item-stack">
+                        {priorities.map(priority => (
+                            <div key={priority.id} className="sn-settings-item-list">
+                                {editingPriorityId === priority.id ? (
+                                    <div className="sn-settings-fields">
+                                        <div className="sn-settings-grid-2">
                                                 <TextInputField
                                                     value={editPriorityForm.name}
                                                     onChange={(value) => setEditPriorityForm({ ...editPriorityForm, name: value })}
@@ -202,9 +199,9 @@ const LabelsAndFiltersSettings = () => {
                                                 >
                                                     {__('Cancel', 'analogwp-site-notes')}
                                                 </Button>
-                                            </div>
                                         </div>
-                                    ) : (
+                                    </div>
+                                ) : (
                                         <div className="sn-settings-item-row">
                                             <div className="sn-settings-item-info">
                                                 <span
@@ -239,11 +236,10 @@ const LabelsAndFiltersSettings = () => {
                                     )}
                                 </div>
                             ))}
-                        </div>
-                    )}
-                </SettingsCard>
-            </SettingsSection>
-        </div>
+                    </div>
+                )}
+            </SettingsCard>
+        </SettingsSection>
     );
 };
 

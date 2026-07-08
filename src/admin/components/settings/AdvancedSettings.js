@@ -8,20 +8,17 @@ import { __ } from '@wordpress/i18n';
  */
 import { Button } from '../ui';
 import { useSettings } from './SettingsProvider';
-import { useExtensions } from './extensions/ExtensionsProvider';
 import {
     SettingsSection,
     SettingsCard,
     ToggleField,
     SelectField,
-    TextAreaField,
     FileUpload,
     FieldDescription
 } from './FieldComponents';
 
 const AdvancedSettings = () => {
     const { settings, updateSetting, exportSettings, importSettings } = useSettings();
-    const { isFeatureAvailable } = useExtensions();
 
     const logLevelOptions = [
         { value: 'error', label: __('Error', 'analogwp-site-notes') },
@@ -38,36 +35,34 @@ const AdvancedSettings = () => {
     };
 
     return (
-        <div className="sn-settings-section">
+        <>
             <SettingsSection
                 title={__('Debug & Logging', 'analogwp-site-notes')}
                 description={__('Configure debugging and logging settings for troubleshooting.', 'analogwp-site-notes')}
             >
                 <SettingsCard title={__('Debug Settings', 'analogwp-site-notes')}>
-                    <div className="sn-space-y-6">
-                        <ToggleField
-                            id="enable_debug_mode"
-                            label={__('Enable Debug Mode', 'analogwp-site-notes')}
-                            description={__('Show detailed error messages and debug information. Disable in production.', 'analogwp-site-notes')}
-                            checked={settings.advanced?.enable_debug_mode ?? false}
-                            onChange={(value) => updateSetting('advanced.enable_debug_mode', value)}
-                        />
+                    <ToggleField
+                        id="enable_debug_mode"
+                        label={__('Enable Debug Mode', 'analogwp-site-notes')}
+                        description={__('Show detailed error messages and debug information. Disable in production.', 'analogwp-site-notes')}
+                        checked={settings.advanced?.enable_debug_mode ?? false}
+                        onChange={(value) => updateSetting('advanced.enable_debug_mode', value)}
+                    />
 
-                        {settings.advanced?.enable_debug_mode && (
-                            <FieldDescription type="warning">
-                                {__('Debug mode should not be enabled on production sites as it may expose sensitive information.', 'analogwp-site-notes')}
-                            </FieldDescription>
-                        )}
+                    {settings.advanced?.enable_debug_mode && (
+                        <FieldDescription type="warning">
+                            {__('Debug mode should not be enabled on production sites as it may expose sensitive information.', 'analogwp-site-notes')}
+                        </FieldDescription>
+                    )}
 
-                        <SelectField
-                            id="log_level"
-                            label={__('Log Level', 'analogwp-site-notes')}
-                            description={__('Minimum level of messages to log. Debug logs the most, Error logs the least.', 'analogwp-site-notes')}
-                            value={settings.advanced?.log_level ?? 'error'}
-                            onChange={(value) => updateSetting('advanced.log_level', value)}
-                            options={logLevelOptions}
-                        />
-                    </div>
+                    <SelectField
+                        id="log_level"
+                        label={__('Log Level', 'analogwp-site-notes')}
+                        description={__('Minimum level of messages to log. Debug logs the most, Error logs the least.', 'analogwp-site-notes')}
+                        value={settings.advanced?.log_level ?? 'error'}
+                        onChange={(value) => updateSetting('advanced.log_level', value)}
+                        options={logLevelOptions}
+                    />
                 </SettingsCard>
             </SettingsSection>
 
@@ -77,9 +72,9 @@ const AdvancedSettings = () => {
             >
                 <SettingsCard title={__('Import/Export Settings', 'analogwp-site-notes')}>
                     <div className="sn-settings-grid-2">
-                        <div className="sn-settings-advanced-card sn-space-y-4">
-                            <h4 className="sn-title-s sn-m-0 sn-mb-2">{__('Export Settings', 'analogwp-site-notes')}</h4>
-                            <p className="sn-text-m sn-text-secondary sn-mb-4">{__('Download all your settings as a JSON file for backup or transfer to another site.', 'analogwp-site-notes')}</p>
+                        <div className="sn-settings-advanced-card">
+                            <h4 className="sn-settings-advanced-card__title">{__('Export Settings', 'analogwp-site-notes')}</h4>
+                            <p className="sn-settings-advanced-card__desc">{__('Download all your settings as a JSON file for backup or transfer to another site.', 'analogwp-site-notes')}</p>
                             <Button
                                 onClick={exportSettings}
                                 variant="default"
@@ -89,9 +84,9 @@ const AdvancedSettings = () => {
                             </Button>
                         </div>
 
-                        <div className="sn-settings-advanced-card sn-space-y-4">
-                            <h4 className="sn-title-s sn-m-0 sn-mb-2">{__('Import Settings', 'analogwp-site-notes')}</h4>
-                            <p className="sn-text-m sn-text-secondary sn-mb-4">{__('Upload a settings file to restore or transfer settings from another installation.', 'analogwp-site-notes')}</p>
+                        <div className="sn-settings-advanced-card">
+                            <h4 className="sn-settings-advanced-card__title">{__('Import Settings', 'analogwp-site-notes')}</h4>
+                            <p className="sn-settings-advanced-card__desc">{__('Upload a settings file to restore or transfer settings from another installation.', 'analogwp-site-notes')}</p>
                             <FileUpload
                                 id="import_settings"
                                 accept=".json"
@@ -121,7 +116,7 @@ const AdvancedSettings = () => {
                     </div>
                 </SettingsCard>
             </SettingsSection>
-        </div>
+        </>
     );
 };
 

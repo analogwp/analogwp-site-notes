@@ -269,11 +269,12 @@
 .sn-field-status {
 	display: flex;
 	gap: var(--sn-space-xs);
-	padding: var(--sn-space-s) 0;
+	align-items: flex-start;
 	border-radius: var(--sn-radius-input);
 	font-size: var(--sn-text-m-size);
 
 	&--neutral { color: var(--sn-text-secondary); }
+	&--info { color: var(--sn-color-info-text); }
 	&--warning { color: var(--sn-color-warning-text); }
 	&--success { color: var(--sn-color-success-text); }
 }

@@ -101,50 +101,47 @@ const CategoriesSettings = () => {
     };
 
     return (
-        <div className="sn-settings-section">
-            <SettingsSection
-                title={__('Categories', 'analogwp-site-notes')}
-                description={__('Organize comments and tasks into categories for better project management.', 'analogwp-site-notes')}
-            >
-                <SettingsCard title={__('Add New Category', 'analogwp-site-notes')}>
-                    <div className="sn-space-y-6">
-                        <TextInputField
-                            id="new_category_name"
-                            label={__('Category Name', 'analogwp-site-notes')}
-                            value={newCategory.name}
-                            onChange={(value) => setNewCategory({ ...newCategory, name: value })}
-                            placeholder={__('Enter category name...', 'analogwp-site-notes')}
-                        />
+        <SettingsSection
+            title={__('Categories', 'analogwp-site-notes')}
+            description={__('Organize comments and tasks into categories for better project management.', 'analogwp-site-notes')}
+        >
+            <SettingsCard title={__('Add New Category', 'analogwp-site-notes')}>
+                <TextInputField
+                    id="new_category_name"
+                    label={__('Category Name', 'analogwp-site-notes')}
+                    value={newCategory.name}
+                    onChange={(value) => setNewCategory({ ...newCategory, name: value })}
+                    placeholder={__('Enter category name...', 'analogwp-site-notes')}
+                />
 
-                        <Button
-                            onClick={addCategory}
-                            disabled={!newCategory.name.trim()}
-                            variant="primary"
-                            size="default"
-                            icon={<PlusIcon className="sn-icon" />}
-                        >
-                            {__('Add Category', 'analogwp-site-notes')}
-                        </Button>
-                    </div>
-                </SettingsCard>
+                <Button
+                    onClick={addCategory}
+                    disabled={!newCategory.name.trim()}
+                    variant="primary"
+                    size="default"
+                    icon={<PlusIcon className="sn-icon" />}
+                >
+                    {__('Add Category', 'analogwp-site-notes')}
+                </Button>
+            </SettingsCard>
 
-                <SettingsCard title={__('Existing Categories', 'analogwp-site-notes')}>
-                    {categories.length === 0 ? (
-                        <FieldDescription>
-                            {__('No categories created yet. Add your first category above.', 'analogwp-site-notes')}
-                        </FieldDescription>
-                    ) : (
-                        <div className="sn-space-y-3">
-                            {categories.map((category) => (
-                                <div key={category.id} className="sn-settings-item-list">
-                                    {editingCategoryId === category.id ? (
-                                        <div className="sn-space-y-4">
-                                            <TextInputField
-                                                value={editCategoryForm.name}
-                                                onChange={(value) => setEditCategoryForm({ ...editCategoryForm, name: value })}
-                                                placeholder={__('Category name...', 'analogwp-site-notes')}
-                                            />
-                                            <div className="sn-flex sn-gap-2">
+            <SettingsCard title={__('Existing Categories', 'analogwp-site-notes')}>
+                {categories.length === 0 ? (
+                    <FieldDescription>
+                        {__('No categories created yet. Add your first category above.', 'analogwp-site-notes')}
+                    </FieldDescription>
+                ) : (
+                    <div className="sn-settings-item-stack">
+                        {categories.map((category) => (
+                            <div key={category.id} className="sn-settings-item-list">
+                                {editingCategoryId === category.id ? (
+                                    <div className="sn-settings-fields">
+                                        <TextInputField
+                                            value={editCategoryForm.name}
+                                            onChange={(value) => setEditCategoryForm({ ...editCategoryForm, name: value })}
+                                            placeholder={__('Category name...', 'analogwp-site-notes')}
+                                        />
+                                        <div className="sn-flex sn-gap-2">
                                                 <Button
                                                     onClick={saveEditCategory}
                                                     variant="primary"
@@ -163,9 +160,9 @@ const CategoriesSettings = () => {
                                                 >
                                                     {__('Cancel', 'analogwp-site-notes')}
                                                 </Button>
-                                            </div>
                                         </div>
-                                    ) : (
+                                    </div>
+                                ) : (
                                         <div className="sn-settings-item-row">
                                             <div className="sn-settings-item-info">
                                                 <span className="sn-settings-item-name">{category.name}</span>
@@ -195,12 +192,11 @@ const CategoriesSettings = () => {
                                         </div>
                                     )}
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </SettingsCard>
-            </SettingsSection>
-        </div>
+                        ))}
+                    </div>
+                )}
+            </SettingsCard>
+        </SettingsSection>
     );
 };
 

@@ -21,7 +21,7 @@ import {
 } from '../../../shared/icons';
 
 export const FieldGroup = ({ children, className = '' }) => (
-	<div className={classnames('sn-space-y-4', className)}>
+	<div className={classnames('sn-settings-fields', className)}>
 		{children}
 	</div>
 );
@@ -316,27 +316,23 @@ export const FileUpload = ({
 );
 
 export const SettingsSection = ({ title, description, children, className = '' }) => (
-	<div className={classnames('sn-field-group', className)}>
+	<section className={classnames('sn-settings-section', className)}>
 		{(title || description) && (
-			<div className="sn-field-group--sm">
+			<header className="sn-settings-section__header">
 				{title && <h3 className="sn-settings-section__title">{title}</h3>}
 				{description && <p className="sn-settings-section__desc">{description}</p>}
-			</div>
+			</header>
 		)}
-		<div className="sn-space-y-6">
+		<div className="sn-settings-section__body">
 			{children}
 		</div>
-	</div>
+	</section>
 );
 
 export const SettingsCard = ({ title, children, className = '' }) => (
-	<div className={classnames('sn-settings-section__divider', className)}>
-		{title && (
-			<div>
-				<h4 className="sn-settings-section__subtitle">{title}</h4>
-			</div>
-		)}
-		<div className="sn-space-y-10">
+	<div className={classnames('sn-settings-card', className)}>
+		{title && <h4 className="sn-settings-card__title">{title}</h4>}
+		<div className="sn-settings-card__body">
 			{children}
 		</div>
 	</div>
