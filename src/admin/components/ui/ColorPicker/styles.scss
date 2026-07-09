@@ -1,0 +1,32 @@
+.sn-color-swatch {
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: var(--sn-radius-pill);
+	border: 2px solid var(--sn-border-light);
+	cursor: pointer;
+	transition: transform var(--sn-transition-base), border-color var(--sn-transition-base);
+
+	&:hover {
+		transform: scale(1.1);
+		border-color: var(--sn-border-strong);
+	}
+
+	&--selected {
+		border-color: var(--sn-text-primary);
+		box-shadow: 0 0 0 2px var(--sn-text-primary), 0 0 0 4px var(--sn-surface-body-ultra-light);
+	}
+}
+
+.sn-color-input-swatch {
+	height: 2.5rem;
+	width: 4rem;
+	border-radius: var(--sn-radius-input);
+	border: 1px solid var(--sn-border-strong);
+	cursor: pointer;
+	padding: 0;
+
+	&:disabled {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
+}

@@ -390,44 +390,24 @@
 	}
 }
 
-.sn-task-sidebar__date-wrap {
-	position: relative;
-}
-
-.sn-task-sidebar__date-icon {
-	position: absolute;
-	right: var(--sn-space-s);
-	top: var(--sn-space-s);
-	color: var(--sn-text-secondary);
-	pointer-events: none;
-}
-
 .sn-task-sidebar__time-row {
 	display: flex;
 	align-items: center;
-	gap: var(--sn-space-2xs);
-	flex-wrap: wrap;
+	gap: var(--sn-space-s);
 }
 
-.sn-task-sidebar__time-input {
-	width: 3rem;
-	padding-left: var(--sn-space-2xs);
-	padding-right: var(--sn-space-2xs);
-	text-align: center;
-}
-
-.sn-task-sidebar__time-add-btn {
-	margin-left: auto;
-	padding: var(--sn-space-xs) var(--sn-space-m);
+.sn-task-sidebar__time-log-btn {
+	flex-shrink: 0;
+	padding: var(--sn-space-2xs) var(--sn-space-m);
+	min-height: 2.25rem;
 	font-size: var(--sn-text-m-size);
 	font-weight: var(--sn-font-weight-medium);
 	color: var(--sn-text-inverted);
 	background-color: var(--sn-text-primary);
 	border: none;
-	border-radius: var(--sn-radius-button);
+	border-radius: var(--sn-radius-input);
 	cursor: pointer;
 	transition: opacity var(--sn-transition-base);
-	flex-shrink: 0;
 
 	&:hover:not(:disabled) {
 		opacity: 0.85;

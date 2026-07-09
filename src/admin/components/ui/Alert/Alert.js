@@ -1,4 +1,5 @@
-import { CloseIcon } from '../../../shared/icons';
+import './styles.scss';
+import { CloseIcon } from '../../../../shared/icons';
 
 const Alert = ({
 	children,

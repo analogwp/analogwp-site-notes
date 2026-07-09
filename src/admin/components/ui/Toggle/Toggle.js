@@ -1,3 +1,4 @@
+import './styles.scss';
 import { ToggleControl as WPToggleControl } from '@wordpress/components';
 import classnames from 'classnames';
 

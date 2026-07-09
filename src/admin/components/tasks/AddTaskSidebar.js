@@ -68,9 +68,13 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [] }) => {
 		}));
 	};
 
-	const handleAddTime = () => {
-		const hours = parseInt(formData.timeHours, 10) || 0;
-		const minutes = parseInt(formData.timeMinutes, 10) || 0;
+	const handleAddTime = (hoursOverride, minutesOverride) => {
+		const hours = hoursOverride !== undefined
+			? parseInt(hoursOverride, 10) || 0
+			: parseInt(formData.timeHours, 10) || 0;
+		const minutes = minutesOverride !== undefined
+			? parseInt(minutesOverride, 10) || 0
+			: parseInt(formData.timeMinutes, 10) || 0;
 
 		if (hours <= 0 && minutes <= 0) {
 			showToast.error(__('Please enter hours or minutes', 'analogwp-site-notes'));

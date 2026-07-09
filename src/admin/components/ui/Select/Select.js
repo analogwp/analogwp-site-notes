@@ -1,3 +1,4 @@
+import './styles.scss';
 import { SelectControl as WPSelectControl } from '@wordpress/components';
 import classnames from 'classnames';
 

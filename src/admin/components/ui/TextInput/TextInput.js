@@ -1,3 +1,4 @@
+import './styles.scss';
 import { TextControl as WPTextControl } from '@wordpress/components';
 import classnames from 'classnames';
 

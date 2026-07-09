@@ -1,3 +1,4 @@
+import './styles.scss';
 import { RangeControl as WPRangeControl } from '@wordpress/components';
 import classnames from 'classnames';
 

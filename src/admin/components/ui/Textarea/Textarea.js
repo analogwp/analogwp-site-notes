@@ -1,3 +1,4 @@
+import './styles.scss';
 import { TextareaControl as WPTextareaControl } from '@wordpress/components';
 import classnames from 'classnames';
 

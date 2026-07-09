@@ -1,9 +1,10 @@
+import './styles.scss';
 /**
  * Custom select with colored badge options.
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
 import classnames from 'classnames';
-import { ChevronDownIcon } from '../../../shared/icons';
+import { ChevronDownIcon } from '../../../../shared/icons';
 
 const BadgeSelect = ({
 	value,
@@ -65,7 +66,7 @@ const BadgeSelect = ({
 				<span className="sn-badge-select__badge" style={selectedStyle}>
 					{selectedOption?.label}
 				</span>
-				<ChevronDownIcon size="sm" className="sn-badge-select__chevron" />
+				<ChevronDownIcon size="lg" className="sn-badge-select__chevron" />
 			</button>
 
 			{isOpen && (

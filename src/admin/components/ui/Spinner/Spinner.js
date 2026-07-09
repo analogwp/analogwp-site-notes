@@ -1,5 +1,6 @@
+import './styles.scss';
 import classnames from 'classnames';
-import { SpinnerIcon } from '../../../shared/icons';
+import { SpinnerIcon } from '../../../../shared/icons';
 
 const Spinner = ({
 	size = 'medium',

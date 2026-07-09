@@ -1,7 +1,3 @@
-/**
- * Button component styles
- */
-
 .sn-button {
 	font-size: var(--sn-input-text-size) !important;
 	line-height: var(--sn-input-text-line) !important;
@@ -111,11 +107,6 @@
 	&--fill-current {
 		fill: currentColor;
 	}
-}
-
-.sn-avatar + span,
-.sn-kanban-card-user-row .sn-avatar {
-	margin-right: var(--sn-space-xs);
 }
 
 .sn-icon-action {

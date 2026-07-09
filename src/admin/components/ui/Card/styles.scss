@@ -1,0 +1,19 @@
+.sn-card {
+	background-color: var(--sn-surface-body-ultra-light);
+	border: 1px solid var(--sn-border-light);
+	border-radius: var(--sn-radius-card);
+
+	&--radius-sm {
+		border-radius: var(--sn-radius-button);
+	}
+
+	&--padding-none { padding: 0; }
+	&--padding-small { padding: var(--sn-space-m); }
+	&--padding-medium { padding: var(--sn-space-xl); }
+	&--padding-large { padding: var(--sn-space-2xl); }
+
+	&--shadow-none { box-shadow: none; }
+	&--shadow-small { box-shadow: var(--sn-shadow-card); }
+	&--shadow-medium { box-shadow: var(--sn-shadow-card-hover); }
+	&--shadow-large { box-shadow: var(--sn-shadow-ui); }
+}

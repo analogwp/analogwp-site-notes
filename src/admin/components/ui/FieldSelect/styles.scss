@@ -1,0 +1,118 @@
+.sn-field-select {
+	position: relative;
+	width: 100%;
+
+	&__trigger {
+		display: flex;
+		align-items: center;
+		gap: var(--sn-space-s);
+		width: 100%;
+		min-height: 2.25rem;
+		padding: var(--sn-space-s) var(--sn-space-s);
+		background-color: var(--sn-surface-body-light);
+		border: 1px solid var(--sn-border-light);
+		border-radius: var(--sn-radius-input);
+		cursor: pointer;
+		transition: border-color var(--sn-transition-base), box-shadow var(--sn-transition-base);
+
+		&:hover:not(:disabled) {
+			border-color: var(--sn-border-dark);
+		}
+
+		&:focus {
+			outline: none;
+			border-color: var(--sn-accent);
+			box-shadow: 0 0 0 2px rgba(56, 88, 233, 0.15);
+		}
+
+		&:disabled {
+			cursor: not-allowed;
+			opacity: 0.6;
+		}
+	}
+
+	&--open &__trigger {
+		border-color: var(--sn-accent);
+		box-shadow: 0 0 0 2px rgba(56, 88, 233, 0.15);
+	}
+
+	&__value {
+		flex: 1;
+		min-width: 0;
+		text-align: left;
+		font-size: var(--sn-input-text-size);
+		line-height: var(--sn-input-text-line);
+		color: var(--sn-text-primary);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+
+		&--placeholder {
+			color: var(--sn-text-secondary);
+		}
+	}
+
+	&__chevron {
+		flex-shrink: 0;
+		margin-left: auto;
+		color: var(--sn-text-primary);
+		transition: transform var(--sn-transition-base);
+	}
+
+	&--open &__chevron {
+		transform: rotate(180deg);
+	}
+
+	&__menu {
+		position: absolute;
+		top: calc(100% + var(--sn-space-2xs));
+		left: 0;
+		right: 0;
+		z-index: 20;
+		margin: 0;
+		padding: var(--sn-space-xs);
+		list-style: none;
+		background-color: var(--sn-surface-body-ultra-light);
+		border: 1px solid var(--sn-border-strong);
+		border-radius: var(--sn-radius-input);
+		box-shadow: var(--sn-shadow-ui);
+		max-height: 14rem;
+		overflow-y: auto;
+	}
+
+	&__menu-item {
+		margin: 0;
+	}
+
+	&__option {
+		display: flex;
+		align-items: center;
+		gap: var(--sn-space-s);
+		width: 100%;
+		padding: var(--sn-space-xs) var(--sn-space-s);
+		background: transparent;
+		border: none;
+		border-radius: var(--sn-radius-button);
+		cursor: pointer;
+		transition: background-color var(--sn-transition-base);
+		text-align: left;
+
+		&:hover,
+		&--selected {
+			background-color: var(--sn-surface-body-light);
+		}
+
+		&:focus {
+			outline: none;
+			background-color: var(--sn-surface-body-light);
+		}
+	}
+
+	&__option-label {
+		flex: 1;
+		min-width: 0;
+		font-size: var(--sn-input-text-size);
+		line-height: var(--sn-input-text-line);
+		color: var(--sn-text-primary);
+	}
+}

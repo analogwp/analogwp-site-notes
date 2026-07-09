@@ -1,0 +1,34 @@
+.sn-select {
+	select {
+		width: 100%;
+		padding: 0.3rem 1.75rem 0.3rem 0.7rem !important;
+		height: auto !important;
+		font-size: var(--sn-input-text-size) !important;
+		line-height: var(--sn-input-text-line);
+		color: var(--sn-text-primary);
+		background-color: var(--sn-surface-body-ultra-light);
+		border: 1px solid var(--sn-border-strong) !important;
+		border-radius: var(--sn-radius-input);
+		transition: border-color var(--sn-transition-base), box-shadow var(--sn-transition-base);
+
+		&:focus {
+			outline: none;
+			border-color: var(--sn-accent);
+			box-shadow: 0 0 0 2px rgba(56, 88, 233, 0.15);
+		}
+
+		&:disabled {
+			background-color: var(--sn-surface-body-light);
+			color: var(--sn-text-secondary);
+			cursor: not-allowed;
+		}
+	}
+
+	.components-input-control__backdrop {
+		border: 1px solid var(--sn-border-strong) !important;
+	}
+
+	.components-input-control__container {
+		border-radius: var(--sn-radius-input) !important;
+	}
+}

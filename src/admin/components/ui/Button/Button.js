@@ -1,9 +1,10 @@
+import './styles.scss';
 /**
  * WordPress dependencies
  */
 import { Button as WPButton } from '@wordpress/components';
 import classnames from 'classnames';
-import { resolveIconPixelSize } from '../../../shared/icons';
+import { resolveIconPixelSize } from '../../../../shared/icons';
 
 const resolveButtonIconSize = (iconSize, icon) => {
 	if (iconSize !== undefined) {

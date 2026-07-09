@@ -1,3 +1,4 @@
+import './styles.scss';
 import { ColorPicker as WPColorPicker } from '@wordpress/components';
 import classnames from 'classnames';
 
