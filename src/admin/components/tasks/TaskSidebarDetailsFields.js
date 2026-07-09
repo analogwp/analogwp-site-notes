@@ -7,8 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { BadgeSelect, FieldSelect, FieldDate, FieldTime, parseTimeInput } from '../ui';
-import { CloseSmallIcon } from '../../../shared/icons';
+import { BadgeSelect, FieldSelect, FieldMultiSelect, FieldDate, FieldTime, parseTimeInput } from '../ui';
 import { showToast } from '../ToastProvider';
 
 const getUserInitials = (name) => {
@@ -42,9 +41,7 @@ const TaskSidebarDetailsFields = ({
 	priorityOptions,
 	users,
 	pages,
-	availableCategories,
-	onCategorySelect,
-	onCategoryToggle,
+	categories,
 	onAddTime,
 	getStatusBadgeStyle,
 	getPriorityBadgeStyle,
@@ -63,9 +60,10 @@ const TaskSidebarDetailsFields = ({
 		setTimeInput('');
 	};
 
-	const categoryDisplayLabel = formData.categories.length > 0
-		? formData.categories.join(', ')
-		: null;
+	const categoryOptions = categories.map((category) => ({
+		value: category.name,
+		label: category.name,
+	}));
 
 	return (
 		<>
@@ -106,6 +104,8 @@ const TaskSidebarDetailsFields = ({
 						value={formData.assignedUser}
 						onChange={(value) => onInputChange('assignedUser', value)}
 						placeholder={__('Select User', 'analogwp-site-notes')}
+						clearable
+						clearLabel={__('Unassigned', 'analogwp-site-notes')}
 						options={users.map((user) => ({
 							value: String(user.id),
 							label: user.name,
@@ -120,36 +120,15 @@ const TaskSidebarDetailsFields = ({
 			<div className="sn-task-sidebar__row">
 				<label className="sn-task-sidebar__row-label">{__('Category', 'analogwp-site-notes')}</label>
 				<div className="sn-task-sidebar__row-control">
-					<FieldSelect
-						value=""
-						displayLabel={categoryDisplayLabel}
-						onChange={onCategorySelect}
+					<FieldMultiSelect
+						value={formData.categories}
+						onChange={(selected) => onInputChange('categories', selected)}
 						placeholder={__('Select Category', 'analogwp-site-notes')}
-						disabled={availableCategories.length === 0}
-						options={availableCategories.map((category) => ({
-							value: category.name,
-							label: category.name,
-						}))}
+						disabled={categoryOptions.length === 0}
+						options={categoryOptions}
 					/>
 				</div>
 			</div>
-
-			{formData.categories.length > 0 && (
-				<div className="sn-task-sidebar__category-tags">
-					{formData.categories.map((categoryName, index) => (
-						<span key={index} className="sn-tag-removable">
-							{categoryName}
-							<button
-								type="button"
-								onClick={() => onCategoryToggle(categoryName)}
-								className="sn-tag-remove-btn"
-							>
-								<CloseSmallIcon size="sm" />
-							</button>
-						</span>
-					))}
-				</div>
-			)}
 
 			<div className="sn-task-sidebar__row">
 				<label className="sn-task-sidebar__row-label">{__('Page', 'analogwp-site-notes')}</label>

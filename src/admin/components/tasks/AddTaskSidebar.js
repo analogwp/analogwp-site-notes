@@ -32,39 +32,11 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [] }) => {
 	const [pendingTimeEntries, setPendingTimeEntries] = useState([]);
 
 	const priorityOptions = getDefaultPriorityOptions(priorities);
-	const availableCategories = categories.filter(
-		(category) => !formData.categories.includes(category.name)
-	);
 
 	const handleInputChange = (field, value) => {
 		setFormData((prev) => ({
 			...prev,
 			[field]: value,
-		}));
-	};
-
-	const handleCategoryToggle = (categoryName) => {
-		setFormData((prev) => {
-			const currentCategories = prev.categories || [];
-			const isSelected = currentCategories.includes(categoryName);
-
-			return {
-				...prev,
-				categories: isSelected
-					? currentCategories.filter((cat) => cat !== categoryName)
-					: [...currentCategories, categoryName],
-			};
-		});
-	};
-
-	const handleCategorySelect = (categoryName) => {
-		if (!categoryName || formData.categories.includes(categoryName)) {
-			return;
-		}
-
-		setFormData((prev) => ({
-			...prev,
-			categories: [...prev.categories, categoryName],
 		}));
 	};
 
@@ -183,9 +155,7 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [] }) => {
 						priorityOptions={priorityOptions}
 						users={users}
 						pages={pages}
-						availableCategories={availableCategories}
-						onCategorySelect={handleCategorySelect}
-						onCategoryToggle={handleCategoryToggle}
+						categories={categories}
 						onAddTime={handleAddTime}
 						getStatusBadgeStyle={getStatusBadgeStyle}
 						getPriorityBadgeStyle={getPriorityBadgeStyle}

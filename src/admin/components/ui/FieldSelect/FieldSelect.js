@@ -3,8 +3,11 @@ import './styles.scss';
  * Custom bordered select field with optional leading content (e.g. avatar).
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 import { ChevronDownIcon } from '../../../../shared/icons';
+import SelectMenuSearch from '../SelectMenuSearch/SelectMenuSearch';
+import { filterSelectOptions, shouldShowSelectSearch } from '../selectMenuUtils';
 
 const FieldSelect = ({
 	value,
@@ -13,18 +16,31 @@ const FieldSelect = ({
 	placeholder = '',
 	displayLabel = null,
 	renderLeading = null,
+	clearable = false,
+	clearLabel = '',
+	clearValue = '',
 	disabled = false,
 	className = '',
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const [searchQuery, setSearchQuery] = useState('');
 	const containerRef = useRef(null);
+	const searchInputRef = useRef(null);
 	const selectedOption = options.find((option) => String(option.value) === String(value));
-	const hasValue = displayLabel || selectedOption?.label;
+	const hasValue = Boolean(displayLabel || selectedOption?.label);
 	const triggerLabel = displayLabel || selectedOption?.label || placeholder;
+	const resolvedClearLabel = clearLabel || placeholder;
+	const showSearch = shouldShowSelectSearch(options);
+	const filteredOptions = filterSelectOptions(options, searchQuery);
 
 	useEffect(() => {
 		if (!isOpen) {
+			setSearchQuery('');
 			return undefined;
+		}
+
+		if (showSearch && searchInputRef.current) {
+			searchInputRef.current.focus();
 		}
 
 		const handlePointerDown = (event) => {
@@ -46,7 +62,7 @@ const FieldSelect = ({
 			document.removeEventListener('mousedown', handlePointerDown);
 			document.removeEventListener('keydown', handleKeyDown);
 		};
-	}, [isOpen]);
+	}, [isOpen, showSearch]);
 
 	const handleSelect = (optionValue) => {
 		onChange(optionValue);
@@ -81,28 +97,57 @@ const FieldSelect = ({
 			</button>
 
 			{isOpen && (
-				<ul className="sn-field-select__menu" role="listbox">
-					{options.map((option) => {
-						const isSelected = String(option.value) === String(value);
-
-						return (
-							<li key={option.value || option.label} className="sn-field-select__menu-item">
+				<div className="sn-field-select__dropdown">
+					{showSearch && (
+						<SelectMenuSearch
+							value={searchQuery}
+							onChange={setSearchQuery}
+							inputRef={searchInputRef}
+						/>
+					)}
+					<ul className="sn-field-select__menu" role="listbox">
+						{clearable && (
+							<li className="sn-field-select__menu-item">
 								<button
 									type="button"
 									role="option"
-									aria-selected={isSelected}
-									className={classnames('sn-field-select__option', {
-										'sn-field-select__option--selected': isSelected,
+									aria-selected={!hasValue}
+									className={classnames('sn-field-select__option', 'sn-field-select__option--clear', {
+										'sn-field-select__option--selected': !hasValue,
 									})}
-									onClick={() => handleSelect(option.value)}
+									onClick={() => handleSelect(clearValue)}
 								>
-									{renderLeading && renderLeading(option)}
-									<span className="sn-field-select__option-label">{option.label}</span>
+									<span className="sn-field-select__option-label">{resolvedClearLabel}</span>
 								</button>
 							</li>
-						);
-					})}
-				</ul>
+						)}
+						{filteredOptions.map((option) => {
+							const isSelected = String(option.value) === String(value);
+
+							return (
+								<li key={option.value || option.label} className="sn-field-select__menu-item">
+									<button
+										type="button"
+										role="option"
+										aria-selected={isSelected}
+										className={classnames('sn-field-select__option', {
+											'sn-field-select__option--selected': isSelected,
+										})}
+										onClick={() => handleSelect(option.value)}
+									>
+										{renderLeading && renderLeading(option)}
+										<span className="sn-field-select__option-label">{option.label}</span>
+									</button>
+								</li>
+							);
+						})}
+						{filteredOptions.length === 0 && (
+							<li className="sn-field-select__empty">
+								{__('No results found', 'analogwp-site-notes')}
+							</li>
+						)}
+					</ul>
+				</div>
 			)}
 		</div>
 	);
