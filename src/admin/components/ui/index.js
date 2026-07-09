@@ -9,3 +9,4 @@ export { default as Textarea } from './Textarea';
 export { default as Toggle } from './Toggle';
 export { default as Range } from './Range';
 export { default as ColorPicker } from './ColorPicker';
+export { default as BadgeSelect } from './BadgeSelect';

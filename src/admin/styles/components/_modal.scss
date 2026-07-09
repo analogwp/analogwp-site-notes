@@ -299,38 +299,6 @@
 	color: var(--sn-text-primary);
 }
 
-.sn-badge-select {
-	position: relative;
-	display: inline-flex;
-	max-width: 100%;
-
-	&__input {
-		appearance: none;
-		border: none;
-		border-radius: var(--sn-radius-pill);
-		padding: var(--sn-space-2xs) var(--sn-space-xl) var(--sn-space-2xs) var(--sn-space-s);
-		font-size: var(--sn-text-s-size);
-		font-weight: var(--sn-font-weight-medium);
-		cursor: pointer;
-		max-width: 100%;
-		line-height: 1.4;
-
-		&:focus {
-			outline: 2px solid var(--sn-accent);
-			outline-offset: 1px;
-		}
-	}
-
-	&__chevron {
-		position: absolute;
-		right: var(--sn-space-xs);
-		top: 50%;
-		transform: translateY(-50%);
-		pointer-events: none;
-		opacity: 0.7;
-	}
-}
-
 .sn-task-sidebar__footer {
 	flex: none;
 	border-top: 1px solid var(--sn-border-light);

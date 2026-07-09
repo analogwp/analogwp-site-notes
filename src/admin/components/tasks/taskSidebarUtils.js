@@ -46,7 +46,8 @@ export const getPriorityBadgeStyle = (priorityKey, priorityOptions) => {
 	const color = priority?.color || '#6b7280';
 
 	return {
-		backgroundColor: `color-mix(in srgb, ${color} 22%, white)`,
+		backgroundColor: 'transparent',
+		border: `1px solid ${color}`,
 		color,
 	};
 };

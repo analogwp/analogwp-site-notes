@@ -11,7 +11,7 @@ import {
 	ClockCircleIcon,
 	CloseSmallIcon,
 } from '../../../shared/icons';
-import TaskSidebarBadgeSelect from './TaskSidebarBadgeSelect';
+import { BadgeSelect } from '../ui';
 
 const TaskSidebarDetailsFields = ({
 	formData,
@@ -31,7 +31,7 @@ const TaskSidebarDetailsFields = ({
 		<div className="sn-task-sidebar__row">
 			<label className="sn-task-sidebar__row-label">{__('Status', 'analogwp-site-notes')}</label>
 			<div className="sn-task-sidebar__row-control">
-				<TaskSidebarBadgeSelect
+				<BadgeSelect
 					value={formData.status}
 					onChange={(value) => onInputChange('status', value)}
 					options={statuses.map((status) => ({
@@ -46,7 +46,7 @@ const TaskSidebarDetailsFields = ({
 		<div className="sn-task-sidebar__row">
 			<label className="sn-task-sidebar__row-label">{__('Priority', 'analogwp-site-notes')}</label>
 			<div className="sn-task-sidebar__row-control">
-				<TaskSidebarBadgeSelect
+				<BadgeSelect
 					value={formData.priority}
 					onChange={(value) => onInputChange('priority', value)}
 					options={priorityOptions.map((priority) => ({
