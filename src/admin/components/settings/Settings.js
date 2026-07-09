@@ -18,8 +18,12 @@ import AdvancedSettings from './AdvancedSettings';
 import { Button } from '../ui';
 import { SiteNotesLogoIcon } from '../../../shared/icons';
 
-const ModernSettings = () => {
-	const [activeTab, setActiveTab] = useState('general');
+const ModernSettings = ({ initialTab = 'general' }) => {
+	const [activeTab, setActiveTab] = useState(initialTab);
+
+	useEffect(() => {
+		setActiveTab(initialTab);
+	}, [initialTab]);
 
 	useEffect(() => {
 		const handleBeforeUnload = () => {};

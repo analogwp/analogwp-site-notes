@@ -104,6 +104,109 @@ export const mapTaskToFormData = (task, pages) => {
 	};
 };
 
+const normalizeAssignedUser = (value) => {
+	if (!value || value === '0' || value === 0) {
+		return '';
+	}
+
+	return String(value);
+};
+
+const normalizeCategories = (categories) => [...(categories || [])].sort().join('\0');
+
+export const hasTaskFormChanges = (initialFormData, currentFormData, pendingTimeEntries = []) => {
+	if (pendingTimeEntries.length > 0) {
+		return true;
+	}
+
+	const scalarFields = ['taskTitle', 'status', 'pageId', 'dueDate', 'priority', 'description'];
+
+	for (const field of scalarFields) {
+		if ((initialFormData[field] || '') !== (currentFormData[field] || '')) {
+			return true;
+		}
+	}
+
+	if (normalizeAssignedUser(initialFormData.assignedUser) !== normalizeAssignedUser(currentFormData.assignedUser)) {
+		return true;
+	}
+
+	return normalizeCategories(initialFormData.categories) !== normalizeCategories(currentFormData.categories);
+};
+
+export const buildFieldUpdatePayload = (field, value, formData, pages) => {
+	switch (field) {
+		case 'taskTitle':
+			return { comment_title: value || formData.description };
+		case 'description':
+			return { comment_text: value };
+		case 'status':
+			return { status: value };
+		case 'priority':
+			return { priority: value };
+		case 'assignedUser':
+			return { assigned_to: value || 0 };
+		case 'categories':
+			return { categories: value };
+		case 'dueDate':
+			return { due_date: value };
+		case 'pageId': {
+			const selectedPage = pages.find((page) => String(page.id) === String(value));
+			const pageUrl = selectedPage ? selectedPage.url : '';
+			let postId = 0;
+
+			if (value && value !== '') {
+				const numericId = parseInt(value, 10);
+				if (!isNaN(numericId)) {
+					postId = numericId;
+				}
+			}
+
+			return {
+				post_id: postId,
+				page_url: pageUrl,
+			};
+		}
+		default:
+			return null;
+	}
+};
+
+export const formatRelativeTime = (dateString) => {
+	if (!dateString) {
+		return '';
+	}
+
+	const date = new Date(dateString);
+	const now = new Date();
+	const diffMs = now - date;
+	const diffMinutes = Math.floor(diffMs / 60000);
+	const diffHours = Math.floor(diffMinutes / 60);
+	const diffDays = Math.floor(diffHours / 24);
+
+	if (diffMinutes < 1) {
+		return __('Just now', 'analogwp-site-notes');
+	}
+
+	if (diffMinutes < 60) {
+		return `${diffMinutes}m`;
+	}
+
+	if (diffHours < 24) {
+		return `${diffHours}h`;
+	}
+
+	if (diffDays < 7) {
+		return `${diffDays}d`;
+	}
+
+	return new Intl.DateTimeFormat(undefined, {
+		month: 'short',
+		day: 'numeric',
+		year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+	}).format(date);
+};
+
 export const parseTimesheetEntries = (timesheet) => {
 	if (!timesheet) {
 		return [];

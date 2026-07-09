@@ -14,7 +14,8 @@ import { DragOverlay } from '@dnd-kit/core';
 import TaskCard from './TaskCard';
 import TaskDetail from './TaskDetail';
 import AddTaskSidebar from './AddTaskSidebar';
-import EditTaskSidebar from './EditTaskSidebar';
+import ManageTaskSidebar from './ManageTaskSidebar';
+import TaskSidebarBackdropClose from './TaskSidebarBackdropClose';
 import TasksControls from './TasksControls';
 import { TrashOutlineIcon, EditIcon } from '../../../shared/icons';
 
@@ -41,11 +42,15 @@ const TasksListView = ({
     onBack,
     onCloseModal,
     onSaveTask,
+    handleUpdateTask,
+    liveEditingTask,
+    onAddReply,
     pages,
     handleStatusChange,
     handleEditTask,
     handleDelete,
-    activeView
+    activeView,
+    onNavigateToSettingsTab,
 }) => {
     const getPriorityColor = (priority) => {
         const priorityObj = priorities.find(p => p.key === priority);
@@ -180,16 +185,23 @@ const TasksListView = ({
                         role="presentation"
                     />
 
-                    <div className="sn-kanban-sidebar">
+                    <TaskSidebarBackdropClose
+                        onClose={onCloseModal}
+                        isManage={Boolean(editingTask)}
+                    />
+
+                    <div className={`sn-kanban-sidebar${editingTask ? ' sn-kanban-sidebar--manage' : ''}`}>
                         {editingTask ? (
-                            <EditTaskSidebar
-                                task={editingTask}
+                            <ManageTaskSidebar
+                                task={liveEditingTask || editingTask}
                                 onClose={onCloseModal}
-                                onSave={onSaveTask}
+                                onUpdate={handleUpdateTask}
                                 onDelete={onDelete}
+                                onAddReply={onAddReply}
                                 users={users}
                                 pages={pages || []}
                                 statuses={statuses}
+                                onNavigateToSettingsTab={onNavigateToSettingsTab}
                             />
                         ) : (
                             <AddTaskSidebar
@@ -198,6 +210,7 @@ const TasksListView = ({
                                 users={users}
                                 pages={pages || []}
                                 statuses={statuses}
+                                onNavigateToSettingsTab={onNavigateToSettingsTab}
                             />
                         )}
                     </div>

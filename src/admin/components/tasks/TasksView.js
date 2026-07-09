@@ -19,6 +19,7 @@ import { TASK_STATUSES } from '../../constants/taskStatuses';
 const TasksView = ({ 
     comments, 
     onUpdateComment, 
+    onAddReply,
     onDelete, 
     onAddTask, 
     users, 
@@ -31,7 +32,8 @@ const TasksView = ({
     filters,
     onFilterChange,
     sortBy,
-    onSortChange
+    onSortChange,
+    onNavigateToSettingsTab,
 }) => {
     const [draggedItem, setDraggedItem] = useState(null);
     const [activeId, setActiveId] = useState(null);
@@ -60,7 +62,6 @@ const TasksView = ({
 
     const handleSaveTask = async (taskData) => {
         if (editingTask) {
-            // Update existing task
             if (onUpdateComment) {
                 await onUpdateComment(editingTask.id, taskData);
             }
@@ -72,6 +73,18 @@ const TasksView = ({
         }
         handleCloseModal();
     };
+
+    const handleUpdateTask = async (taskData, options = {}) => {
+        if (!editingTask || !onUpdateComment) {
+            return false;
+        }
+
+        return onUpdateComment(editingTask.id, taskData, options);
+    };
+
+    const liveEditingTask = editingTask
+        ? comments.find((comment) => comment.id === editingTask.id) || editingTask
+        : null;
 
     const handleStatusChange = (id, status) => {
         if (onUpdateComment) {
@@ -185,11 +198,15 @@ const TasksView = ({
         showAddModal,
         handleCloseModal,
         handleSaveTask,
+        handleUpdateTask,
+        liveEditingTask,
+        onAddReply,
         pages,
         editingTask,
         comments,
         activeView,
-        onViewChange
+        onViewChange,
+        onNavigateToSettingsTab,
     };
 
     if (activeView === 'list') {

@@ -60,6 +60,7 @@ class Ajax {
 		add_action( 'wp_ajax_agwp_sn_get_admin_data', array( $this, 'get_admin_data' ) );
 		add_action( 'wp_ajax_agwp_sn_get_pages', array( $this, 'get_pages' ) );
 		add_action( 'wp_ajax_agwp_sn_add_new_task', array( $this, 'add_new_task' ) );
+		add_action( 'wp_ajax_agwp_sn_admin_add_reply', array( $this, 'admin_add_reply' ) );
 
 		// Settings AJAX actions.
 		add_action( 'wp_ajax_agwp_sn_get_settings', array( $this, 'get_settings' ) );
@@ -459,6 +460,62 @@ class Ajax {
 		}
 
 		wp_send_json_success( array( 'message' => __( 'Comment updated successfully', 'analogwp-site-notes' ) ) );
+	}
+
+	/**
+	 * Handle admin add reply AJAX request.
+	 *
+	 * @since 1.0.0
+	 */
+	public function admin_add_reply() {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
+			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
+		}
+
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
+		}
+
+		$comment_id = isset( $_POST['comment_id'] ) ? absint( wp_unslash( $_POST['comment_id'] ) ) : 0;
+		$reply_text = isset( $_POST['reply_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['reply_text'] ) ) : '';
+
+		$this->enforce_max_length( $reply_text, 2000, __( 'Reply text is too long.', 'analogwp-site-notes' ) );
+
+		if ( empty( $comment_id ) || empty( $reply_text ) ) {
+			$this->send_error( __( 'Comment ID and reply text are required', 'analogwp-site-notes' ) );
+		}
+
+		$comment = $this->database->get_comment( $comment_id );
+		if ( empty( $comment ) ) {
+			$this->send_error( __( 'Invalid comment target.', 'analogwp-site-notes' ), 404 );
+		}
+
+		$reply_id = $this->database->add_reply(
+			array(
+				'comment_id' => $comment_id,
+				'reply_text' => $reply_text,
+			)
+		);
+
+		if ( ! $reply_id ) {
+			$this->send_error( __( 'Failed to add reply', 'analogwp-site-notes' ) );
+		}
+
+		$current_user = wp_get_current_user();
+
+		$this->send_success(
+			array(
+				'reply' => array(
+					'id'           => (int) $reply_id,
+					'comment_id'   => $comment_id,
+					'user_id'      => (int) $current_user->ID,
+					'display_name' => $current_user->display_name,
+					'reply_text'   => $reply_text,
+					'created_at'   => current_time( 'mysql' ),
+					'avatar'       => get_avatar_url( $current_user->ID, array( 'size' => 80 ) ),
+				),
+			)
+		);
 	}
 
 	/**

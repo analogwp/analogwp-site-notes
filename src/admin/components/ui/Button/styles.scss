@@ -146,6 +146,11 @@
 	&:hover:not(:disabled) {
 		background-color: var(--sn-accent-hover);
 	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 }
 
 .sn-btn-secondary-solid {

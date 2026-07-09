@@ -26,7 +26,18 @@ const UnifiedAdminApp = ({ initialPage = 'dashboard' }) => {
 
 const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
     const { priorities } = useSettings();
+    const getInitialSettingsTab = () => {
+        try {
+            const tab = new URLSearchParams(window.location.search).get('tab');
+            const validTabs = ['general', 'access-control', 'task-priorities', 'categories', 'advanced'];
+
+            return validTabs.includes(tab) ? tab : 'general';
+        } catch (error) {
+            return 'general';
+        }
+    };
     const [currentPage, setCurrentPage] = useState(initialPage);
+    const [settingsTab, setSettingsTab] = useState(getInitialSettingsTab);
     const [comments, setComments] = useState([]);
     const [users, setUsers] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -183,7 +194,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
         }
     };
 
-    const handleUpdateComment = async (commentId, updates) => {
+    const handleUpdateComment = async (commentId, updates, options = {}) => {
         logger.debug('Updating comment with ID:', commentId);
         logger.debug('Updates to apply:', updates);
         try {
@@ -221,16 +232,63 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                     }
                     return comment;
                 }));
-                showToast.success(__('Task updated successfully!', 'analogwp-site-notes'));
+                if (!options.silent) {
+                    showToast.success(__('Task updated successfully!', 'analogwp-site-notes'));
+                }
+                return true;
             } else {
                 const errorMessage = data.data?.message || data.message || 'Unknown error';
                 logger.error('Error updating comment:', errorMessage);
                 logger.error('Full response:', data);
                 showToast.error(__('Error updating task. Please try again.', 'analogwp-site-notes'));
+                return false;
             }
         } catch (err) {
             logger.error('Error updating comment:', err);
             showToast.error(__('Error updating task. Please try again.', 'analogwp-site-notes'));
+            return false;
+        }
+    };
+
+    const handleAddReply = async (commentId, replyText) => {
+        try {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'agwp_sn_admin_add_reply',
+                    nonce: agwp_sn_ajax.nonce,
+                    comment_id: commentId,
+                    reply_text: replyText,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.data?.reply) {
+                setComments(comments.map((comment) => {
+                    if (comment.id !== commentId) {
+                        return comment;
+                    }
+
+                    const existingReplies = Array.isArray(comment.replies) ? comment.replies : [];
+
+                    return {
+                        ...comment,
+                        replies: [...existingReplies, data.data.reply],
+                    };
+                }));
+                return data.data.reply;
+            }
+
+            showToast.error(data.data?.message || __('Error adding reply', 'analogwp-site-notes'));
+            return null;
+        } catch (err) {
+            logger.error('Error adding reply:', err);
+            showToast.error(__('Error adding reply', 'analogwp-site-notes'));
+            return null;
         }
     };
 
@@ -274,8 +332,12 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
     };
 
     // Navigation handler
-    const handleNavigation = (page) => {
+    const handleNavigation = (page, options = {}) => {
         setCurrentPage(page);
+
+        if (page === 'settings' && options.tab) {
+            setSettingsTab(options.tab);
+        }
         
         // Update URL without reloading the page if we're in WordPress admin
         try {
@@ -284,12 +346,17 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
             
             if (page === 'settings') {
                 baseParams.set('page', 'agwp-sn-settings');
+
+                if (options.tab) {
+                    baseParams.set('tab', options.tab);
+                }
             } else {
                 baseParams.set('page', 'agwp-sn-dashboard');
+                baseParams.delete('tab');
             }
             
             const newUrl = `${currentUrl.origin}${currentUrl.pathname}?${baseParams.toString()}`;
-            window.history.pushState({ page }, '', newUrl);
+            window.history.pushState({ page, tab: options.tab || null }, '', newUrl);
             
             // Update document title
             document.title = page === 'settings' 
@@ -301,12 +368,23 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
         }
     };
 
+    const handleNavigateToSettingsTab = (tab) => {
+        handleNavigation('settings', { tab });
+    };
+
     // Handle browser back/forward buttons
     useEffect(() => {
-        const handlePopState = (event) => {
-            if (event.state && event.state.page) {
-                setCurrentPage(event.state.page);
+        const handlePopState = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = urlParams.get('page');
+
+            if (page && page.includes('settings')) {
+                setCurrentPage('settings');
+                setSettingsTab(getInitialSettingsTab());
+                return;
             }
+
+            setCurrentPage('dashboard');
         };
 
         window.addEventListener('popstate', handlePopState);
@@ -326,13 +404,14 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 
         switch (currentPage) {
             case 'settings':
-                return <Settings />;
+                return <Settings initialTab={settingsTab} />;
             case 'dashboard':
             default:
                 return (
                     <TasksView 
                         comments={filteredComments}
                         onUpdateComment={handleUpdateComment}
+                        onAddReply={handleAddReply}
                         onDelete={handleDelete}
                         onAddTask={handleAddTask}
                         users={users}
@@ -346,6 +425,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                         onFilterChange={handleFilterChange}
                         sortBy={sortBy}
                         onSortChange={handleSortChange}
+                        onNavigateToSettingsTab={handleNavigateToSettingsTab}
                     />
                 );
         }

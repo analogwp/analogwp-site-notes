@@ -25,7 +25,7 @@ import {
 	getStatusBadgeStyle,
 } from './taskSidebarUtils';
 
-const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [] }) => {
+const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNavigateToSettingsTab }) => {
 	const { categories, priorities } = useSettings();
 	const [formData, setFormData] = useState(EMPTY_TASK_FORM);
 	const [activeTab, setActiveTab] = useState('details');
@@ -159,6 +159,7 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [] }) => {
 						onAddTime={handleAddTime}
 						getStatusBadgeStyle={getStatusBadgeStyle}
 						getPriorityBadgeStyle={getPriorityBadgeStyle}
+						onNavigateToSettingsTab={onNavigateToSettingsTab}
 					/>
 				) : (
 					<TaskSidebarTimesheetTab entries={pendingTimeEntries} />

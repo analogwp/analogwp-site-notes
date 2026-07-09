@@ -5,7 +5,8 @@ import { __ } from '@wordpress/i18n';
 import TaskCard from './TaskCard';
 import TaskDetail from './TaskDetail';
 import AddTaskSidebar from './AddTaskSidebar';
-import EditTaskSidebar from './EditTaskSidebar';
+import ManageTaskSidebar from './ManageTaskSidebar';
+import TaskSidebarBackdropClose from './TaskSidebarBackdropClose';
 import TasksControls from './TasksControls';
 import DroppableColumn from './DroppableColumn';
 import { AddIcon } from '../../../shared/icons';
@@ -37,10 +38,14 @@ const TasksKanbanView = ({
 	showAddModal,
 	handleCloseModal,
 	handleSaveTask,
+	handleUpdateTask,
+	liveEditingTask,
+	onAddReply,
 	pages,
 	editingTask,
 	activeView,
-	onViewChange
+	onViewChange,
+	onNavigateToSettingsTab,
 }) => {
 	return (
 		<div>
@@ -129,16 +134,23 @@ const TasksKanbanView = ({
 						role="presentation"
 					/>
 
-					<div className="sn-kanban-sidebar">
+					<TaskSidebarBackdropClose
+						onClose={handleCloseModal}
+						isManage={Boolean(editingTask)}
+					/>
+
+					<div className={`sn-kanban-sidebar${editingTask ? ' sn-kanban-sidebar--manage' : ''}`}>
 						{editingTask ? (
-							<EditTaskSidebar
-								task={editingTask}
+							<ManageTaskSidebar
+								task={liveEditingTask || editingTask}
 								onClose={handleCloseModal}
-								onSave={handleSaveTask}
+								onUpdate={handleUpdateTask}
 								onDelete={handleDelete}
+								onAddReply={onAddReply}
 								users={users}
 								pages={pages || []}
 								statuses={statuses}
+								onNavigateToSettingsTab={onNavigateToSettingsTab}
 							/>
 						) : (
 							<AddTaskSidebar
@@ -147,6 +159,7 @@ const TasksKanbanView = ({
 								users={users}
 								pages={pages || []}
 								statuses={statuses}
+								onNavigateToSettingsTab={onNavigateToSettingsTab}
 							/>
 						)}
 					</div>
