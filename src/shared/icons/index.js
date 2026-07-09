@@ -1,4 +1,4 @@
-export { default as Icon } from './Icon';
+export { default as Icon, ICON_SIZE_MAP, resolveIconPixelSize } from './Icon';
 
 export { default as AddIcon } from './AddIcon';
 export { default as ArrowLeftIcon } from './ArrowLeftIcon';

@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import classnames from 'classnames';
-import { DeleteIcon, GlobeIcon } from '../../../shared/icons';
+import { TrashOutlineIcon, GlobeIcon } from '../../../shared/icons';
 
 const TaskCard = ({
 	comment,
@@ -92,7 +92,7 @@ const TaskCard = ({
 						className="sn-icon-action sn-icon-action--danger"
 						title={__('Delete', 'analogwp-site-notes')}
 					>
-						<DeleteIcon size={12} />
+						<TrashOutlineIcon size="md" />
 					</button>
 				</div>
 			</div>

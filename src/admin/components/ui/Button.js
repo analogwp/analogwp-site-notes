@@ -3,6 +3,19 @@
  */
 import { Button as WPButton } from '@wordpress/components';
 import classnames from 'classnames';
+import { resolveIconPixelSize } from '../../../shared/icons';
+
+const resolveButtonIconSize = (iconSize, icon) => {
+	if (iconSize !== undefined) {
+		return resolveIconPixelSize(iconSize);
+	}
+
+	if (icon?.props?.size !== undefined) {
+		return resolveIconPixelSize(icon.props.size);
+	}
+
+	return resolveIconPixelSize('md');
+};
 
 const Button = ({
 	children,
@@ -10,6 +23,7 @@ const Button = ({
 	size = 'default',
 	className = '',
 	icon,
+	iconSize,
 	disabled = false,
 	loading = false,
 	...props
@@ -74,6 +88,7 @@ const Button = ({
 			className={buttonClasses}
 			disabled={disabled || loading}
 			icon={icon}
+			iconSize={icon ? resolveButtonIconSize(iconSize, icon) : undefined}
 		>
 			{children}
 		</WPButton>

@@ -6,6 +6,7 @@
 	font-size: var(--sn-input-text-size) !important;
 	line-height: var(--sn-input-text-line) !important;
 	transition: background-color var(--sn-transition-base), color var(--sn-transition-base), border-color var(--sn-transition-base), box-shadow var(--sn-transition-base);
+	gap: var(--sn-space-xs) !important;
 
 	&--primary,
 	&--secondary {
@@ -105,19 +106,7 @@
 }
 
 .sn-icon {
-	width: 1rem;
-	height: 1rem;
 	flex-shrink: 0;
-
-	&--sm {
-		width: 0.75rem;
-		height: 0.75rem;
-	}
-
-	&--md {
-		width: 1.25rem;
-		height: 1.25rem;
-	}
 
 	&--fill-current {
 		fill: currentColor;

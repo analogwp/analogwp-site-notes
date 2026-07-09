@@ -13,9 +13,10 @@ import { DragOverlay } from '@dnd-kit/core';
  */
 import TaskCard from './TaskCard';
 import TaskDetail from './TaskDetail';
-import AddTaskModal from './AddTaskModal';
+import AddTaskSidebar from './AddTaskSidebar';
+import EditTaskSidebar from './EditTaskSidebar';
 import TasksControls from './TasksControls';
-import { DeleteIcon, EditIcon } from '../../../shared/icons';
+import { TrashOutlineIcon, EditIcon } from '../../../shared/icons';
 
 const TasksListView = ({
     comments,
@@ -160,7 +161,7 @@ const TasksListView = ({
                                                 className="sn-icon-action sn-icon-action--danger"
                                                 title={__('Delete', 'analogwp-site-notes')}
                                             >
-                                                <DeleteIcon size="sm" />
+                                                <TrashOutlineIcon size="sm" />
                                             </button>
                                         </div>
                                     </div>
@@ -180,16 +181,25 @@ const TasksListView = ({
                     />
 
                     <div className="sn-kanban-sidebar">
-                        <AddTaskModal
-                            isOpen={true}
-                            onClose={onCloseModal}
-                            onSave={onSaveTask}
-                            users={users}
-                            pages={pages || []}
-                            editTask={editingTask}
-                            statuses={statuses}
-                            isSidebar={true}
-                        />
+                        {editingTask ? (
+                            <EditTaskSidebar
+                                task={editingTask}
+                                onClose={onCloseModal}
+                                onSave={onSaveTask}
+                                onDelete={onDelete}
+                                users={users}
+                                pages={pages || []}
+                                statuses={statuses}
+                            />
+                        ) : (
+                            <AddTaskSidebar
+                                onClose={onCloseModal}
+                                onSave={onSaveTask}
+                                users={users}
+                                pages={pages || []}
+                                statuses={statuses}
+                            />
+                        )}
                     </div>
                 </>
             )}

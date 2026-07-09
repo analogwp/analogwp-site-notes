@@ -1,8 +1,12 @@
 import Icon from './Icon';
 
 const PencilIcon = (props) => (
-	<Icon fill="none" stroke="currentColor" strokeWidth={1.5} {...props}>
-		<path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+	<Icon viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} {...props}>
+		<path
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			d="M13.5 6.50006L17.5 10.5001M4 20.0001H8L18.5 9.50006C19.0304 8.96963 19.3284 8.2502 19.3284 7.50006C19.3284 6.74991 19.0304 6.03049 18.5 5.50006C17.9696 4.96963 17.2501 4.67163 16.5 4.67163C15.7499 4.67163 15.0304 4.96963 14.5 5.50006L4 16.0001V20.0001Z"
+		/>
 	</Icon>
 );
 

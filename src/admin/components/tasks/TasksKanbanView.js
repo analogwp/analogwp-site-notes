@@ -4,7 +4,8 @@ import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { __ } from '@wordpress/i18n';
 import TaskCard from './TaskCard';
 import TaskDetail from './TaskDetail';
-import AddTaskModal from './AddTaskModal';
+import AddTaskSidebar from './AddTaskSidebar';
+import EditTaskSidebar from './EditTaskSidebar';
 import TasksControls from './TasksControls';
 import DroppableColumn from './DroppableColumn';
 import { AddIcon } from '../../../shared/icons';
@@ -129,16 +130,25 @@ const TasksKanbanView = ({
 					/>
 
 					<div className="sn-kanban-sidebar">
-						<AddTaskModal
-							isOpen={true}
-							onClose={handleCloseModal}
-							onSave={handleSaveTask}
-							users={users}
-							pages={pages || []}
-							editTask={editingTask}
-							statuses={statuses}
-							isSidebar={true}
-						/>
+						{editingTask ? (
+							<EditTaskSidebar
+								task={editingTask}
+								onClose={handleCloseModal}
+								onSave={handleSaveTask}
+								onDelete={handleDelete}
+								users={users}
+								pages={pages || []}
+								statuses={statuses}
+							/>
+						) : (
+							<AddTaskSidebar
+								onClose={handleCloseModal}
+								onSave={handleSaveTask}
+								users={users}
+								pages={pages || []}
+								statuses={statuses}
+							/>
+						)}
 					</div>
 				</>
 			)}
