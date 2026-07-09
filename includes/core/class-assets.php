@@ -62,10 +62,12 @@ class Assets {
 			true
 		);
 
+		$this->enqueue_inter_font();
+
 		wp_enqueue_style(
 			'agwp-sn-frontend',
 			AGWP_SN_PLUGIN_URL . 'assets/js/app/frontend.css',
-			array(),
+			array( 'agwp-sn-inter' ),
 			$asset['version']
 		);
 
@@ -113,10 +115,12 @@ class Assets {
 			get_bloginfo( 'version' )
 		);
 
+		$this->enqueue_inter_font();
+
 		wp_enqueue_style(
 			'agwp-sn-admin',
 			AGWP_SN_PLUGIN_URL . 'assets/js/app/admin.css',
-			array( 'wp-components' ),
+			array( 'wp-components', 'agwp-sn-inter' ),
 			$asset['version']
 		);
 
@@ -125,6 +129,26 @@ class Assets {
 			'agwp-sn-admin',
 			'agwp_sn_ajax',
 			$this->get_admin_localized_data()
+		);
+	}
+
+	/**
+	 * Enqueue self-hosted Inter font stylesheet.
+	 *
+	 * @since 1.4.0
+	 */
+	private function enqueue_inter_font() {
+		$font_css_path = AGWP_SN_PLUGIN_PATH . 'assets/fonts/inter/inter.css';
+
+		if ( ! file_exists( $font_css_path ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'agwp-sn-inter',
+			AGWP_SN_PLUGIN_URL . 'assets/fonts/inter/inter.css',
+			array(),
+			AGWP_SN_VERSION
 		);
 	}
 
