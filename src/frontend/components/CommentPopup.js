@@ -497,7 +497,7 @@ const CommentPopup = ({ position, onSave, onCancel, selectedElement }) => {
                         <textarea
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
-                            placeholder={__('Describe the issue or feedback...', 'analogwp-site-notes')}
+                            placeholder={__('Describe the task or feedback...', 'analogwp-site-notes')}
                             className="sn-comment-textarea"
                             rows="4"
                             disabled={isLoading}
