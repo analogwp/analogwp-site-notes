@@ -7,8 +7,9 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { BadgeSelect, FieldSelect, FieldMultiSelect, FieldDate, FieldTime, parseTimeInput } from '../ui';
+import { SidebarSelect, SidebarMultiSelect, FieldDate, FieldTime, parseTimeInput } from '../ui';
 import { showToast } from '../ToastProvider';
+import { buildUserSelectOptions } from './taskSidebarUtils';
 
 const getUserInitials = (name) => {
 	if (!name) {
@@ -32,6 +33,13 @@ const renderUserAvatar = (user, className = 'sn-avatar sn-avatar--xs') => (
 	>
 		{!user?.avatar && getUserInitials(user?.name || user?.label || '')}
 	</div>
+);
+
+const renderUserPill = (user) => (
+	<span className="sn-sidebar-field__user-pill">
+		{renderUserAvatar(user)}
+		<span className="sn-sidebar-field__user-pill-name">{user.label}</span>
+	</span>
 );
 
 const TaskSidebarDetailsFields = ({
@@ -67,121 +75,88 @@ const TaskSidebarDetailsFields = ({
 		value: category.name,
 		label: category.name,
 	}));
+	const userOptions = buildUserSelectOptions(users);
 
 	return (
 		<>
 			{!hideQuickFields && (
 				<>
-					<div className="sn-task-sidebar__row">
-						<label className="sn-task-sidebar__row-label">{__('Status', 'analogwp-site-notes')}</label>
-						<div className="sn-task-sidebar__row-control">
-							<div className="sn-task-sidebar__row-field">
-								<BadgeSelect
-									value={formData.status}
-									onChange={(value) => onInputChange('status', value)}
-									options={statuses.map((status) => ({
-										value: status.key,
-										label: status.title,
-									}))}
-									getOptionStyle={getStatusBadgeStyle}
-								/>
-							</div>
-						</div>
-					</div>
+					<SidebarSelect
+						label={__('Status', 'analogwp-site-notes')}
+						emptyText={__('No status', 'analogwp-site-notes')}
+						value={formData.status}
+						onChange={(value) => onInputChange('status', value)}
+						options={statuses.map((status) => ({
+							value: status.key,
+							label: status.title,
+						}))}
+						getOptionStyle={getStatusBadgeStyle}
+					/>
 
-					<div className="sn-task-sidebar__row">
-						<label className="sn-task-sidebar__row-label">{__('Priority', 'analogwp-site-notes')}</label>
-						<div className="sn-task-sidebar__row-control">
-							<div className="sn-task-sidebar__row-field">
-								<BadgeSelect
-									value={formData.priority}
-									onChange={(value) => onInputChange('priority', value)}
-									options={priorityOptions.map((priority) => ({
-										value: priority.key,
-										label: priority.name,
-									}))}
-									getOptionStyle={(value) => getPriorityBadgeStyle(value, priorityOptions)}
-								/>
-							</div>
-							{onNavigateToSettingsTab && (
-								<button
-									type="button"
-									className="sn-task-sidebar__field-link"
-									onClick={() => onNavigateToSettingsTab('task-priorities')}
-								>
-									{__('Manage Priorities', 'analogwp-site-notes')}
-								</button>
-							)}
-						</div>
-					</div>
-
-					<div className="sn-task-sidebar__row">
-						<label className="sn-task-sidebar__row-label">{__('Assign', 'analogwp-site-notes')}</label>
-						<div className="sn-task-sidebar__row-control">
-							<div className="sn-task-sidebar__row-field">
-								<FieldSelect
-									value={formData.assignedUser}
-									onChange={(value) => onInputChange('assignedUser', value)}
-									placeholder={__('Select User', 'analogwp-site-notes')}
-									clearable
-									clearLabel={__('Unassigned', 'analogwp-site-notes')}
-									options={users.map((user) => ({
-										value: String(user.id),
-										label: user.name,
-										avatar: user.avatar,
-										name: user.name,
-									}))}
-									renderLeading={(option) => renderUserAvatar(option)}
-								/>
-							</div>
-						</div>
-					</div>
+					<SidebarSelect
+						label={__('Priority', 'analogwp-site-notes')}
+						emptyText={__('No priority', 'analogwp-site-notes')}
+						value={formData.priority}
+						onChange={(value) => onInputChange('priority', value)}
+						options={priorityOptions.map((priority) => ({
+							value: priority.key,
+							label: priority.name,
+						}))}
+						getOptionStyle={(value) => getPriorityBadgeStyle(value, priorityOptions)}
+						footerLink={onNavigateToSettingsTab && (
+							<button
+								type="button"
+								className="sn-task-sidebar__field-link"
+								onClick={() => onNavigateToSettingsTab('task-priorities')}
+							>
+								{__('Manage Priorities', 'analogwp-site-notes')}
+							</button>
+						)}
+					/>
 				</>
 			)}
 
-			<div className="sn-task-sidebar__row">
-				<label className="sn-task-sidebar__row-label">{__('Category', 'analogwp-site-notes')}</label>
-				<div className="sn-task-sidebar__row-control">
-					<div className="sn-task-sidebar__row-field">
-						<FieldMultiSelect
-							value={formData.categories}
-							onChange={(selected) => onInputChange('categories', selected)}
-							placeholder={__('Select Category', 'analogwp-site-notes')}
-							disabled={categoryOptions.length === 0}
-							options={categoryOptions}
-						/>
-					</div>
-					{onNavigateToSettingsTab && (
-						<button
-							type="button"
-							className="sn-task-sidebar__field-link"
-							onClick={() => onNavigateToSettingsTab('categories')}
-						>
-							{__('Manage Categories', 'analogwp-site-notes')}
-						</button>
-					)}
-				</div>
-			</div>
+			<SidebarMultiSelect
+				label={__('Assignees', 'analogwp-site-notes')}
+				emptyText={__('No one assigned', 'analogwp-site-notes')}
+				value={formData.assignedUsers}
+				onChange={(value) => onInputChange('assignedUsers', value)}
+				options={userOptions}
+				renderOptionLeading={(option) => renderUserAvatar(option)}
+				renderPill={renderUserPill}
+			/>
 
-			<div className="sn-task-sidebar__row">
-				<label className="sn-task-sidebar__row-label">{__('Page', 'analogwp-site-notes')}</label>
-				<div className="sn-task-sidebar__row-control">
-					<div className="sn-task-sidebar__row-field">
-						<FieldSelect
-							value={formData.pageId}
-							onChange={(value) => onInputChange('pageId', value)}
-							placeholder={__('Select Page', 'analogwp-site-notes')}
-							disabled={pages.length === 0}
-							options={pages.map((page) => ({
-								value: String(page.id),
-								label: page.title,
-							}))}
-						/>
-					</div>
-				</div>
-			</div>
+			<SidebarMultiSelect
+				label={__('Categories', 'analogwp-site-notes')}
+				emptyText={__('No categories', 'analogwp-site-notes')}
+				value={formData.categories}
+				onChange={(selected) => onInputChange('categories', selected)}
+				disabled={categoryOptions.length === 0}
+				options={categoryOptions}
+				footerLink={onNavigateToSettingsTab && (
+					<button
+						type="button"
+						className="sn-task-sidebar__field-link"
+						onClick={() => onNavigateToSettingsTab('categories')}
+					>
+						{__('Manage Categories', 'analogwp-site-notes')}
+					</button>
+				)}
+			/>
 
-			<div className="sn-task-sidebar__row">
+			<SidebarSelect
+				label={__('Page', 'analogwp-site-notes')}
+				emptyText={__('No page selected', 'analogwp-site-notes')}
+				value={formData.pageId}
+				onChange={(value) => onInputChange('pageId', value)}
+				disabled={pages.length === 0}
+				options={pages.map((page) => ({
+					value: String(page.id),
+					label: page.title,
+				}))}
+			/>
+
+			<div className="sn-task-sidebar__row sn-task-sidebar__row--spaced">
 				<label className="sn-task-sidebar__row-label">{__('Due Date', 'analogwp-site-notes')}</label>
 				<div className="sn-task-sidebar__row-control">
 					<div className="sn-task-sidebar__row-field">

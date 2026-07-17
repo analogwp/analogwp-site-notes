@@ -202,6 +202,20 @@
 	align-items: center;
 	gap: var(--sn-space-xs);
 	min-width: 0;
+
+	&--assignees {
+		flex-wrap: wrap;
+		align-items: flex-start;
+		gap: var(--sn-space-2xs);
+	}
+}
+
+.sn-kanban-card-assignee {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--sn-space-2xs);
+	max-width: 100%;
+	min-width: 0;
 }
 
 .sn-kanban-card-user-name {
