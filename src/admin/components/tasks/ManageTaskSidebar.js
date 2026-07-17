@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import classnames from 'classnames';
 
 /**
@@ -11,12 +11,16 @@ import classnames from 'classnames';
 import { showConfirmation, showToast } from '../ToastProvider';
 import { useSettings } from '../settings/SettingsProvider';
 import logger from '../../../shared/utils/logger';
-import { CloseIcon, PencilIcon } from '../../../shared/icons';
+import { CheckmarkIcon, CloseIcon, PencilIcon } from '../../../shared/icons';
 import TaskSidebarDetailsFields from './TaskSidebarDetailsFields';
 import TaskSidebarQuickFields from './TaskSidebarQuickFields';
 import TaskSidebarDiscussion from './TaskSidebarDiscussion';
+import TaskSidebarComment from './TaskSidebarComment';
+import TaskSidebarTimeline from './TaskSidebarTimeline';
 import TaskSidebarReplyForm from './TaskSidebarReplyForm';
 import TaskSidebarFooter from './TaskSidebarFooter';
+import TaskSidebarTabs from './TaskSidebarTabs';
+import TaskSidebarTimesheetTab from './TaskSidebarTimesheetTab';
 import {
 	buildTimeEntry,
 	buildFieldUpdatePayload,
@@ -25,10 +29,26 @@ import {
 	getStatusBadgeStyle,
 	mapTaskToFormData,
 	parseTimesheetEntries,
+	formatOpenedDate,
 } from './taskSidebarUtils';
 
 const TEXT_SAVE_FIELDS = ['taskTitle', 'description'];
 const TEXT_SAVE_DELAY = 600;
+
+const getSavedFieldValue = (field, taskData) => {
+	if (!taskData) {
+		return '';
+	}
+
+	switch (field) {
+		case 'taskTitle':
+			return taskData.comment_title || '';
+		case 'description':
+			return taskData.comment_text || '';
+		default:
+			return '';
+	}
+};
 
 const ManageTaskSidebar = ({
 	task,
@@ -36,6 +56,7 @@ const ManageTaskSidebar = ({
 	onUpdate,
 	onDelete,
 	onAddReply,
+	onDeleteReply,
 	users,
 	pages,
 	statuses = [],
@@ -47,9 +68,17 @@ const ManageTaskSidebar = ({
 	const [formData, setFormData] = useState(() => mapTaskToFormData(task, pages));
 	const [isTitleEditing, setIsTitleEditing] = useState(false);
 	const [isDescriptionEditing, setIsDescriptionEditing] = useState(false);
+	const [activeAsideTab, setActiveAsideTab] = useState('details');
 	const formDataRef = useRef(formData);
 	const debounceRefs = useRef({});
+	const taskRef = useRef(task);
+	const pagesRef = useRef(pages);
+	const onUpdateRef = useRef(onUpdate);
 	const priorityOptions = getDefaultPriorityOptions(priorities);
+
+	taskRef.current = task;
+	pagesRef.current = pages;
+	onUpdateRef.current = onUpdate;
 	const existingTimeEntries = parseTimesheetEntries(task.timesheet);
 
 	useEffect(() => {
@@ -60,12 +89,14 @@ const ManageTaskSidebar = ({
 		setFormData(mapTaskToFormData(task, pages));
 		setIsTitleEditing(false);
 		setIsDescriptionEditing(false);
-	}, [task, pages]);
+		setActiveAsideTab('details');
+	}, [task?.id, pages]);
 
 	useEffect(() => {
 		if (isTitleEditing && titleInputRef.current) {
 			titleInputRef.current.focus();
-			titleInputRef.current.select();
+			const { length } = titleInputRef.current.value;
+			titleInputRef.current.setSelectionRange(length, length);
 		}
 	}, [isTitleEditing]);
 
@@ -76,25 +107,64 @@ const ManageTaskSidebar = ({
 	}, [isDescriptionEditing]);
 
 	useEffect(() => () => {
-		Object.values(debounceRefs.current).forEach(clearTimeout);
+		TEXT_SAVE_FIELDS.forEach((field) => {
+			if (!debounceRefs.current[field]) {
+				return;
+			}
+
+			clearTimeout(debounceRefs.current[field]);
+			debounceRefs.current[field] = null;
+
+			const value = formDataRef.current[field] ?? '';
+			if (value === getSavedFieldValue(field, taskRef.current)) {
+				return;
+			}
+
+			const updates = buildFieldUpdatePayload(
+				field,
+				value,
+				formDataRef.current,
+				pagesRef.current
+			);
+
+			if (updates && onUpdateRef.current) {
+				onUpdateRef.current(updates, { silent: true });
+			}
+		});
 	}, []);
 
 	const persistUpdate = useCallback(async (updates) => {
-		if (!updates || !onUpdate) {
+		if (!updates || !onUpdateRef.current) {
 			return false;
 		}
 
-		return onUpdate(updates, { silent: true });
-	}, [onUpdate]);
+		return onUpdateRef.current(updates, { silent: true });
+	}, []);
+
+	const clearPendingTextSave = (field) => {
+		clearTimeout(debounceRefs.current[field]);
+		debounceRefs.current[field] = null;
+	};
 
 	const flushFieldSave = (field) => {
-		clearTimeout(debounceRefs.current[field]);
+		clearPendingTextSave(field);
+
+		const value = formDataRef.current[field] ?? '';
+		if (value === getSavedFieldValue(field, taskRef.current)) {
+			return;
+		}
+
 		const updates = buildFieldUpdatePayload(
 			field,
-			formDataRef.current[field],
+			value,
 			formDataRef.current,
-			pages
+			pagesRef.current
 		);
+
+		if (!updates) {
+			return;
+		}
+
 		persistUpdate(updates);
 	};
 
@@ -106,15 +176,10 @@ const ManageTaskSidebar = ({
 		});
 
 		if (TEXT_SAVE_FIELDS.includes(field)) {
-			clearTimeout(debounceRefs.current[field]);
+			clearPendingTextSave(field);
 			debounceRefs.current[field] = setTimeout(() => {
-				const updates = buildFieldUpdatePayload(
-					field,
-					formDataRef.current[field],
-					formDataRef.current,
-					pages
-				);
-				persistUpdate(updates);
+				debounceRefs.current[field] = null;
+				flushFieldSave(field);
 			}, TEXT_SAVE_DELAY);
 			return;
 		}
@@ -128,8 +193,40 @@ const ManageTaskSidebar = ({
 		setIsTitleEditing(false);
 	};
 
+	const handleTitleSave = () => {
+		flushFieldSave('taskTitle');
+		setIsTitleEditing(false);
+	};
+
+	const handleTitleCancel = () => {
+		clearPendingTextSave('taskTitle');
+		const savedTitle = getSavedFieldValue('taskTitle', taskRef.current);
+		setFormData((prev) => {
+			const next = { ...prev, taskTitle: savedTitle };
+			formDataRef.current = next;
+			return next;
+		});
+		setIsTitleEditing(false);
+	};
+
 	const handleDescriptionBlur = () => {
 		flushFieldSave('description');
+		setIsDescriptionEditing(false);
+	};
+
+	const handleDescriptionSave = () => {
+		flushFieldSave('description');
+		setIsDescriptionEditing(false);
+	};
+
+	const handleDescriptionCancel = () => {
+		clearPendingTextSave('description');
+		const savedDescription = getSavedFieldValue('description', taskRef.current);
+		setFormData((prev) => {
+			const next = { ...prev, description: savedDescription };
+			formDataRef.current = next;
+			return next;
+		});
 		setIsDescriptionEditing(false);
 	};
 
@@ -180,6 +277,28 @@ const ManageTaskSidebar = ({
 		return Boolean(reply);
 	};
 
+	const handleDeleteReply = async (replyId) => {
+		if (!onDeleteReply) {
+			return;
+		}
+
+		const confirmed = await showConfirmation(
+			__('Are you sure you want to delete this comment?', 'analogwp-site-notes'),
+			{ confirmText: __('Delete', 'analogwp-site-notes') }
+		);
+
+		if (!confirmed) {
+			return;
+		}
+
+		try {
+			await onDeleteReply(task.id, replyId);
+		} catch (err) {
+			logger.error('Error deleting reply:', err);
+			showToast.error(__('Error deleting comment. Please try again.', 'analogwp-site-notes'));
+		}
+	};
+
 	const handleDelete = async () => {
 		if (!onDelete) {
 			return;
@@ -202,6 +321,49 @@ const ManageTaskSidebar = ({
 			showToast.error(__('Error deleting task. Please try again.', 'analogwp-site-notes'));
 		}
 	};
+
+	const creator = task.creator || task.user || {};
+	const creatorName = creator.name || __('Unknown User', 'analogwp-site-notes');
+	const openedMeta = task.created_at
+		? sprintf(
+			/* translators: %s: formatted date */
+			__('opened on %s', 'analogwp-site-notes'),
+			formatOpenedDate(task.created_at)
+		)
+		: '';
+
+	const descriptionEditAction = isDescriptionEditing ? (
+		<>
+			<button
+				type="button"
+				className="sn-task-comment__edit-btn"
+				onMouseDown={(event) => event.preventDefault()}
+				onClick={handleDescriptionSave}
+				title={__('Save description', 'analogwp-site-notes')}
+			>
+				<CheckmarkIcon size="md" />
+			</button>
+			<button
+				type="button"
+				className="sn-task-comment__edit-btn"
+				onMouseDown={(event) => event.preventDefault()}
+				onClick={handleDescriptionCancel}
+				title={__('Close description editor', 'analogwp-site-notes')}
+			>
+				<CloseIcon size="md" />
+			</button>
+		</>
+	) : (
+		<button
+			type="button"
+			className="sn-task-comment__edit-btn"
+			onMouseDown={(event) => event.preventDefault()}
+			onClick={() => setIsDescriptionEditing(true)}
+			title={__('Edit description', 'analogwp-site-notes')}
+		>
+			<PencilIcon size="md" />
+		</button>
+	);
 
 	return (
 		<div className="sn-task-sidebar sn-task-sidebar--manage">
@@ -229,27 +391,38 @@ const ManageTaskSidebar = ({
 								</div>
 							)}
 							<div className="sn-task-sidebar__header-actions">
-								<button
-									type="button"
-									className="sn-task-sidebar__header-action"
-									onMouseDown={(event) => event.preventDefault()}
-									onClick={() => {
-										if (isTitleEditing) {
-											handleTitleBlur();
-										} else {
-											setIsTitleEditing(true);
-										}
-									}}
-									title={isTitleEditing
-										? __('Close title editor', 'analogwp-site-notes')
-										: __('Edit task title', 'analogwp-site-notes')}
-								>
-									{isTitleEditing ? (
-										<CloseIcon size="xl" />
-									) : (
+								{isTitleEditing ? (
+									<>
+										<button
+											type="button"
+											className="sn-task-sidebar__header-action"
+											onMouseDown={(event) => event.preventDefault()}
+											onClick={handleTitleSave}
+											title={__('Save task title', 'analogwp-site-notes')}
+										>
+											<CheckmarkIcon size="xl" />
+										</button>
+										<button
+											type="button"
+											className="sn-task-sidebar__header-action"
+											onMouseDown={(event) => event.preventDefault()}
+											onClick={handleTitleCancel}
+											title={__('Close title editor', 'analogwp-site-notes')}
+										>
+											<CloseIcon size="xl" />
+										</button>
+									</>
+								) : (
+									<button
+										type="button"
+										className="sn-task-sidebar__header-action"
+										onMouseDown={(event) => event.preventDefault()}
+										onClick={() => setIsTitleEditing(true)}
+										title={__('Edit task title', 'analogwp-site-notes')}
+									>
 										<PencilIcon size="xl" />
-									)}
-								</button>
+									</button>
+								)}
 							</div>
 						</div>
 
@@ -258,55 +431,44 @@ const ManageTaskSidebar = ({
 							onInputChange={handleAutoFieldChange}
 							statuses={statuses}
 							priorityOptions={priorityOptions}
-							users={users}
 							getStatusBadgeStyle={getStatusBadgeStyle}
 							getPriorityBadgeStyle={getPriorityBadgeStyle}
 						/>
 
-						<div className="sn-task-sidebar__editable-group">
-							{isDescriptionEditing ? (
-								<textarea
-									ref={descriptionInputRef}
-									value={formData.description}
-									onChange={(event) => handleAutoFieldChange('description', event.target.value)}
-									onBlur={handleDescriptionBlur}
-									placeholder={__('Add a task description here (optional)', 'analogwp-site-notes')}
-									className="sn-input sn-task-sidebar__description-input sn-task-sidebar__description-input--manage"
-									rows="4"
-								/>
-							) : (
-								<div
-									className={classnames('sn-task-sidebar__description-display', {
-										'sn-task-sidebar__description-display--placeholder': !formData.description.trim(),
-									})}
-								>
-									{formData.description.trim() || __('Add a task description here (optional)', 'analogwp-site-notes')}
-								</div>
-							)}
-							<button
-								type="button"
-								className="sn-task-sidebar__float-edit-btn"
-								onMouseDown={(event) => event.preventDefault()}
-								onClick={() => {
-									if (isDescriptionEditing) {
-										handleDescriptionBlur();
-									} else {
-										setIsDescriptionEditing(true);
-									}
-								}}
-								title={isDescriptionEditing
-									? __('Close description editor', 'analogwp-site-notes')
-									: __('Edit description', 'analogwp-site-notes')}
+						<TaskSidebarTimeline>
+							<TaskSidebarComment
+								user={creator}
+								authorName={creatorName}
+								metaText={openedMeta}
+								variant="opener"
+								headerAction={descriptionEditAction}
 							>
 								{isDescriptionEditing ? (
-									<CloseIcon size="md" />
+									<textarea
+										ref={descriptionInputRef}
+										value={formData.description}
+										onChange={(event) => handleAutoFieldChange('description', event.target.value)}
+										onBlur={handleDescriptionBlur}
+										placeholder={__('Add a task description here (optional)', 'analogwp-site-notes')}
+										className="sn-task-comment__description-input"
+										rows="4"
+									/>
 								) : (
-									<PencilIcon size="md" />
+									<div
+										className={classnames('sn-task-comment__description-text', {
+											'sn-task-comment__description-text--placeholder': !formData.description.trim(),
+										})}
+									>
+										{formData.description.trim() || __('Add a task description here (optional)', 'analogwp-site-notes')}
+									</div>
 								)}
-							</button>
-						</div>
+							</TaskSidebarComment>
 
-						<TaskSidebarDiscussion replies={task.replies || []} />
+							<TaskSidebarDiscussion
+								replies={task.replies || []}
+								onDeleteReply={onDeleteReply ? handleDeleteReply : undefined}
+							/>
+						</TaskSidebarTimeline>
 					</div>
 
 					<TaskSidebarReplyForm onSubmit={handleReplySubmit} />
@@ -314,37 +476,49 @@ const ManageTaskSidebar = ({
 
 				<aside className="sn-task-sidebar__aside">
 					<div className="sn-task-sidebar__aside-body">
-						{task.screenshot_url && (
-							<div className="sn-task-sidebar__screenshot">
-								<img
-									src={task.screenshot_url}
-									alt={__('Task screenshot', 'analogwp-site-notes')}
-								/>
-							</div>
-						)}
+						{activeAsideTab === 'details' ? (
+							<>
+								{task.screenshot_url && (
+									<div className="sn-task-sidebar__screenshot">
+										<img
+											src={task.screenshot_url}
+											alt={__('Task screenshot', 'analogwp-site-notes')}
+										/>
+									</div>
+								)}
 
-						<div className="sn-task-sidebar__aside-fields">
-							<TaskSidebarDetailsFields
-								formData={formData}
-								onInputChange={handleAutoFieldChange}
-								statuses={statuses}
-								priorityOptions={priorityOptions}
-								users={users}
-								pages={pages}
-								categories={categories}
-								onAddTime={handleAddTime}
-								getStatusBadgeStyle={getStatusBadgeStyle}
-								getPriorityBadgeStyle={getPriorityBadgeStyle}
-								onNavigateToSettingsTab={onNavigateToSettingsTab}
-								showDescription={false}
-								hideQuickFields
-							/>
-						</div>
+								<div className="sn-task-sidebar__aside-fields">
+									<TaskSidebarDetailsFields
+										formData={formData}
+										onInputChange={handleAutoFieldChange}
+										statuses={statuses}
+										priorityOptions={priorityOptions}
+										users={users}
+										pages={pages}
+										categories={categories}
+										onAddTime={handleAddTime}
+										getStatusBadgeStyle={getStatusBadgeStyle}
+										getPriorityBadgeStyle={getPriorityBadgeStyle}
+										onNavigateToSettingsTab={onNavigateToSettingsTab}
+										showDescription={false}
+										hideQuickFields
+									/>
+								</div>
+							</>
+						) : (
+							<TaskSidebarTimesheetTab entries={existingTimeEntries} />
+						)}
 					</div>
 
 					<TaskSidebarFooter
 						deleteOnly
 						onDelete={onDelete ? handleDelete : undefined}
+						tabs={(
+							<TaskSidebarTabs
+								activeTab={activeAsideTab}
+								onTabChange={setActiveAsideTab}
+							/>
+						)}
 					/>
 				</aside>
 			</div>

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -20,6 +20,7 @@ const TasksView = ({
     comments, 
     onUpdateComment, 
     onAddReply,
+    onDeleteReply,
     onDelete, 
     onAddTask, 
     users, 
@@ -74,16 +75,16 @@ const TasksView = ({
         handleCloseModal();
     };
 
-    const handleUpdateTask = async (taskData, options = {}) => {
+    const handleUpdateTask = useCallback(async (taskData, options = {}) => {
         if (!editingTask || !onUpdateComment) {
             return false;
         }
 
         return onUpdateComment(editingTask.id, taskData, options);
-    };
+    }, [editingTask, onUpdateComment]);
 
     const liveEditingTask = editingTask
-        ? comments.find((comment) => comment.id === editingTask.id) || editingTask
+        ? comments.find((comment) => String(comment.id) === String(editingTask.id)) || editingTask
         : null;
 
     const handleStatusChange = (id, status) => {
@@ -201,6 +202,7 @@ const TasksView = ({
         handleUpdateTask,
         liveEditingTask,
         onAddReply,
+        onDeleteReply,
         pages,
         editingTask,
         comments,

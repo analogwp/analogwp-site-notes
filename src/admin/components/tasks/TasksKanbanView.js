@@ -41,6 +41,7 @@ const TasksKanbanView = ({
 	handleUpdateTask,
 	liveEditingTask,
 	onAddReply,
+	onDeleteReply,
 	pages,
 	editingTask,
 	activeView,
@@ -147,6 +148,7 @@ const TasksKanbanView = ({
 								onUpdate={handleUpdateTask}
 								onDelete={handleDelete}
 								onAddReply={onAddReply}
+								onDeleteReply={onDeleteReply}
 								users={users}
 								pages={pages || []}
 								statuses={statuses}

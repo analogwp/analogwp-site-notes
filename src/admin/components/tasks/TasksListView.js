@@ -45,6 +45,7 @@ const TasksListView = ({
     handleUpdateTask,
     liveEditingTask,
     onAddReply,
+    onDeleteReply,
     pages,
     handleStatusChange,
     handleEditTask,
@@ -198,6 +199,7 @@ const TasksListView = ({
                                 onUpdate={handleUpdateTask}
                                 onDelete={onDelete}
                                 onAddReply={onAddReply}
+                                onDeleteReply={onDeleteReply}
                                 users={users}
                                 pages={pages || []}
                                 statuses={statuses}
