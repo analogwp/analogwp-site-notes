@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 import { ChevronDownIcon, CloseSmallIcon } from '../../../../shared/icons';
 import SelectMenuSearch from '../SelectMenuSearch/SelectMenuSearch';
-import { filterSelectOptions, shouldShowSelectSearch } from '../selectMenuUtils';
+import { filterSelectOptions } from '../selectMenuUtils';
 
 const FieldMultiSelect = ({
 	value = [],
@@ -22,9 +22,8 @@ const FieldMultiSelect = ({
 	const containerRef = useRef(null);
 	const searchInputRef = useRef(null);
 	const availableOptions = options.filter(
-		(option) => !value.includes(option.value)
+		(option) => !value.some((item) => String(item) === String(option.value))
 	);
-	const showSearch = shouldShowSelectSearch(options);
 	const filteredOptions = filterSelectOptions(availableOptions, searchQuery);
 
 	useEffect(() => {
@@ -33,7 +32,7 @@ const FieldMultiSelect = ({
 			return undefined;
 		}
 
-		if (showSearch && searchInputRef.current) {
+		if (searchInputRef.current) {
 			searchInputRef.current.focus();
 		}
 
@@ -56,10 +55,10 @@ const FieldMultiSelect = ({
 			document.removeEventListener('mousedown', handlePointerDown);
 			document.removeEventListener('keydown', handleKeyDown);
 		};
-	}, [isOpen, showSearch]);
+	}, [isOpen]);
 
 	const handleAdd = (optionValue) => {
-		if (value.includes(optionValue)) {
+		if (value.some((item) => String(item) === String(optionValue))) {
 			return;
 		}
 
@@ -118,16 +117,19 @@ const FieldMultiSelect = ({
 				<ChevronDownIcon size="lg" className="sn-field-multi-select__chevron" />
 			</button>
 
-			{isOpen && availableOptions.length > 0 && (
+			{isOpen && (
 				<div className="sn-field-multi-select__dropdown">
-					{showSearch && (
-						<SelectMenuSearch
-							value={searchQuery}
-							onChange={setSearchQuery}
-							inputRef={searchInputRef}
-						/>
-					)}
+					<SelectMenuSearch
+						value={searchQuery}
+						onChange={setSearchQuery}
+						inputRef={searchInputRef}
+					/>
 					<ul className="sn-field-multi-select__menu" role="listbox">
+						{options.length === 0 && (
+							<li className="sn-field-multi-select__empty">
+								{__('No options available', 'analogwp-site-notes')}
+							</li>
+						)}
 						{filteredOptions.map((option) => (
 							<li key={option.value} className="sn-field-multi-select__menu-item">
 								<button

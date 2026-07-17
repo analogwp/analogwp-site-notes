@@ -14,6 +14,8 @@ export { default as ColorPicker } from './ColorPicker/ColorPicker';
 export { default as BadgeSelect } from './BadgeSelect/BadgeSelect';
 export { default as FieldSelect } from './FieldSelect/FieldSelect';
 export { default as FieldMultiSelect } from './FieldMultiSelect/FieldMultiSelect';
+export { default as SidebarSelect } from './SidebarSelect/SidebarSelect';
+export { default as SidebarMultiSelect } from './SidebarMultiSelect/SidebarMultiSelect';
 export { default as FieldDate } from './FieldDate/FieldDate';
 export { default as FieldTime } from './FieldTime/FieldTime';
 export { parseTimeInput } from './FieldTime/parseTimeInput';

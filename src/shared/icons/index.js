@@ -25,6 +25,7 @@ export { default as InformationCircleIcon } from './InformationCircleIcon';
 export { default as PencilIcon } from './PencilIcon';
 export { default as PlusIcon } from './PlusIcon';
 export { default as SettingsIcon } from './SettingsIcon';
+export { default as SidebarFieldSettingsIcon } from './SidebarFieldSettingsIcon';
 export { default as SiteNotesLogoIcon } from './SiteNotesLogoIcon';
 export { default as SpinnerIcon } from './SpinnerIcon';
 export { default as TasksIcon } from './TasksIcon';

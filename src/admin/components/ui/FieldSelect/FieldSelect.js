@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 import { ChevronDownIcon } from '../../../../shared/icons';
 import SelectMenuSearch from '../SelectMenuSearch/SelectMenuSearch';
-import { filterSelectOptions, shouldShowSelectSearch } from '../selectMenuUtils';
+import { filterSelectOptions } from '../selectMenuUtils';
 
 const FieldSelect = ({
 	value,
@@ -30,7 +30,6 @@ const FieldSelect = ({
 	const hasValue = Boolean(displayLabel || selectedOption?.label);
 	const triggerLabel = displayLabel || selectedOption?.label || placeholder;
 	const resolvedClearLabel = clearLabel || placeholder;
-	const showSearch = shouldShowSelectSearch(options);
 	const filteredOptions = filterSelectOptions(options, searchQuery);
 
 	useEffect(() => {
@@ -39,7 +38,7 @@ const FieldSelect = ({
 			return undefined;
 		}
 
-		if (showSearch && searchInputRef.current) {
+		if (searchInputRef.current) {
 			searchInputRef.current.focus();
 		}
 
@@ -62,7 +61,7 @@ const FieldSelect = ({
 			document.removeEventListener('mousedown', handlePointerDown);
 			document.removeEventListener('keydown', handleKeyDown);
 		};
-	}, [isOpen, showSearch]);
+	}, [isOpen]);
 
 	const handleSelect = (optionValue) => {
 		onChange(optionValue);
@@ -98,13 +97,11 @@ const FieldSelect = ({
 
 			{isOpen && (
 				<div className="sn-field-select__dropdown">
-					{showSearch && (
-						<SelectMenuSearch
-							value={searchQuery}
-							onChange={setSearchQuery}
-							inputRef={searchInputRef}
-						/>
-					)}
+					<SelectMenuSearch
+						value={searchQuery}
+						onChange={setSearchQuery}
+						inputRef={searchInputRef}
+					/>
 					<ul className="sn-field-select__menu" role="listbox">
 						{clearable && (
 							<li className="sn-field-select__menu-item">
