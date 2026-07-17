@@ -7,7 +7,7 @@ import { getStatusByKey } from '../../../shared/constants/taskStatuses';
 export const EMPTY_TASK_FORM = {
 	taskTitle: '',
 	status: 'open',
-	assignedUser: '',
+	assignedUsers: [],
 	categories: [],
 	pageId: '',
 	dueDate: '',
@@ -16,6 +16,13 @@ export const EMPTY_TASK_FORM = {
 	priority: 'medium',
 	description: '',
 };
+
+export const buildUserSelectOptions = (users) => users.map((user) => ({
+	value: String(user.id),
+	label: user.name,
+	avatar: user.avatar,
+	name: user.name,
+}));
 
 export const getDefaultPriorityOptions = (priorities) => {
 	if (priorities && priorities.length > 0) {
@@ -62,17 +69,38 @@ export const normalizePageUrl = (url) => {
 	return normalized.toLowerCase();
 };
 
-export const mapTaskToFormData = (task, pages) => {
-	let assignedUserId = '';
+const normalizeAssignedUsers = (value) => [...(value || [])].map(String).sort().join('\0');
 
-	if (task.assigned_to) {
-		assignedUserId = task.assigned_to;
-	} else if (task.assignee?.id) {
-		assignedUserId = task.assignee.id;
-	} else if (task.user_id) {
-		assignedUserId = task.user_id;
+export const isValidAssignedUserId = (userId) => {
+	if (userId === null || userId === undefined || userId === '' || userId === 0 || userId === '0') {
+		return false;
 	}
 
+	const parsed = parseInt(userId, 10);
+	return !Number.isNaN(parsed) && parsed > 0;
+};
+
+export const normalizeAssignedUsersFormValue = (userIds) => [...(userIds || [])]
+	.filter(isValidAssignedUserId)
+	.map((userId) => String(userId));
+
+const mapAssignedUsersToForm = (task) => {
+	if (Array.isArray(task.assignees) && task.assignees.length > 0) {
+		return normalizeAssignedUsersFormValue(task.assignees.map((assignee) => assignee.id));
+	}
+
+	if (Array.isArray(task.assigned_user_ids) && task.assigned_user_ids.length > 0) {
+		return normalizeAssignedUsersFormValue(task.assigned_user_ids);
+	}
+
+	if (isValidAssignedUserId(task.assigned_to)) {
+		return [String(task.assigned_to)];
+	}
+
+	return [];
+};
+
+export const mapTaskToFormData = (task, pages) => {
 	let pageId = '';
 
 	if (task.page_url && pages.length > 0) {
@@ -93,7 +121,7 @@ export const mapTaskToFormData = (task, pages) => {
 	return {
 		taskTitle: task.comment_title || '',
 		status: task.status || 'open',
-		assignedUser: assignedUserId,
+		assignedUsers: mapAssignedUsersToForm(task),
 		categories: task.categories || [],
 		pageId,
 		dueDate: task.due_date || '',
@@ -102,14 +130,6 @@ export const mapTaskToFormData = (task, pages) => {
 		priority: task.priority || 'medium',
 		description: task.comment_text || '',
 	};
-};
-
-const normalizeAssignedUser = (value) => {
-	if (!value || value === '0' || value === 0) {
-		return '';
-	}
-
-	return String(value);
 };
 
 const normalizeCategories = (categories) => [...(categories || [])].sort().join('\0');
@@ -127,12 +147,15 @@ export const hasTaskFormChanges = (initialFormData, currentFormData, pendingTime
 		}
 	}
 
-	if (normalizeAssignedUser(initialFormData.assignedUser) !== normalizeAssignedUser(currentFormData.assignedUser)) {
+	if (normalizeAssignedUsers(initialFormData.assignedUsers) !== normalizeAssignedUsers(currentFormData.assignedUsers)) {
 		return true;
 	}
 
 	return normalizeCategories(initialFormData.categories) !== normalizeCategories(currentFormData.categories);
 };
+
+const normalizeAssignedUserIds = (value) => normalizeAssignedUsersFormValue(value)
+	.map((userId) => parseInt(userId, 10));
 
 export const buildFieldUpdatePayload = (field, value, formData, pages) => {
 	switch (field) {
@@ -144,8 +167,8 @@ export const buildFieldUpdatePayload = (field, value, formData, pages) => {
 			return { status: value };
 		case 'priority':
 			return { priority: value };
-		case 'assignedUser':
-			return { assigned_to: value || 0 };
+		case 'assignedUsers':
+			return { assigned_users: normalizeAssignedUserIds(value) };
 		case 'categories':
 			return { categories: value };
 		case 'dueDate':
@@ -189,21 +212,40 @@ export const formatRelativeTime = (dateString) => {
 	}
 
 	if (diffMinutes < 60) {
-		return `${diffMinutes}m`;
+		return `${diffMinutes}m ago`;
 	}
 
 	if (diffHours < 24) {
-		return `${diffHours}h`;
+		return `${diffHours}h ago`;
 	}
 
 	if (diffDays < 7) {
-		return `${diffDays}d`;
+		return `${diffDays}d ago`;
+	}
+
+	if (diffDays < 30) {
+		const weeks = Math.floor(diffDays / 7);
+		return `${weeks}w ago`;
 	}
 
 	return new Intl.DateTimeFormat(undefined, {
 		month: 'short',
 		day: 'numeric',
 		year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+	}).format(date);
+};
+
+export const formatOpenedDate = (dateString) => {
+	if (!dateString) {
+		return '';
+	}
+
+	const date = new Date(dateString);
+
+	return new Intl.DateTimeFormat(undefined, {
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric',
 	}).format(date);
 };
 
@@ -255,12 +297,14 @@ export const buildTaskPayload = (formData, pages, timesheetData) => {
 		}
 	}
 
+	const assignedUsers = normalizeAssignedUserIds(formData.assignedUsers);
+
 	const taskData = {
 		comment_title: formData.taskTitle || formData.description,
 		comment_text: formData.description,
 		post_id: postId,
 		page_url: pageUrl,
-		assigned_to: formData.assignedUser || 0,
+		assigned_users: JSON.stringify(assignedUsers),
 		priority: formData.priority,
 		status: formData.status,
 		categories: formData.categories,

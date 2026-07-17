@@ -61,6 +61,7 @@ class Ajax {
 		add_action( 'wp_ajax_agwp_sn_get_pages', array( $this, 'get_pages' ) );
 		add_action( 'wp_ajax_agwp_sn_add_new_task', array( $this, 'add_new_task' ) );
 		add_action( 'wp_ajax_agwp_sn_admin_add_reply', array( $this, 'admin_add_reply' ) );
+		add_action( 'wp_ajax_agwp_sn_admin_delete_reply', array( $this, 'admin_delete_reply' ) );
 
 		// Settings AJAX actions.
 		add_action( 'wp_ajax_agwp_sn_get_settings', array( $this, 'get_settings' ) );
@@ -443,8 +444,8 @@ class Ajax {
 		$updates = array();
 
 		// Get data from the 'updates' field (JSON format - main app).
-		if ( isset( $_POST['updates'] ) && ! empty( $_POST['updates'] ) ) {
-			$updates = json_decode( sanitize_textarea_field( wp_unslash( $_POST['updates'] ) ), true );
+		if ( isset( $_POST['updates'] ) && '' !== wp_unslash( $_POST['updates'] ) ) {
+			$updates = json_decode( wp_unslash( $_POST['updates'] ), true );
 		}
 
 		if ( empty( $comment_id ) || empty( $updates ) || ! is_array( $updates ) ) {
@@ -514,6 +515,40 @@ class Ajax {
 					'created_at'   => current_time( 'mysql' ),
 					'avatar'       => get_avatar_url( $current_user->ID, array( 'size' => 80 ) ),
 				),
+			)
+		);
+	}
+
+	/**
+	 * Handle admin delete reply AJAX request.
+	 *
+	 * @since 1.4.0
+	 */
+	public function admin_delete_reply() {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
+			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
+		}
+
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
+		}
+
+		$reply_id = isset( $_POST['reply_id'] ) ? absint( wp_unslash( $_POST['reply_id'] ) ) : 0;
+
+		if ( empty( $reply_id ) ) {
+			$this->send_error( __( 'Reply ID is required', 'analogwp-site-notes' ) );
+		}
+
+		$result = $this->database->delete_reply( $reply_id );
+
+		if ( ! $result ) {
+			$this->send_error( __( 'Failed to delete comment', 'analogwp-site-notes' ) );
+		}
+
+		$this->send_success(
+			array(
+				'reply_id' => $reply_id,
+				'message'  => __( 'Comment deleted successfully', 'analogwp-site-notes' ),
 			)
 		);
 	}
@@ -726,27 +761,31 @@ class Ajax {
 				);
 			}
 
-			// Assigned user information.
-			if ( ! empty( $comment->assigned_to ) ) {
-				$assigned_data = get_userdata( $comment->assigned_to );
-				if ( $assigned_data ) {
-					$comment->assignee = array(
-						'id'     => (int) $assigned_data->ID,
-						'name'   => $assigned_data->display_name,
-						'email'  => $assigned_data->user_email,
-						'avatar' => get_avatar_url( $assigned_data->ID, array( 'size' => 40 ) ),
-					);
-				} else {
-					$comment->assignee = array(
-						'id'     => (int) $comment->assigned_to,
-						'name'   => $comment->assigned_name ? $comment->assigned_name : 'Unknown User',
-						'email'  => $comment->assigned_email ? $comment->assigned_email : '',
-						'avatar' => get_avatar_url( $comment->assigned_to, array( 'size' => 40 ) ),
-					);
+			// Assigned users information.
+			$comment->assignees = array();
+
+			if ( ! empty( $comment->assigned_user_ids ) && is_array( $comment->assigned_user_ids ) ) {
+				foreach ( $comment->assigned_user_ids as $assigned_user_id ) {
+					$assigned_data = get_userdata( $assigned_user_id );
+					if ( $assigned_data ) {
+						$comment->assignees[] = array(
+							'id'     => (int) $assigned_data->ID,
+							'name'   => $assigned_data->display_name,
+							'email'  => $assigned_data->user_email,
+							'avatar' => get_avatar_url( $assigned_data->ID, array( 'size' => 40 ) ),
+						);
+					} else {
+						$comment->assignees[] = array(
+							'id'     => (int) $assigned_user_id,
+							'name'   => 'Unknown User',
+							'email'  => '',
+							'avatar' => get_avatar_url( $assigned_user_id, array( 'size' => 40 ) ),
+						);
+					}
 				}
-			} else {
-				$comment->assignee = null;
 			}
+
+			$comment->assignee = ! empty( $comment->assignees ) ? $comment->assignees[0] : null;
 
 			// Keep backward compatibility with user field (using creator).
 			$comment->user = $comment->creator;
@@ -984,6 +1023,19 @@ class Ajax {
 			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
+		$assigned_user_ids = array();
+		if ( isset( $_POST['assigned_users'] ) && '' !== wp_unslash( $_POST['assigned_users'] ) ) {
+			$decoded_assigned_users = json_decode( wp_unslash( $_POST['assigned_users'] ), true );
+			if ( is_array( $decoded_assigned_users ) ) {
+				$assigned_user_ids = array_values( array_filter( array_map( 'absint', $decoded_assigned_users ) ) );
+			}
+		} elseif ( isset( $_POST['assigned_to'] ) ) {
+			$assigned_to = absint( wp_unslash( $_POST['assigned_to'] ) );
+			if ( $assigned_to ) {
+				$assigned_user_ids = array( $assigned_to );
+			}
+		}
+
 		// Prepare task data.
 		$task_data = array(
 			'post_id'         => isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0,
@@ -992,7 +1044,7 @@ class Ajax {
 			'page_url'        => isset( $_POST['page_url'] ) ? sanitize_url( wp_unslash( $_POST['page_url'] ) ) : get_permalink( absint( $_POST['post_id'] ) ),
 			'status'          => isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : 'open',
 			'priority'        => isset( $_POST['priority'] ) ? sanitize_text_field( wp_unslash( $_POST['priority'] ) ) : 'medium',
-			'assigned_to'     => isset( $_POST['assigned_to'] ) ? absint( wp_unslash( $_POST['assigned_to'] ) ) : 0,
+			'assigned_users'  => $assigned_user_ids,
 			'categories'      => isset( $_POST['categories'] ) ? sanitize_text_field( wp_unslash( $_POST['categories'] ) ) : array(),
 			'due_date'        => isset( $_POST['due_date'] ) ? sanitize_text_field( wp_unslash( $_POST['due_date'] ) ) : '',
 			'time_estimation' => isset( $_POST['time_estimation'] ) ? sanitize_text_field( wp_unslash( $_POST['time_estimation'] ) ) : '',

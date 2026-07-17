@@ -228,6 +228,64 @@ class Database {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Required schema update.
 			$wpdb->query( $wpdb->prepare( "ALTER TABLE %i ADD COLUMN comment_title varchar(255) DEFAULT '' AFTER assigned_to", $comments_table ) );
 		}
+
+		// Check if assigned_users column exists, if not add it.
+		$assigned_users_column_exists = self::column_exists( $comments_table, 'assigned_users' );
+
+		if ( empty( $assigned_users_column_exists ) ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Required schema update.
+			$wpdb->query( $wpdb->prepare( "ALTER TABLE %i ADD COLUMN assigned_users text DEFAULT NULL AFTER assigned_to", $comments_table ) );
+		}
+	}
+
+	/**
+	 * Normalize assigned user IDs from request data.
+	 *
+	 * @since 1.0.0
+	 * @param array $data Request data.
+	 * @return array<int>
+	 */
+	private function normalize_assigned_user_ids( $data ) {
+		$ids = array();
+
+		if ( isset( $data['assigned_users'] ) ) {
+			$assigned_users = $data['assigned_users'];
+
+			if ( is_string( $assigned_users ) ) {
+				$assigned_users = json_decode( wp_unslash( $assigned_users ), true );
+			}
+
+			if ( is_array( $assigned_users ) ) {
+				foreach ( $assigned_users as $user_id ) {
+					$user_id = absint( $user_id );
+					if ( $user_id ) {
+						$ids[] = $user_id;
+					}
+				}
+			}
+		} elseif ( isset( $data['assigned_to'] ) ) {
+			$user_id = absint( $data['assigned_to'] );
+			if ( $user_id ) {
+				$ids[] = $user_id;
+			}
+		}
+
+		return array_values( array_unique( $ids ) );
+	}
+
+	/**
+	 * Encode assigned user IDs for storage.
+	 *
+	 * @since 1.0.0
+	 * @param array<int> $user_ids User IDs.
+	 * @return string|null
+	 */
+	private function encode_assigned_user_ids( $user_ids ) {
+		if ( empty( $user_ids ) ) {
+			return null;
+		}
+
+		return wp_json_encode( array_values( array_unique( array_map( 'absint', $user_ids ) ) ) );
 	}
 
 	/**
@@ -321,6 +379,18 @@ class Database {
 			} else {
 				$comment->categories = array();
 			}
+
+			// Decode assignees from JSON.
+			if ( ! empty( $comment->assigned_users ) ) {
+				$decoded_assignees     = json_decode( $comment->assigned_users, true );
+				$comment->assigned_user_ids = is_array( $decoded_assignees )
+					? array_values( array_filter( array_map( 'absint', $decoded_assignees ) ) )
+					: array();
+			} elseif ( ! empty( $comment->assigned_to ) && absint( $comment->assigned_to ) > 0 ) {
+				$comment->assigned_user_ids = array( absint( $comment->assigned_to ) );
+			} else {
+				$comment->assigned_user_ids = array();
+			}
 		}
 
 		return $comments;
@@ -377,11 +447,13 @@ class Database {
 		}
 
 		$table_name = self::tables( 'comments', 'name' );
+		$assigned_user_ids = $this->normalize_assigned_user_ids( $data );
 
 		$insert_data = array(
 			'post_id'          => isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0,
 			'user_id'          => get_current_user_id(),
-			'assigned_to'      => isset( $data['assigned_to'] ) ? intval( $data['assigned_to'] ) : 0,
+			'assigned_to'      => ! empty( $assigned_user_ids ) ? $assigned_user_ids[0] : 0,
+			'assigned_users'   => $this->encode_assigned_user_ids( $assigned_user_ids ),
 			'comment_title'    => isset( $data['comment_title'] ) ? sanitize_text_field( wp_unslash( $data['comment_title'] ) ) : '',
 			'comment_text'     => sanitize_textarea_field( wp_unslash( $data['comment_text'] ) ),
 			'element_selector' => isset( $data['element_selector'] ) ? sanitize_text_field( wp_unslash( $data['element_selector'] ) ) : '',
@@ -469,6 +541,7 @@ class Database {
 			'post_id',
 			'page_url',
 			'assigned_to',
+			'assigned_users',
 			'priority',
 			'category',
 			'status',
@@ -479,6 +552,13 @@ class Database {
 
 		// Filter data to only include allowed fields.
 		$filtered_data = array_intersect_key( $data, array_flip( $allowed_fields ) );
+
+		// Handle assignees array - convert to JSON for storage.
+		if ( isset( $data['assigned_users'] ) ) {
+			$assigned_user_ids               = $this->normalize_assigned_user_ids( $data );
+			$filtered_data['assigned_users'] = $this->encode_assigned_user_ids( $assigned_user_ids );
+			$filtered_data['assigned_to']    = ! empty( $assigned_user_ids ) ? $assigned_user_ids[0] : 0;
+		}
 
 		// Handle categories array - convert to JSON for storage.
 		if ( isset( $data['categories'] ) && is_array( $data['categories'] ) ) {
@@ -496,8 +576,18 @@ class Database {
 			if ( null === $value ) {
 				continue; // Keep NULL values as NULL.
 			}
-			// Skip sanitization for category as it's already JSON-encoded.
+			// Skip sanitization for JSON-encoded fields.
 			if ( 'category' === $key && is_string( $value ) && strpos( $value, '[' ) === 0 ) {
+				continue;
+			}
+			if ( 'assigned_users' === $key && is_string( $value ) && strpos( $value, '[' ) === 0 ) {
+				continue;
+			}
+			if ( 'timesheet' === $key ) {
+				continue;
+			}
+			if ( 'comment_text' === $key ) {
+				$filtered_data[ $key ] = sanitize_textarea_field( $value );
 				continue;
 			}
 			$filtered_data[ $key ] = sanitize_text_field( $value );
@@ -546,6 +636,32 @@ class Database {
 		}
 
 		return $wpdb->insert_id;
+	}
+
+	/**
+	 * Delete a reply by ID.
+	 *
+	 * @since 1.4.0
+	 * @param int $reply_id Reply ID.
+	 * @return bool True on success, false on error.
+	 */
+	public function delete_reply( $reply_id ) {
+		global $wpdb;
+
+		if ( empty( $reply_id ) ) {
+			return false;
+		}
+
+		$table_name = self::tables( 'comment_replies', 'name' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Delete operation, no caching needed.
+		$result = $wpdb->delete(
+			$table_name,
+			array( 'id' => intval( $reply_id ) ),
+			array( '%d' )
+		);
+
+		return false !== $result && $result > 0;
 	}
 
 	/**

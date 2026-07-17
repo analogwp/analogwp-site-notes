@@ -214,23 +214,34 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
             const data = await response.json();
             logger.debug('Server response:', data);
             if (data.success) {
-                setComments(comments.map(comment => {
-                    if (comment.id === commentId) {
-                        const updatedComment = { ...comment, ...updates };
+                setComments((prevComments) => prevComments.map(comment => {
+                    if (String(comment.id) !== String(commentId)) {
+                        return comment;
+                    }
+
+                    const updatedComment = { ...comment, ...updates };
                         
-                        // If assigned_to is being updated, we need to resolve the assignee object
-                        if (updates.assigned_to !== undefined) {
+                        // If assignees are being updated, resolve the assignee objects.
+                        if (updates.assigned_users !== undefined) {
+                            const assignees = (updates.assigned_users || [])
+                                .filter((userId) => parseInt(userId, 10) > 0)
+                                .map((userId) => users.find((user) => String(user.id) === String(userId)))
+                                .filter(Boolean);
+                            updatedComment.assignees = assignees;
+                            updatedComment.assignee = assignees[0] || null;
+                            updatedComment.assigned_to = assignees[0]?.id || 0;
+                        } else if (updates.assigned_to !== undefined) {
                             if (updates.assigned_to && updates.assigned_to !== '0' && updates.assigned_to !== 0) {
                                 const assignedUser = users.find(user => String(user.id) === String(updates.assigned_to));
+                                updatedComment.assignees = assignedUser ? [assignedUser] : [];
                                 updatedComment.assignee = assignedUser || null;
                             } else {
+                                updatedComment.assignees = [];
                                 updatedComment.assignee = null;
                             }
                         }
                         
-                        return updatedComment;
-                    }
-                    return comment;
+                    return updatedComment;
                 }));
                 if (!options.silent) {
                     showToast.success(__('Task updated successfully!', 'analogwp-site-notes'));
@@ -240,12 +251,16 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                 const errorMessage = data.data?.message || data.message || 'Unknown error';
                 logger.error('Error updating comment:', errorMessage);
                 logger.error('Full response:', data);
-                showToast.error(__('Error updating task. Please try again.', 'analogwp-site-notes'));
+                if (!options.silent) {
+                    showToast.error(__('Error updating task. Please try again.', 'analogwp-site-notes'));
+                }
                 return false;
             }
         } catch (err) {
             logger.error('Error updating comment:', err);
-            showToast.error(__('Error updating task. Please try again.', 'analogwp-site-notes'));
+            if (!options.silent) {
+                showToast.error(__('Error updating task. Please try again.', 'analogwp-site-notes'));
+            }
             return false;
         }
     };
@@ -289,6 +304,49 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
             logger.error('Error adding reply:', err);
             showToast.error(__('Error adding reply', 'analogwp-site-notes'));
             return null;
+        }
+    };
+
+    const handleDeleteReply = async (commentId, replyId) => {
+        try {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'agwp_sn_admin_delete_reply',
+                    nonce: agwp_sn_ajax.nonce,
+                    reply_id: replyId,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setComments(comments.map((comment) => {
+                    if (comment.id !== commentId) {
+                        return comment;
+                    }
+
+                    const existingReplies = Array.isArray(comment.replies) ? comment.replies : [];
+
+                    return {
+                        ...comment,
+                        replies: existingReplies.filter(
+                            (reply) => String(reply.id) !== String(replyId)
+                        ),
+                    };
+                }));
+                return true;
+            }
+
+            showToast.error(data.data?.message || __('Error deleting comment', 'analogwp-site-notes'));
+            return false;
+        } catch (err) {
+            logger.error('Error deleting reply:', err);
+            showToast.error(__('Error deleting comment', 'analogwp-site-notes'));
+            return false;
         }
     };
 
@@ -412,6 +470,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                         comments={filteredComments}
                         onUpdateComment={handleUpdateComment}
                         onAddReply={handleAddReply}
+                        onDeleteReply={handleDeleteReply}
                         onDelete={handleDelete}
                         onAddTask={handleAddTask}
                         users={users}

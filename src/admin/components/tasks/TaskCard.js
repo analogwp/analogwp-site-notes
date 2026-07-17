@@ -129,14 +129,18 @@ const TaskCard = ({
 							</span>
 						</div>
 					</div>
-					{comment.assignee && (
+					{(comment.assignees?.length > 0 || comment.assignee) && (
 						<div className="sn-kanban-card-user-field">
-							<small className="sn-kanban-card-user-label">{__('Assigned to', 'analogwp-site-notes')}</small>
-							<div className="sn-kanban-card-user-row">
-								{renderAvatar(comment.assignee)}
-								<span className="sn-kanban-card-user-name">
-									{comment.assignee?.name || __('Unknown User', 'analogwp-site-notes')}
-								</span>
+							<small className="sn-kanban-card-user-label">{__('Assignees', 'analogwp-site-notes')}</small>
+							<div className="sn-kanban-card-user-row sn-kanban-card-user-row--assignees">
+								{(comment.assignees?.length ? comment.assignees : [comment.assignee]).map((assignee) => (
+									<div key={assignee.id} className="sn-kanban-card-assignee">
+										{renderAvatar(assignee)}
+										<span className="sn-kanban-card-user-name">
+											{assignee?.name || __('Unknown User', 'analogwp-site-notes')}
+										</span>
+									</div>
+								))}
 							</div>
 						</div>
 					)}

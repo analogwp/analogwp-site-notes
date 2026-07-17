@@ -442,22 +442,24 @@ const TaskDetail = ({
                                     </div>
                                 </div>
 
-                                {comment.assignee && (
-                                    <div className="sn-task-detail__user-card sn-task-detail__user-card--accent">
-                                        {renderAvatar(comment.assignee, 'sn-avatar sn-avatar--lg', true)}
-                                        <div className="sn-flex-1">
-                                            <div className="sn-task-detail__user-name sn-task-detail__user-name--accent">
-                                                {comment.assignee?.name || __('Unknown User', 'analogwp-site-notes')}
+                                {(comment.assignees?.length > 0 || comment.assignee) && (
+                                    (comment.assignees?.length ? comment.assignees : [comment.assignee]).map((assignee) => (
+                                        <div key={assignee.id} className="sn-task-detail__user-card sn-task-detail__user-card--accent">
+                                            {renderAvatar(assignee, 'sn-avatar sn-avatar--lg', true)}
+                                            <div className="sn-flex-1">
+                                                <div className="sn-task-detail__user-name sn-task-detail__user-name--accent">
+                                                    {assignee?.name || __('Unknown User', 'analogwp-site-notes')}
+                                                </div>
+                                                <div className="sn-task-detail__user-meta sn-task-detail__user-meta--accent">{__('Assignees', 'analogwp-site-notes')}</div>
                                             </div>
-                                            <div className="sn-task-detail__user-meta sn-task-detail__user-meta--accent">{__('Assigned to', 'analogwp-site-notes')}</div>
-                                        </div>
-                                        <div className="sn-text-right">
-                                            <div className="sn-task-detail__user-meta sn-task-detail__user-meta--accent sn-uppercase">{__('Assignee', 'analogwp-site-notes')}</div>
-                                            <div className="sn-task-detail__user-name sn-task-detail__user-name--accent">
-                                                <InfoIcon size="sm" />
+                                            <div className="sn-text-right">
+                                                <div className="sn-task-detail__user-meta sn-task-detail__user-meta--accent sn-uppercase">{__('Assignees', 'analogwp-site-notes')}</div>
+                                                <div className="sn-task-detail__user-name sn-task-detail__user-name--accent">
+                                                    <InfoIcon size="sm" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    ))
                                 )}
                             </div>
                         </div>
