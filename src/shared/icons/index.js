@@ -5,6 +5,7 @@ export { default as ArrowLeftIcon } from './ArrowLeftIcon';
 export { default as CalendarIcon } from './CalendarIcon';
 export { default as CheckCircleIcon } from './CheckCircleIcon';
 export { default as CheckIcon } from './CheckIcon';
+export { default as CheckmarkIcon } from './CheckmarkIcon';
 export { default as ChevronDownIcon } from './ChevronDownIcon';
 export { default as ChevronLeftIcon } from './ChevronLeftIcon';
 export { default as ChevronRightIcon } from './ChevronRightIcon';

@@ -1,13 +1,13 @@
 import Icon from './Icon';
 
-const CloseIcon = (props) => (
+const CheckmarkIcon = (props) => (
 	<Icon viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
 		<path
 			strokeLinecap="round"
 			strokeLinejoin="round"
-			d="M18 6L6 18M6 6L18 18"
+			d="M5 12L10 17L20 7"
 		/>
 	</Icon>
 );
 
-export default CloseIcon;
+export default CheckmarkIcon;
