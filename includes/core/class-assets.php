@@ -257,6 +257,7 @@ class Assets {
 		return array(
 			'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 			'nonce'         => wp_create_nonce( 'agwp_sn_nonce' ),
+			'homeUrl'       => home_url( '/' ),
 			'currentUser'   => $this->get_current_user_data(),
 			'strings'       => $this->get_admin_strings(),
 			'pluginVersion' => AGWP_SN_VERSION,

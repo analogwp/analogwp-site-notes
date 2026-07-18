@@ -40,6 +40,14 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 		}));
 	};
 
+	const handlePageChange = ({ pageId, pageUrl }) => {
+		setFormData((prev) => ({
+			...prev,
+			pageId,
+			pageUrl,
+		}));
+	};
+
 	const handleAddTime = (hoursOverride, minutesOverride) => {
 		const hours = hoursOverride !== undefined
 			? parseInt(hoursOverride, 10) || 0
@@ -86,7 +94,7 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 			return;
 		}
 
-		if (!formData.pageId || formData.pageId === '') {
+		if (!formData.pageUrl) {
 			showToast.error(__('Please select a page for this task', 'analogwp-site-notes'));
 			return;
 		}
@@ -151,6 +159,7 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 					<TaskSidebarDetailsFields
 						formData={formData}
 						onInputChange={handleInputChange}
+						onPageChange={handlePageChange}
 						statuses={statuses}
 						priorityOptions={priorityOptions}
 						users={users}

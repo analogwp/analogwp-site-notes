@@ -59,6 +59,7 @@ class Ajax {
 		add_action( 'wp_ajax_agwp_sn_get_dashboard_stats', array( $this, 'get_dashboard_stats' ) );
 		add_action( 'wp_ajax_agwp_sn_get_admin_data', array( $this, 'get_admin_data' ) );
 		add_action( 'wp_ajax_agwp_sn_get_pages', array( $this, 'get_pages' ) );
+		add_action( 'wp_ajax_agwp_sn_search_pages', array( $this, 'search_pages' ) );
 		add_action( 'wp_ajax_agwp_sn_add_new_task', array( $this, 'add_new_task' ) );
 		add_action( 'wp_ajax_agwp_sn_admin_add_reply', array( $this, 'admin_add_reply' ) );
 		add_action( 'wp_ajax_agwp_sn_admin_delete_reply', array( $this, 'admin_delete_reply' ) );
@@ -157,6 +158,51 @@ class Ajax {
 			if ( '' !== $query_string ) {
 				$normalized .= '?' . $query_string;
 			}
+		}
+
+		return $normalized;
+	}
+
+	/**
+	 * Resolve a relative or absolute URL to a normalized on-site page URL.
+	 *
+	 * @since 1.5.0
+	 * @param string $page_url Submitted page URL (absolute or site-relative).
+	 * @return string Normalized on-site URL, or empty string if invalid/off-site.
+	 */
+	public static function resolve_admin_page_url( $page_url ) {
+		$page_url = trim( wp_unslash( (string) $page_url ) );
+
+		if ( '' === $page_url ) {
+			return '';
+		}
+
+		$parts = wp_parse_url( $page_url );
+
+		// Relative path or query-only → resolve against home URL.
+		if ( empty( $parts['scheme'] ) || empty( $parts['host'] ) ) {
+			if ( 0 === strpos( $page_url, '/' ) ) {
+				$page_url = home_url( $page_url );
+			} else {
+				$page_url = home_url( '/' . ltrim( $page_url, '/' ) );
+			}
+		}
+
+		$normalized = self::normalize_page_url( $page_url );
+
+		if ( empty( $normalized ) ) {
+			return '';
+		}
+
+		$site_parts = wp_parse_url( home_url( '/' ) );
+		$page_parts = wp_parse_url( $normalized );
+
+		if ( empty( $site_parts['host'] ) || empty( $page_parts['host'] ) ) {
+			return '';
+		}
+
+		if ( strtolower( $site_parts['host'] ) !== strtolower( $page_parts['host'] ) ) {
+			return '';
 		}
 
 		return $normalized;
@@ -451,6 +497,22 @@ class Ajax {
 		if ( empty( $comment_id ) || empty( $updates ) || ! is_array( $updates ) ) {
 			wp_send_json_error( array( 'message' => __( 'Comment ID and updates are required', 'analogwp-site-notes' ) ) );
 			return;
+		}
+
+		if ( isset( $updates['page_url'] ) ) {
+			$resolved = self::resolve_admin_page_url( $updates['page_url'] );
+			if ( empty( $resolved ) ) {
+				wp_send_json_error( array( 'message' => __( 'A valid on-site page URL is required', 'analogwp-site-notes' ) ) );
+				return;
+			}
+			$updates['page_url'] = $resolved;
+		}
+
+		if ( isset( $updates['post_id'] ) ) {
+			$updates['post_id'] = absint( $updates['post_id'] );
+			if ( $updates['post_id'] > 0 && ! get_post( $updates['post_id'] ) ) {
+				$updates['post_id'] = 0;
+			}
 		}
 
 		$result = $this->database->update_comment( $comment_id, $updates );
@@ -850,21 +912,229 @@ class Ajax {
 	 *
 	 * @since 1.0.0
 	 */
+	/**
+	 * Build a page-target list item.
+	 *
+	 * @since 1.5.0
+	 * @param string $id    Stable item ID.
+	 * @param string $title Display title.
+	 * @param string $url   Absolute URL.
+	 * @param string $type  Item type key.
+	 * @param string $group Group key: special|archive|content|taxonomy.
+	 * @return array|null
+	 */
+	private function build_page_item( $id, $title, $url, $type, $group ) {
+		if ( empty( $url ) || is_wp_error( $url ) ) {
+			return null;
+		}
+
+		$normalized = self::normalize_page_url( $url );
+		if ( empty( $normalized ) ) {
+			$normalized = $url;
+		}
+
+		return array(
+			'id'    => $id,
+			'title' => $title,
+			'url'   => $normalized,
+			'type'  => $type,
+			'group' => $group,
+		);
+	}
+
+	/**
+	 * Get always-available special page destinations (home, blog, archives, authors).
+	 *
+	 * @since 1.0.0
+	 */
 	public function get_pages() {
-		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
 		}
 
-		// Check permissions - user must have access to site notes.
 		if ( ! Plugin::user_has_access() ) {
 			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
 		}
 
+		$this->send_success( array( 'pages' => $this->get_special_page_targets() ) );
+	}
+
+	/**
+	 * Search posts, pages, CPTs, and taxonomy terms for the page picker.
+	 *
+	 * @since 1.5.0
+	 */
+	public function search_pages() {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
+			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
+		}
+
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
+		}
+
+		$search = isset( $_POST['search'] ) ? sanitize_text_field( wp_unslash( $_POST['search'] ) ) : '';
+		$search = trim( $search );
+
+		if ( strlen( $search ) < 2 ) {
+			$this->send_success( array( 'pages' => array() ) );
+		}
+
+		$this->send_success( array( 'pages' => $this->search_page_targets( $search ) ) );
+	}
+
+	/**
+	 * Always-available destinations for the page picker.
+	 *
+	 * @since 1.5.0
+	 * @return array
+	 */
+	private function get_special_page_targets() {
 		$items = array();
 
-		// Add taxonomy archives.
-		// Get all public taxonomies.
+		$show_on_front  = get_option( 'show_on_front' );
+		$page_on_front  = (int) get_option( 'page_on_front' );
+		$page_for_posts = (int) get_option( 'page_for_posts' );
+
+		if ( 'page' === $show_on_front && $page_on_front > 0 ) {
+			$front_url = get_permalink( $page_on_front );
+			$front     = $this->build_page_item(
+				'home',
+				__( 'Home', 'analogwp-site-notes' ),
+				$front_url,
+				'special',
+				'special'
+			);
+		} else {
+			$front = $this->build_page_item(
+				'home',
+				__( 'Home', 'analogwp-site-notes' ),
+				home_url( '/' ),
+				'special',
+				'special'
+			);
+		}
+
+		if ( $front ) {
+			$items[] = $front;
+		}
+
+		if ( 'page' === $show_on_front && $page_for_posts > 0 ) {
+			$blog = $this->build_page_item(
+				'blog',
+				__( 'Blog', 'analogwp-site-notes' ),
+				get_permalink( $page_for_posts ),
+				'special',
+				'special'
+			);
+			if ( $blog ) {
+				$items[] = $blog;
+			}
+		}
+
+		$post_types = get_post_types(
+			array(
+				'public'   => true,
+				'_builtin' => false,
+			),
+			'objects'
+		);
+
+		foreach ( $post_types as $post_type ) {
+			if ( empty( $post_type->has_archive ) ) {
+				continue;
+			}
+
+			$archive = $this->build_page_item(
+				$post_type->name . '-archive',
+				/* translators: %s: Post type label */
+				sprintf( __( '%s Archive', 'analogwp-site-notes' ), $post_type->label ),
+				get_post_type_archive_link( $post_type->name ),
+				'archive',
+				'archive'
+			);
+
+			if ( $archive ) {
+				$items[] = $archive;
+			}
+		}
+
+		$authors = get_users(
+			array(
+				'who'     => 'authors',
+				'orderby' => 'display_name',
+				'number'  => 50,
+			)
+		);
+
+		foreach ( $authors as $author ) {
+			$author_item = $this->build_page_item(
+				'author-' . $author->ID,
+				/* translators: %s: Author name */
+				sprintf( __( 'Author: %s', 'analogwp-site-notes' ), $author->display_name ),
+				get_author_posts_url( $author->ID ),
+				'archive',
+				'archive'
+			);
+
+			if ( $author_item ) {
+				$items[] = $author_item;
+			}
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Search content and taxonomy targets.
+	 *
+	 * @since 1.5.0
+	 * @param string $search Search string (min 2 chars).
+	 * @return array
+	 */
+	private function search_page_targets( $search ) {
+		$items      = array();
+		$post_types = get_post_types(
+			array(
+				'public' => true,
+			),
+			'names'
+		);
+
+		$query = new \WP_Query(
+			array(
+				's'              => $search,
+				'post_type'      => array_values( $post_types ),
+				'post_status'    => 'publish',
+				'posts_per_page' => 20,
+				'orderby'        => 'relevance',
+				'no_found_rows'  => true,
+			)
+		);
+
+		foreach ( $query->posts as $post ) {
+			$post_type_obj = get_post_type_object( $post->post_type );
+			$type_label    = $post_type_obj ? $post_type_obj->labels->singular_name : $post->post_type;
+			$title         = sprintf(
+				/* translators: 1: Post type label, 2: Post title */
+				__( '%1$s · %2$s', 'analogwp-site-notes' ),
+				$type_label,
+				get_the_title( $post )
+			);
+
+			$item = $this->build_page_item(
+				(string) $post->ID,
+				$title,
+				get_permalink( $post->ID ),
+				$post->post_type,
+				'content'
+			);
+
+			if ( $item ) {
+				$items[] = $item;
+			}
+		}
+
 		$taxonomies = get_taxonomies(
 			array(
 				'public' => true,
@@ -872,139 +1142,73 @@ class Ajax {
 			'objects'
 		);
 
+		$term_count = 0;
 		foreach ( $taxonomies as $taxonomy ) {
-			// Get all terms for this taxonomy.
+			if ( $term_count >= 10 ) {
+				break;
+			}
+
 			$terms = get_terms(
 				array(
 					'taxonomy'   => $taxonomy->name,
 					'hide_empty' => false,
+					'number'     => 10 - $term_count,
+					'search'     => $search,
 				)
 			);
 
-			if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-				foreach ( $terms as $term ) {
-					$term_link = get_term_link( $term );
-					if ( ! is_wp_error( $term_link ) ) {
-						$items[] = array(
-							'id'    => 'term-' . $term->term_id,
-							'title' => sprintf(
-								/* translators: 1: Taxonomy name, 2: Term name */
-								__( '%1$s: %2$s', 'analogwp-site-notes' ),
-								$taxonomy->label,
-								$term->name
-							),
-							'url'   => $term_link,
-							'type'  => 'taxonomy',
-						);
-					}
+			if ( is_wp_error( $terms ) || empty( $terms ) ) {
+				continue;
+			}
+
+			foreach ( $terms as $term ) {
+				$term_link = get_term_link( $term );
+				$title     = sprintf(
+					/* translators: 1: Taxonomy name, 2: Term name */
+					__( '%1$s · %2$s', 'analogwp-site-notes' ),
+					$taxonomy->label,
+					$term->name
+				);
+
+				$item = $this->build_page_item(
+					'term-' . $term->term_id,
+					$title,
+					$term_link,
+					'taxonomy',
+					'taxonomy'
+				);
+
+				if ( $item ) {
+					$items[] = $item;
+					++$term_count;
+				}
+
+				if ( $term_count >= 10 ) {
+					break;
 				}
 			}
 		}
 
-		// Add author archives.
-		$authors = get_users(
-			array(
-				'who'     => 'authors',
-				'orderby' => 'display_name',
-			)
-		);
-
-		foreach ( $authors as $author ) {
-			$items[] = array(
-				'id'    => 'author-' . $author->ID,
-				'title' => sprintf(
-					/* translators: %s: Author name */
-					__( 'Author: %s', 'analogwp-site-notes' ),
-					$author->display_name
-				),
-				'url'   => get_author_posts_url( $author->ID ),
-				'type'  => 'archive',
-			);
-		}
-
-		// Add date archive (example).
-		$items[] = array(
-			'id'    => 'date-archive',
-			'title' => __( 'Date Archive', 'analogwp-site-notes' ),
-			'url'   => home_url( '/date/' ),
-			'type'  => 'archive',
-		);
-
-		// Add search and 404 pages.
-		$items[] = array(
-			'id'    => 'search',
-			'title' => __( 'Search Results', 'analogwp-site-notes' ),
-			'url'   => home_url( '/?s=test' ),
-			'type'  => 'special',
-		);
-
-		$items[] = array(
-			'id'    => '404',
-			'title' => __( '404 Error Page', 'analogwp-site-notes' ),
-			'url'   => home_url( '/404-test-page/' ),
-			'type'  => 'special',
-		);
-
-		// Get all published pages and posts.
-		$pages = get_pages(
-			array(
-				'sort_order'  => 'ASC',
-				'sort_column' => 'post_title',
-				'post_status' => 'publish',
-			)
-		);
-
-		$posts = get_posts(
-			array(
-				'numberposts' => -1,
-				'post_status' => 'publish',
-				'post_type'   => 'post',
-			)
-		);
-
-		// Get custom post types.
-		$post_types   = get_post_types(
-			array(
-				'public'   => true,
-				'_builtin' => false,
-			),
-			'objects'
-		);
-		$custom_posts = array();
-		foreach ( $post_types as $post_type ) {
-			$type_posts   = get_posts(
-				array(
-					'numberposts' => 20, // Limit custom post types to avoid too many entries.
-					'post_status' => 'publish',
-					'post_type'   => $post_type->name,
-				)
-			);
-			$custom_posts = array_merge( $custom_posts, $type_posts );
-
-			// Add post type archive if it has one.
-			if ( $post_type->has_archive ) {
-				$items[] = array(
-					'id'    => $post_type->name . '-archive',
-					/* translators: %s: Post type label */
-					'title' => sprintf( __( '%s Archive', 'analogwp-site-notes' ), $post_type->label ),
-					'url'   => get_post_type_archive_link( $post_type->name ),
-					'type'  => 'archive',
-				);
+		// Also match special destinations by title when searching.
+		foreach ( $this->get_special_page_targets() as $special ) {
+			if ( false !== stripos( $special['title'], $search ) ) {
+				$items[] = $special;
 			}
 		}
 
-		$all_posts = array_merge( $pages, $posts, $custom_posts );
-
-		foreach ( $all_posts as $item ) {
-			$items[] = array(
-				'id'    => $item->ID,
-				'title' => $item->post_title,
-				'url'   => get_permalink( $item->ID ),
-				'type'  => $item->post_type,
-			);
+		// Dedupe by id.
+		$seen     = array();
+		$deduped  = array();
+		foreach ( $items as $item ) {
+			$key = (string) $item['id'];
+			if ( isset( $seen[ $key ] ) ) {
+				continue;
+			}
+			$seen[ $key ] = true;
+			$deduped[]    = $item;
 		}
 
-		$this->send_success( array( 'pages' => $items ) );
+		return array_slice( $deduped, 0, 30 );
 	}
 
 	/**
@@ -1036,12 +1240,30 @@ class Ajax {
 			}
 		}
 
+		$post_id  = isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0;
+		$page_url = '';
+
+		if ( isset( $_POST['page_url'] ) && '' !== wp_unslash( $_POST['page_url'] ) ) {
+			$page_url = self::resolve_admin_page_url( $_POST['page_url'] );
+		} elseif ( $post_id > 0 ) {
+			$page_url = self::normalize_page_url( get_permalink( $post_id ) );
+		}
+
+		if ( empty( $page_url ) ) {
+			$this->send_error( __( 'A valid on-site page URL is required', 'analogwp-site-notes' ) );
+		}
+
+		// Only keep post_id when it is a real published post matching the URL context.
+		if ( $post_id > 0 && ! get_post( $post_id ) ) {
+			$post_id = 0;
+		}
+
 		// Prepare task data.
 		$task_data = array(
-			'post_id'         => isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0,
+			'post_id'         => $post_id,
 			'comment_title'   => isset( $_POST['comment_title'] ) ? sanitize_text_field( wp_unslash( $_POST['comment_title'] ) ) : '',
 			'comment_text'    => isset( $_POST['comment_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comment_text'] ) ) : '',
-			'page_url'        => isset( $_POST['page_url'] ) ? sanitize_url( wp_unslash( $_POST['page_url'] ) ) : get_permalink( absint( $_POST['post_id'] ) ),
+			'page_url'        => $page_url,
 			'status'          => isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : 'open',
 			'priority'        => isset( $_POST['priority'] ) ? sanitize_text_field( wp_unslash( $_POST['priority'] ) ) : 'medium',
 			'assigned_users'  => $assigned_user_ids,

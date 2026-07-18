@@ -4,12 +4,15 @@
 import { __ } from '@wordpress/i18n';
 import { getStatusByKey } from '../../../shared/constants/taskStatuses';
 
+export const CUSTOM_PAGE_ID = 'custom';
+
 export const EMPTY_TASK_FORM = {
 	taskTitle: '',
 	status: 'open',
 	assignedUsers: [],
 	categories: [],
 	pageId: '',
+	pageUrl: '',
 	dueDate: '',
 	timeHours: '',
 	timeMinutes: '',
@@ -59,14 +62,49 @@ export const getPriorityBadgeStyle = (priorityKey, priorityOptions) => {
 	};
 };
 
+/**
+ * Compare page URLs loosely for selector rematch (scheme/host/slash insensitive).
+ *
+ * @param {string} url
+ * @return {string}
+ */
 export const normalizePageUrl = (url) => {
 	if (!url) {
 		return '';
 	}
 
-	let normalized = url.replace(/^https?:\/\/(www\.)?/, '');
-	normalized = normalized.replace(/\/$/, '');
+	let normalized = String(url).trim();
+
+	try {
+		const parsed = new URL(normalized);
+		const path = parsed.pathname === '/' ? '/' : parsed.pathname.replace(/\/$/, '');
+		normalized = `${parsed.host}${path}${parsed.search}`;
+	} catch {
+		normalized = normalized.replace(/^https?:\/\/(www\.)?/i, '');
+		normalized = normalized.replace(/\/$/, '');
+	}
+
 	return normalized.toLowerCase();
+};
+
+/**
+ * Resolve post_id only when pageId is a pure positive integer string.
+ *
+ * @param {string|number} pageId
+ * @return {number}
+ */
+export const resolvePagePostId = (pageId) => {
+	if (pageId === null || pageId === undefined || pageId === '') {
+		return 0;
+	}
+
+	const asString = String(pageId);
+	if (!/^\d+$/.test(asString)) {
+		return 0;
+	}
+
+	const numericId = parseInt(asString, 10);
+	return numericId > 0 ? numericId : 0;
 };
 
 const normalizeAssignedUsers = (value) => [...(value || [])].map(String).sort().join('\0');
@@ -100,11 +138,12 @@ const mapAssignedUsersToForm = (task) => {
 	return [];
 };
 
-export const mapTaskToFormData = (task, pages) => {
+export const mapTaskToFormData = (task, pages = []) => {
 	let pageId = '';
+	const pageUrl = task.page_url || '';
 
-	if (task.page_url && pages.length > 0) {
-		const normalizedTaskUrl = normalizePageUrl(task.page_url);
+	if (pageUrl && pages.length > 0) {
+		const normalizedTaskUrl = normalizePageUrl(pageUrl);
 		const matchingPage = pages.find((page) => {
 			return normalizePageUrl(page.url) === normalizedTaskUrl;
 		});
@@ -115,7 +154,14 @@ export const mapTaskToFormData = (task, pages) => {
 	}
 
 	if (!pageId && task.post_id && task.post_id !== '0' && task.post_id !== 0) {
-		pageId = String(task.post_id);
+		const postIdString = String(task.post_id);
+		if (/^\d+$/.test(postIdString)) {
+			pageId = postIdString;
+		}
+	}
+
+	if (!pageId && pageUrl) {
+		pageId = CUSTOM_PAGE_ID;
 	}
 
 	return {
@@ -124,6 +170,7 @@ export const mapTaskToFormData = (task, pages) => {
 		assignedUsers: mapAssignedUsersToForm(task),
 		categories: task.categories || [],
 		pageId,
+		pageUrl,
 		dueDate: task.due_date || '',
 		timeHours: '',
 		timeMinutes: '',
@@ -139,7 +186,7 @@ export const hasTaskFormChanges = (initialFormData, currentFormData, pendingTime
 		return true;
 	}
 
-	const scalarFields = ['taskTitle', 'status', 'pageId', 'dueDate', 'priority', 'description'];
+	const scalarFields = ['taskTitle', 'status', 'pageId', 'pageUrl', 'dueDate', 'priority', 'description'];
 
 	for (const field of scalarFields) {
 		if ((initialFormData[field] || '') !== (currentFormData[field] || '')) {
@@ -157,6 +204,20 @@ export const hasTaskFormChanges = (initialFormData, currentFormData, pendingTime
 const normalizeAssignedUserIds = (value) => normalizeAssignedUsersFormValue(value)
 	.map((userId) => parseInt(userId, 10));
 
+export const buildPageTargetPayload = (pageId, pageUrl, pages = []) => {
+	let resolvedUrl = pageUrl || '';
+
+	if (!resolvedUrl && pageId && pageId !== CUSTOM_PAGE_ID) {
+		const selectedPage = pages.find((page) => String(page.id) === String(pageId));
+		resolvedUrl = selectedPage ? selectedPage.url : '';
+	}
+
+	return {
+		post_id: resolvePagePostId(pageId),
+		page_url: resolvedUrl,
+	};
+};
+
 export const buildFieldUpdatePayload = (field, value, formData, pages) => {
 	switch (field) {
 		case 'taskTitle':
@@ -173,23 +234,10 @@ export const buildFieldUpdatePayload = (field, value, formData, pages) => {
 			return { categories: value };
 		case 'dueDate':
 			return { due_date: value };
-		case 'pageId': {
-			const selectedPage = pages.find((page) => String(page.id) === String(value));
-			const pageUrl = selectedPage ? selectedPage.url : '';
-			let postId = 0;
-
-			if (value && value !== '') {
-				const numericId = parseInt(value, 10);
-				if (!isNaN(numericId)) {
-					postId = numericId;
-				}
-			}
-
-			return {
-				post_id: postId,
-				page_url: pageUrl,
-			};
-		}
+		case 'pageId':
+			return buildPageTargetPayload(value, formData.pageUrl, pages);
+		case 'pageTarget':
+			return buildPageTargetPayload(value.pageId, value.pageUrl, pages);
 		default:
 			return null;
 	}
@@ -286,24 +334,14 @@ export const buildTimesheetData = (pendingTimeEntries, formData, existingEntries
 };
 
 export const buildTaskPayload = (formData, pages, timesheetData) => {
-	const selectedPage = pages.find((page) => String(page.id) === String(formData.pageId));
-	const pageUrl = selectedPage ? selectedPage.url : '';
-
-	let postId = 0;
-	if (formData.pageId && formData.pageId !== '') {
-		const numericId = parseInt(formData.pageId, 10);
-		if (!isNaN(numericId)) {
-			postId = numericId;
-		}
-	}
-
+	const pagePayload = buildPageTargetPayload(formData.pageId, formData.pageUrl, pages);
 	const assignedUsers = normalizeAssignedUserIds(formData.assignedUsers);
 
 	const taskData = {
 		comment_title: formData.taskTitle || formData.description,
 		comment_text: formData.description,
-		post_id: postId,
-		page_url: pageUrl,
+		post_id: pagePayload.post_id,
+		page_url: pagePayload.page_url,
 		assigned_users: JSON.stringify(assignedUsers),
 		priority: formData.priority,
 		status: formData.status,

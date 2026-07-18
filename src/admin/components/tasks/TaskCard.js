@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import classnames from 'classnames';
-import { TrashOutlineIcon, GlobeIcon } from '../../../shared/icons';
+import { TrashOutlineIcon, LinkIcon } from '../../../shared/icons';
 
 const TaskCard = ({
 	comment,
@@ -109,7 +109,7 @@ const TaskCard = ({
 				)}
 				{comment.page_url && (
 					<div className="sn-kanban-card-meta">
-						<GlobeIcon size={12} className="sn-mr-1" />
+						<LinkIcon size={12} className="sn-mr-1" />
 						<span className="sn-truncate">{new URL(comment.page_url).pathname}</span>
 					</div>
 				)}

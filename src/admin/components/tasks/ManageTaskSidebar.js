@@ -188,6 +188,22 @@ const ManageTaskSidebar = ({
 		persistUpdate(updates);
 	};
 
+	const handlePageChange = ({ pageId, pageUrl }) => {
+		setFormData((prev) => {
+			const next = { ...prev, pageId, pageUrl };
+			formDataRef.current = next;
+			return next;
+		});
+
+		const updates = buildFieldUpdatePayload(
+			'pageTarget',
+			{ pageId, pageUrl },
+			{ ...formDataRef.current, pageId, pageUrl },
+			pages
+		);
+		persistUpdate(updates);
+	};
+
 	const handleTitleBlur = () => {
 		flushFieldSave('taskTitle');
 		setIsTitleEditing(false);
@@ -495,6 +511,7 @@ const ManageTaskSidebar = ({
 									<TaskSidebarDetailsFields
 										formData={formData}
 										onInputChange={handleAutoFieldChange}
+										onPageChange={handlePageChange}
 										statuses={statuses}
 										priorityOptions={priorityOptions}
 										users={users}

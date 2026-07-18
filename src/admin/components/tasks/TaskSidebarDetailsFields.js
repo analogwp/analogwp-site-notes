@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { SidebarSelect, SidebarMultiSelect, FieldDate } from '../ui';
 import { buildUserSelectOptions } from './taskSidebarUtils';
+import PageTargetSelect from './PageTargetSelect';
 
 const getUserInitials = (name) => {
 	if (!name) {
@@ -43,6 +44,7 @@ const renderUserPill = (user) => (
 const TaskSidebarDetailsFields = ({
 	formData,
 	onInputChange,
+	onPageChange,
 	statuses,
 	priorityOptions,
 	users,
@@ -59,6 +61,16 @@ const TaskSidebarDetailsFields = ({
 		label: category.name,
 	}));
 	const userOptions = buildUserSelectOptions(users);
+
+	const handlePageChange = (target) => {
+		if (onPageChange) {
+			onPageChange(target);
+			return;
+		}
+
+		onInputChange('pageId', target.pageId);
+		onInputChange('pageUrl', target.pageUrl);
+	};
 
 	return (
 		<>
@@ -127,16 +139,11 @@ const TaskSidebarDetailsFields = ({
 				)}
 			/>
 
-			<SidebarSelect
-				label={__('Page', 'analogwp-site-notes')}
-				emptyText={__('No page selected', 'analogwp-site-notes')}
+			<PageTargetSelect
 				value={formData.pageId}
-				onChange={(value) => onInputChange('pageId', value)}
-				disabled={pages.length === 0}
-				options={pages.map((page) => ({
-					value: String(page.id),
-					label: page.title,
-				}))}
+				pageUrl={formData.pageUrl}
+				specialPages={pages}
+				onChange={handlePageChange}
 			/>
 
 			<div className="sn-task-sidebar__row sn-task-sidebar__row--spaced">
