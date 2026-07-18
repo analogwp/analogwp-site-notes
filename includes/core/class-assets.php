@@ -359,7 +359,7 @@ class Assets {
 		return array(
 			'dashboard'    => __( 'Dashboard', 'analogwp-site-notes' ),
 			'comments'     => __( 'Comments', 'analogwp-site-notes' ),
-			'tasks'        => __( 'Tasks', 'analogwp-site-notes' ),
+			'tasks'        => __( 'Notes', 'analogwp-site-notes' ),
 			'settings'     => __( 'Settings', 'analogwp-site-notes' ),
 			'open'         => __( 'Open', 'analogwp-site-notes' ),
 			'inProgress'   => __( 'In Progress', 'analogwp-site-notes' ),

@@ -419,7 +419,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
             // Update document title
             document.title = page === 'settings' 
                 ? `${__('Settings', 'analogwp-site-notes')} - Analog Site Notes`
-                : `${__('Tasks', 'analogwp-site-notes')} - Analog Site Notes`;
+                : `${__('Notes', 'analogwp-site-notes')} - Analog Site Notes`;
         } catch (error) {
             // Fallback if URL manipulation fails
             logger.navigation('Navigation:', page);

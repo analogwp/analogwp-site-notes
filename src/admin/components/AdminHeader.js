@@ -29,7 +29,7 @@ const AdminHeader = ({
 					onClick={() => onNavigate && onNavigate('dashboard')}
 					icon={<TasksIcon size="md" />}
 				>
-					{__('Tasks', 'analogwp-site-notes')}
+					{__('Notes', 'analogwp-site-notes')}
 				</Button>
 
 				<Button
