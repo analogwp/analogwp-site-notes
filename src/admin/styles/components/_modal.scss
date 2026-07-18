@@ -135,6 +135,13 @@
 	gap: var(--sn-space-s);
 }
 
+.sn-note-sidebar__note-id {
+	flex-shrink: 0;
+	font-size: var(--sn-title-l-size);
+	line-height: var(--sn-title-l-line);
+	font-weight: var(--sn-font-weight-medium);
+	color: var(--sn-accent);
+}
 
 .sn-note-sidebar__title-display {
 	flex: 1;

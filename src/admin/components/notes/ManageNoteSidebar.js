@@ -387,6 +387,9 @@ const ManageNoteSidebar = ({
 				<div className="sn-note-sidebar__main">
 					<div className="sn-note-sidebar__main-scroll">
 						<div className="sn-note-sidebar__header-row sn-note-sidebar__header-row--manage">
+							{note?.id ? (
+								<span className="sn-note-sidebar__note-id">{note.id}</span>
+							) : null}
 							{isTitleEditing ? (
 								<input
 									ref={titleInputRef}
