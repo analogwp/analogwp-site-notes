@@ -9,7 +9,7 @@ import Draggable from 'react-draggable';
 /**
  * Internal dependencies
  */
-import { ArrowUpIcon, ChevronDownIcon } from '../../shared/icons';
+import { ArrowUpIcon, ChevronDownIcon, PhotoFrameIcon } from '../../shared/icons';
 import logger from '../../shared/utils/logger';
 import ScreenshotSelectionFrame, { CAPTURE_SIZE } from './ScreenshotSelectionFrame';
 
@@ -134,8 +134,9 @@ const CommentPopup = ({ position, onSave, onCancel }) => {
 	const [website, setWebsite] = useState('');
 
 	const settings = window.agwp_sn_ajax?.settings || {};
-	const autoScreenshot =
-		(settings.general?.auto_screenshot ?? true) && !!window.agwp_sn_ajax?.canUploadScreenshots;
+	const canUploadScreenshots = !!window.agwp_sn_ajax?.canUploadScreenshots;
+	const autoScreenshotDefault = (settings.general?.auto_screenshot ?? true) && canUploadScreenshots;
+	const [includeScreenshot, setIncludeScreenshot] = useState(autoScreenshotDefault);
 	const canSubmit = Boolean(title.trim() || comment.trim());
 
 	useEffect(() => {
@@ -342,7 +343,7 @@ const CommentPopup = ({ position, onSave, onCancel }) => {
 		setIsLoading(true);
 
 		try {
-			const screenshotUrl = autoScreenshot ? await captureScreenshot() : '';
+			const screenshotUrl = includeScreenshot ? await captureScreenshot() : '';
 			await onSave(comment.trim(), screenshotUrl, priority, title.trim(), website.trim());
 		} catch (error) {
 			logger.error('Error saving comment:', error);
@@ -362,7 +363,7 @@ const CommentPopup = ({ position, onSave, onCancel }) => {
 
 	return (
 		<div className="sn-comment-popup-overlay" onClick={handleOverlayClick}>
-			{autoScreenshot && <ScreenshotSelectionFrame position={position} />}
+			{includeScreenshot && <ScreenshotSelectionFrame position={position} />}
 
 			<Draggable
 				handle=".sn-comment-popup__drag"
@@ -410,12 +411,38 @@ const CommentPopup = ({ position, onSave, onCancel }) => {
 						</div>
 
 						<div className="sn-popup-footer">
-							<PrioritySelect
-								value={priority}
-								onChange={setPriority}
-								disabled={isLoading}
-								options={priorityOptions}
-							/>
+							<div className="sn-popup-footer__actions">
+								<PrioritySelect
+									value={priority}
+									onChange={setPriority}
+									disabled={isLoading}
+									options={priorityOptions}
+								/>
+
+								{canUploadScreenshots && (
+									<button
+										type="button"
+										className={`sn-screenshot-toggle${
+											includeScreenshot ? ' is-active' : ''
+										}`}
+										onClick={() => setIncludeScreenshot((enabled) => !enabled)}
+										disabled={isLoading}
+										aria-pressed={includeScreenshot}
+										aria-label={
+											includeScreenshot
+												? __('Disable screenshot', 'analogwp-site-notes')
+												: __('Enable screenshot', 'analogwp-site-notes')
+										}
+										title={
+											includeScreenshot
+												? __('Screenshot on', 'analogwp-site-notes')
+												: __('Screenshot off', 'analogwp-site-notes')
+										}
+									>
+										<PhotoFrameIcon size="lg" />
+									</button>
+								)}
+							</div>
 
 							<button
 								type="submit"
