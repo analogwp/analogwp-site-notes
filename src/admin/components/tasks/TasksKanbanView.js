@@ -1,9 +1,7 @@
 import React from 'react';
-import classnames from 'classnames';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { __ } from '@wordpress/i18n';
 import TaskCard from './TaskCard';
-import TaskDetail from './TaskDetail';
 import AddTaskSidebar from './AddTaskSidebar';
 import ManageTaskSidebar from './ManageTaskSidebar';
 import TaskSidebarBackdropClose from './TaskSidebarBackdropClose';
@@ -13,8 +11,6 @@ import { AddIcon } from '../../../shared/icons';
 import StatusDot from '../../../shared/components/StatusDot';
 
 const TasksKanbanView = ({
-	selectedTask,
-	onTaskDetailProps,
 	sensors,
 	activeId,
 	draggedItem,
@@ -26,13 +22,10 @@ const TasksKanbanView = ({
 	onSortChange,
 	users,
 	statuses,
-	priorities = [],
 	getCommentsByStatus,
 	getUserById,
-	handleStatusChange,
 	handleDelete,
 	handleEditTask,
-	handleCardClick,
 	formatDate,
 	handleAddNew,
 	showAddModal,
@@ -50,82 +43,74 @@ const TasksKanbanView = ({
 }) => {
 	return (
 		<div>
-			{selectedTask && (
-				<TaskDetail
-					{...onTaskDetailProps}
+			<DndContext
+				sensors={sensors}
+				onDragStart={handleDragStart}
+				onDragEnd={handleDragEnd}
+			>
+				<TasksControls
+					activeView={activeView}
+					onViewChange={onViewChange}
+					filters={filters}
+					onFilterChange={onFilterChange}
+					sortBy={sortBy}
+					onSortChange={onSortChange}
+					users={users}
 				/>
-			)}
-
-			{!selectedTask && (
-				<DndContext
-					sensors={sensors}
-					onDragStart={handleDragStart}
-					onDragEnd={handleDragEnd}
-				>
-					<TasksControls
-						activeView={activeView}
-						onViewChange={onViewChange}
-						filters={filters}
-						onFilterChange={onFilterChange}
-						sortBy={sortBy}
-						onSortChange={onSortChange}
-						users={users}
-					/>
-					<div className="sn-kanban-board">
-						{statuses.map(status => (
-							<DroppableColumn key={status.key} id={status.key} status={status.key}>
-								<div className="sn-kanban-column-header">
-									<div className="sn-kanban-column-title">
-										<StatusDot statusKey={status.key} size="md" />
-										<span className="sn-kanban-column-name">{status.title}</span>
-									</div>
-									<div className="sn-kanban-column-count">
-										{getCommentsByStatus(status.key).length}
-									</div>
+				<div className="sn-kanban-board">
+					{statuses.map((status) => (
+						<DroppableColumn key={status.key} id={status.key} status={status.key}>
+							<div className="sn-kanban-column-header">
+								<div className="sn-kanban-column-title">
+									<StatusDot statusKey={status.key} size="md" />
+									<span className="sn-kanban-column-name">{status.title}</span>
 								</div>
-
-								<div className="sn-kanban-cards">
-									{getCommentsByStatus(status.key).map(comment => (
-										<TaskCard
-											key={comment.id}
-											comment={comment}
-											user={comment.user || getUserById(comment.user_id)}
-											onDelete={handleDelete}
-											onCardClick={handleEditTask}
-											formatDate={formatDate}
-										/>
-									))}
-
-									{status.key !== 'resolved' && (
-										<button
-											type="button"
-											className="sn-kanban-add-btn"
-											onClick={handleAddNew}
-										>
-											<AddIcon />
-											<span className="sn-text-m sn-font-medium">{__('Add new', 'analogwp-site-notes')}</span>
-										</button>
-									)}
+								<div className="sn-kanban-column-count">
+									{getCommentsByStatus(status.key).length}
 								</div>
-							</DroppableColumn>
-						))}
-					</div>
-
-					<DragOverlay>
-						{activeId && draggedItem ? (
-							<div className="sn-kanban-drag-overlay">
-								<TaskCard
-									comment={draggedItem}
-									user={draggedItem.user || getUserById(draggedItem.user_id)}
-									onDelete={() => {}}
-									onCardClick={() => {}}
-									formatDate={formatDate}
-								/>
 							</div>
-						) : null}
-					</DragOverlay>
-				</DndContext>
-			)}
+
+							<div className="sn-kanban-cards">
+								{getCommentsByStatus(status.key).map((comment) => (
+									<TaskCard
+										key={comment.id}
+										comment={comment}
+										user={comment.user || getUserById(comment.user_id)}
+										onDelete={handleDelete}
+										onCardClick={handleEditTask}
+										formatDate={formatDate}
+									/>
+								))}
+
+								{status.key !== 'resolved' && (
+									<button
+										type="button"
+										className="sn-kanban-add-btn"
+										onClick={handleAddNew}
+									>
+										<AddIcon />
+										<span className="sn-text-m sn-font-medium">{__('Add new', 'analogwp-site-notes')}</span>
+									</button>
+								)}
+							</div>
+						</DroppableColumn>
+					))}
+				</div>
+
+				<DragOverlay>
+					{activeId && draggedItem ? (
+						<div className="sn-kanban-drag-overlay">
+							<TaskCard
+								comment={draggedItem}
+								user={draggedItem.user || getUserById(draggedItem.user_id)}
+								onDelete={() => {}}
+								onCardClick={() => {}}
+								formatDate={formatDate}
+							/>
+						</div>
+					) : null}
+				</DragOverlay>
+			</DndContext>
 
 			{showAddModal && (
 				<>
