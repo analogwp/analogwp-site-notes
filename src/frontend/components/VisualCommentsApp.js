@@ -12,10 +12,12 @@ import CommentToggle from './CommentToggle';
 import CommentOverlay from './CommentOverlay';
 import CommentPopup from './CommentPopup';
 import CommentSidebar from './CommentSidebar';
+import CommentsDisplay from './CommentsDisplay';
 import logger from '../../shared/utils/logger';
 
 const VisualCommentsApp = () => {
     const [isActive, setIsActive] = useState(false);
+    const [markersEnabled, setMarkersEnabled] = useState(true);
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const [pageFilter, setPageFilter] = useState('current');
     const [comments, setComments] = useState([]);
@@ -40,6 +42,9 @@ const VisualCommentsApp = () => {
         const handleElementClick = (e) => {
             // Prevent creating popups when clicking specific UI elements
             if (
+                e.target.closest('.sn-comment-marker') ||
+                e.target.closest('.sn-note-thread-card') ||
+                e.target.closest('.sn-comments-display') ||
                 e.target.closest('.sn-comment-popup') ||
                 e.target.closest('.sn-comment-sidebar') ||
                 e.target.closest('.sn-toggle-button') ||
@@ -302,6 +307,36 @@ const VisualCommentsApp = () => {
         }
     };
 
+    // Delete reply
+    const deleteReply = async (replyId) => {
+        if (!agwp_sn_ajax.canManageComments) return;
+
+        try {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'agwp_sn_delete_reply',
+                    nonce: agwp_sn_ajax.nonce,
+                    reply_id: replyId,
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                await loadComments();
+                showNotification(__('Reply deleted successfully!', 'analogwp-site-notes'), 'success');
+            } else {
+                showNotification(data.data?.message || __('Error deleting reply', 'analogwp-site-notes'), 'error');
+            }
+        } catch (error) {
+            logger.error('Error deleting reply:', error);
+            showNotification(__('Error deleting reply', 'analogwp-site-notes'), 'error');
+        }
+    };
+
     // Show notification
     const showNotification = (message, type = 'info') => {
         const notification = document.createElement('div');
@@ -319,6 +354,8 @@ const VisualCommentsApp = () => {
             <CommentToggle 
                 isActive={isActive}
                 onToggle={setIsActive}
+                markersEnabled={markersEnabled}
+                onMarkersToggle={setMarkersEnabled}
             />
             
             {isActive && (
@@ -338,6 +375,18 @@ const VisualCommentsApp = () => {
                         pageUrl={pageUrl}
                         adminDashboardUrl={agwp_sn_ajax.adminDashboardUrl || ''}
                     />
+
+                    {markersEnabled && (
+                        <CommentsDisplay
+                            comments={comments}
+                            onAddReply={addReply}
+                            onDelete={agwp_sn_ajax.canManageComments ? deleteComment : undefined}
+                            onDeleteReply={agwp_sn_ajax.canManageComments ? deleteReply : undefined}
+                            canManageComments={agwp_sn_ajax.canManageComments}
+                            adminDashboardUrl={agwp_sn_ajax.adminDashboardUrl || ''}
+                            pageUrl={pageUrl}
+                        />
+                    )}
                     
                     {showCommentForm && selectedElement && (
                         <CommentPopup

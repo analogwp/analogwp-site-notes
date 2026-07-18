@@ -132,6 +132,19 @@ class Admin {
 			)
 		);
 
+		// Add "Enable/Disable Markers" submenu item (default on).
+		$wp_admin_bar->add_node(
+			array(
+				'parent' => 'agwp-sn-menu',
+				'id'     => 'agwp-sn-markers-toggle',
+				'title'  => '<span id="sn-admin-bar-markers-toggle">' . esc_html__( 'Disable Markers', 'analogwp-site-notes' ) . '</span>',
+				'href'   => '#',
+				'meta'   => array(
+					'class' => 'agwp-sn-admin-bar-markers-toggle',
+				),
+			)
+		);
+
 		// Add "Notes Board" submenu item.
 		$wp_admin_bar->add_node(
 			array(

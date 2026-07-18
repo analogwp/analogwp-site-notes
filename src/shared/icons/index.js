@@ -26,6 +26,7 @@ export { default as GlobeIcon } from './GlobeIcon';
 export { default as HideIcon } from './HideIcon';
 export { default as InfoIcon } from './InfoIcon';
 export { default as LinkIcon } from './LinkIcon';
+export { default as NoteMarkerPinIcon } from './NoteMarkerPinIcon';
 export { default as InformationCircleIcon } from './InformationCircleIcon';
 export { default as PencilIcon } from './PencilIcon';
 export { default as PhotoFrameIcon } from './PhotoFrameIcon';

@@ -9,10 +9,10 @@ import { __ } from '@wordpress/i18n';
  */
 import { CommentCursorIcon, HideIcon } from '../../shared/icons';
 
-const CommentToggle = ({ isActive, onToggle }) => {
+const CommentToggle = ({ isActive, onToggle, markersEnabled, onMarkersToggle }) => {
 	const [isVisible, setIsVisible] = useState(true);
 
-	// Keep admin bar title status and dropdown label in sync with Notes mode.
+	// Keep admin bar title status and dropdown labels in sync.
 	useEffect(() => {
 		const adminBarStatus = document.getElementById('sn-admin-bar-status');
 		if (adminBarStatus) {
@@ -31,7 +31,16 @@ const CommentToggle = ({ isActive, onToggle }) => {
 		}
 	}, [isActive]);
 
-	// Parent admin bar title and dropdown item both toggle Notes mode.
+	useEffect(() => {
+		const markersToggle = document.getElementById('sn-admin-bar-markers-toggle');
+		if (markersToggle) {
+			markersToggle.textContent = markersEnabled
+				? __('Disable Markers', 'analogwp-site-notes')
+				: __('Enable Markers', 'analogwp-site-notes');
+		}
+	}, [markersEnabled]);
+
+	// Parent admin bar title and Notes dropdown item toggle Notes mode.
 	useEffect(() => {
 		const handleToggleClick = (event) => {
 			event.preventDefault();
@@ -49,6 +58,21 @@ const CommentToggle = ({ isActive, onToggle }) => {
 			dropdownItem?.removeEventListener('click', handleToggleClick);
 		};
 	}, [isActive, onToggle]);
+
+	// Markers dropdown item toggles marker visibility.
+	useEffect(() => {
+		const handleMarkersClick = (event) => {
+			event.preventDefault();
+			onMarkersToggle(!markersEnabled);
+		};
+
+		const markersItem = document.querySelector('.agwp-sn-admin-bar-markers-toggle');
+		markersItem?.addEventListener('click', handleMarkersClick);
+
+		return () => {
+			markersItem?.removeEventListener('click', handleMarkersClick);
+		};
+	}, [markersEnabled, onMarkersToggle]);
 
 	if (!isVisible) {
 		return null;

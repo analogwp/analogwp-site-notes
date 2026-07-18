@@ -45,6 +45,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
 
   .ab-submenu {
     #wp-admin-bar-agwp-sn-toggle,
+    #wp-admin-bar-agwp-sn-markers-toggle,
     #wp-admin-bar-agwp-sn-tasks-board,
     #wp-admin-bar-agwp-sn-settings-link {
       min-width: 180px;
@@ -711,69 +712,376 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
 
 // Comments Display Container
 .sn-comments-display {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   pointer-events: none;
-
-  .sn-comment-marker {
-    pointer-events: auto;
-  }
+  z-index: 99990;
 }
 
 // Comment Markers
 .sn-comment-marker {
   position: absolute;
+  z-index: 99991;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  transform: translate(-50%, -50%);
   cursor: pointer;
-  z-index: 10000;
   pointer-events: auto;
-  
-  .sn-marker-dot {
-    min-width: 40px;
-    height: 30px;
-    border-radius: 15px;
-    background: white;
+  transition: width 0.2s ease, height 0.2s ease;
+
+  &__dot {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 0 8px;
-    border: 2px solid #2271b1;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    transition: all 0.2s ease;
-    
-    &:hover {
-      transform: scale(1.1);
-    }
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: $primary-color;
+    box-shadow: 0 0 0 3px rgba(56, 88, 233, 0.22), 0 2px 8px rgba(0, 0, 0, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
 
-    .sn-marker-icon {
+  &__number {
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  &:hover .sn-comment-marker__dot {
+    transform: scale(1.08);
+  }
+
+  &.is-selected {
+    width: 56px;
+    height: 56px;
+
+    .sn-comment-marker__number {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       font-size: 14px;
-      line-height: 1;
     }
+  }
 
-    .sn-marker-number {
-      color: #2271b1;
-      font-weight: bold;
-      font-size: 12px;
+  &__pin {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary-color;
+    filter: drop-shadow(0 4px 12px rgba(56, 88, 233, 0.35));
+    animation: sn-marker-expand 0.22s ease;
+
+    .sn-icon {
+      width: 56px !important;
+      height: 56px !important;
     }
-  }
-  
-  .sn-marker-pulse {
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    width: 50px;
-    height: 40px;
-    border-radius: 20px;
-    background: rgba(34, 113, 177, 0.2);
-    animation: pulse 2s infinite;
-  }
-  
-  &.selected .sn-marker-dot {
-    transform: scale(1.2);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   }
 }
 
-// Comment Detail Popup
+@keyframes sn-marker-expand {
+  from {
+    transform: scale(0.45);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Note thread card (opened from marker)
+.sn-note-thread-card {
+  position: fixed;
+  z-index: 100001;
+  width: min(340px, calc(100vw - 32px));
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  animation: popupSlideIn 0.2s ease;
+  pointer-events: auto;
+}
+
+.sn-note-thread__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sn-note-thread__header-main {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.sn-note-thread__status {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+
+.sn-note-thread__title {
+  margin: 0;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #171717;
+  word-break: break-word;
+
+  &--empty {
+    font-weight: 500;
+    color: #9ca3af;
+  }
+}
+
+.sn-note-thread__menu-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sn-note-thread__menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    color: #1d2327;
+    background: #f3f4f5;
+  }
+}
+
+.sn-note-thread__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 5;
+  min-width: 150px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    text-align: left;
+    font-size: 13px;
+    color: #1d2327;
+    cursor: pointer;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+}
+
+.sn-note-thread__menu-danger {
+  color: #d63638 !important;
+
+  &:hover {
+    background: #fef2f2 !important;
+  }
+}
+
+.sn-note-thread__messages {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: min(420px, 55vh);
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.sn-note-thread__message {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  &:hover .sn-note-thread__reply-delete {
+    opacity: 1;
+  }
+}
+
+.sn-note-thread__reply-delete {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: color 0.15s ease, background-color 0.15s ease, opacity 0.15s ease;
+
+  &:hover {
+    color: #d63638;
+    background: #fef2f2;
+    opacity: 1;
+  }
+}
+
+.sn-note-thread__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #d9d9d9;
+
+  &--fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #646970;
+  }
+}
+
+.sn-note-thread__message-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.sn-note-thread__meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.sn-note-thread__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+}
+
+.sn-note-thread__time {
+  font-size: 12px;
+  color: #8c8f94;
+}
+
+.sn-note-thread__text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #171717;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.sn-note-thread__composer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #f9f9f9;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px 12px 44px;
+
+  textarea {
+    width: 100%;
+    min-height: 64px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    resize: none;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #171717;
+    box-shadow: none;
+
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    &::placeholder {
+      color: #8c8f94;
+    }
+  }
+}
+
+.sn-note-thread__send {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: $primary-color;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.05);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+// Comment Detail Popup (legacy detail chrome kept for compatibility)
 .sn-comment-detail-popup {
   background: $background-color;
   border-radius: 8px;
