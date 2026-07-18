@@ -1,15 +1,15 @@
 /**
- * Tasks list view (Kanban alternative)
+ * Notes list view (Kanban alternative)
  * Layout: status badge | title | date | assignee
  */
 
-.sn-tasks-list {
+.sn-notes-list {
 	display: flex;
 	flex-direction: column;
 	gap: var(--sn-space-m);
 }
 
-.sn-tasks-list__item {
+.sn-notes-list__item {
 	display: flex;
 	align-items: center;
 	gap: var(--sn-space-m);
@@ -49,12 +49,12 @@
 	}
 }
 
-.sn-tasks-list__status-col {
+.sn-notes-list__status-col {
 	flex: 0 0 7.5rem;
 	width: 7.5rem;
 }
 
-.sn-tasks-list__status {
+.sn-notes-list__status {
 	display: inline-flex;
 	align-items: center;
 	padding: var(--sn-space-2xs) var(--sn-space-m);
@@ -65,7 +65,7 @@
 	white-space: nowrap;
 }
 
-.sn-tasks-list__title {
+.sn-notes-list__title {
 	flex: 1 1 auto;
 	min-width: 0;
 	font-size: var(--sn-text-m-size);
@@ -79,7 +79,7 @@
 	}
 }
 
-.sn-tasks-list__date {
+.sn-notes-list__date {
 	flex-shrink: 0;
 	width: 8.5rem;
 	font-size: var(--sn-text-m-size);
@@ -93,7 +93,7 @@
 	}
 }
 
-.sn-tasks-list__assignee {
+.sn-notes-list__assignee {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
@@ -110,7 +110,7 @@
 	}
 }
 
-.sn-tasks-list__assignee-name {
+.sn-notes-list__assignee-name {
 	font-size: var(--sn-text-m-size);
 	line-height: var(--sn-text-m-line);
 	font-weight: var(--sn-font-weight-regular);
@@ -118,11 +118,11 @@
 	text-align: right;
 }
 
-.sn-tasks-list__assignee-avatar {
+.sn-notes-list__assignee-avatar {
 	margin: 0;
 }
 
-.sn-tasks-list__empty {
+.sn-notes-list__empty {
 	padding: var(--sn-space-2xl);
 	text-align: center;
 	font-size: var(--sn-text-m-size);

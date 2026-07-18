@@ -46,7 +46,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   .ab-submenu {
     #wp-admin-bar-agwp-sn-toggle,
     #wp-admin-bar-agwp-sn-markers-toggle,
-    #wp-admin-bar-agwp-sn-tasks-board,
+    #wp-admin-bar-agwp-sn-notes-board,
     #wp-admin-bar-agwp-sn-settings-link {
       min-width: 180px;
       height: auto;
@@ -1997,7 +1997,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   }
 }
 
-.sn-task-title {
+.sn-note-title {
   font-weight: 600;
   font-size: 14px;
   color: #1d2327;

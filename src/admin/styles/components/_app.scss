@@ -55,15 +55,15 @@
 	}
 }
 
-.sn-tasks-controls {
+.sn-notes-controls {
 	margin-bottom: var(--sn-space-l);
 }
 
-.sn-tasks-controls__inner {
+.sn-notes-controls__inner {
 	padding: var(--sn-space-m) 0;
 }
 
-.sn-tasks-controls__row {
+.sn-notes-controls__row {
 	display: flex;
 	flex-direction: column;
 	gap: var(--sn-space-m);
@@ -82,7 +82,7 @@
 	gap: var(--sn-space-xs);
 }
 
-.sn-task-filters {
+.sn-note-filters {
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--sn-space-s);

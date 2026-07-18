@@ -149,7 +149,7 @@ class Admin {
 		$wp_admin_bar->add_node(
 			array(
 				'parent' => 'agwp-sn-menu',
-				'id'     => 'agwp-sn-tasks-board',
+				'id'     => 'agwp-sn-notes-board',
 				'title'  => __( 'Notes Board', 'analogwp-site-notes' ),
 				'href'   => admin_url( 'admin.php?page=agwp-sn-dashboard' ),
 			)
