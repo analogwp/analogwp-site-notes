@@ -6,16 +6,16 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TaskListItem from './TaskListItem';
-import AddTaskSidebar from './AddTaskSidebar';
-import ManageTaskSidebar from './ManageTaskSidebar';
-import TaskSidebarBackdropClose from './TaskSidebarBackdropClose';
-import TasksControls from './TasksControls';
+import NoteListItem from './NoteListItem';
+import AddNoteSidebar from './AddNoteSidebar';
+import ManageNoteSidebar from './ManageNoteSidebar';
+import NoteSidebarBackdropClose from './NoteSidebarBackdropClose';
+import NotesControls from './NotesControls';
 
-const TasksListView = ({
+const NotesListView = ({
 	comments,
 	showAddModal,
-	editingTask,
+	editingNote,
 	onViewChange,
 	filters,
 	onFilterChange,
@@ -26,10 +26,10 @@ const TasksListView = ({
 	formatDate,
 	onDelete,
 	handleCloseModal,
-	handleSaveTask,
-	handleUpdateTask,
-	handleEditTask,
-	liveEditingTask,
+	handleSaveNote,
+	handleUpdateNote,
+	handleEditNote,
+	liveEditingNote,
 	onAddReply,
 	onDeleteReply,
 	pages,
@@ -38,7 +38,7 @@ const TasksListView = ({
 }) => {
 	return (
 		<>
-			<TasksControls
+			<NotesControls
 				activeView={activeView}
 				onViewChange={onViewChange}
 				filters={filters}
@@ -48,17 +48,17 @@ const TasksListView = ({
 				users={users}
 			/>
 
-			<div className="sn-tasks-list">
+			<div className="sn-notes-list">
 				{comments.length === 0 ? (
-					<div className="sn-tasks-list__empty">
+					<div className="sn-notes-list__empty">
 						{__('No notes found.', 'analogwp-site-notes')}
 					</div>
 				) : (
 					comments.map((comment) => (
-						<TaskListItem
+						<NoteListItem
 							key={comment.id}
 							comment={comment}
-							onClick={handleEditTask}
+							onClick={handleEditNote}
 							formatDate={formatDate}
 						/>
 					))
@@ -73,17 +73,17 @@ const TasksListView = ({
 						role="presentation"
 					/>
 
-					<TaskSidebarBackdropClose
+					<NoteSidebarBackdropClose
 						onClose={handleCloseModal}
-						isManage={Boolean(editingTask)}
+						isManage={Boolean(editingNote)}
 					/>
 
-					<div className={`sn-kanban-sidebar${editingTask ? ' sn-kanban-sidebar--manage' : ''}`}>
-						{editingTask ? (
-							<ManageTaskSidebar
-								task={liveEditingTask || editingTask}
+					<div className={`sn-kanban-sidebar${editingNote ? ' sn-kanban-sidebar--manage' : ''}`}>
+						{editingNote ? (
+							<ManageNoteSidebar
+								note={liveEditingNote || editingNote}
 								onClose={handleCloseModal}
-								onUpdate={handleUpdateTask}
+								onUpdate={handleUpdateNote}
 								onDelete={onDelete}
 								onAddReply={onAddReply}
 								onDeleteReply={onDeleteReply}
@@ -93,9 +93,9 @@ const TasksListView = ({
 								onNavigateToSettingsTab={onNavigateToSettingsTab}
 							/>
 						) : (
-							<AddTaskSidebar
+							<AddNoteSidebar
 								onClose={handleCloseModal}
-								onSave={handleSaveTask}
+								onSave={handleSaveNote}
 								users={users}
 								pages={pages || []}
 								statuses={statuses}
@@ -109,4 +109,4 @@ const TasksListView = ({
 	);
 };
 
-export default TasksListView;
+export default NotesListView;

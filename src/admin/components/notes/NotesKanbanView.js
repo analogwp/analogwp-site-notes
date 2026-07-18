@@ -1,16 +1,16 @@
 import React from 'react';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { __ } from '@wordpress/i18n';
-import TaskCard from './TaskCard';
-import AddTaskSidebar from './AddTaskSidebar';
-import ManageTaskSidebar from './ManageTaskSidebar';
-import TaskSidebarBackdropClose from './TaskSidebarBackdropClose';
-import TasksControls from './TasksControls';
+import NoteCard from './NoteCard';
+import AddNoteSidebar from './AddNoteSidebar';
+import ManageNoteSidebar from './ManageNoteSidebar';
+import NoteSidebarBackdropClose from './NoteSidebarBackdropClose';
+import NotesControls from './NotesControls';
 import DroppableColumn from './DroppableColumn';
 import { AddIcon } from '../../../shared/icons';
 import StatusDot from '../../../shared/components/StatusDot';
 
-const TasksKanbanView = ({
+const NotesKanbanView = ({
 	sensors,
 	activeId,
 	draggedItem,
@@ -25,18 +25,18 @@ const TasksKanbanView = ({
 	getCommentsByStatus,
 	getUserById,
 	handleDelete,
-	handleEditTask,
+	handleEditNote,
 	formatDate,
 	handleAddNew,
 	showAddModal,
 	handleCloseModal,
-	handleSaveTask,
-	handleUpdateTask,
-	liveEditingTask,
+	handleSaveNote,
+	handleUpdateNote,
+	liveEditingNote,
 	onAddReply,
 	onDeleteReply,
 	pages,
-	editingTask,
+	editingNote,
 	activeView,
 	onViewChange,
 	onNavigateToSettingsTab,
@@ -48,7 +48,7 @@ const TasksKanbanView = ({
 				onDragStart={handleDragStart}
 				onDragEnd={handleDragEnd}
 			>
-				<TasksControls
+				<NotesControls
 					activeView={activeView}
 					onViewChange={onViewChange}
 					filters={filters}
@@ -72,12 +72,12 @@ const TasksKanbanView = ({
 
 							<div className="sn-kanban-cards">
 								{getCommentsByStatus(status.key).map((comment) => (
-									<TaskCard
+									<NoteCard
 										key={comment.id}
 										comment={comment}
 										user={comment.user || getUserById(comment.user_id)}
 										onDelete={handleDelete}
-										onCardClick={handleEditTask}
+										onCardClick={handleEditNote}
 										formatDate={formatDate}
 									/>
 								))}
@@ -100,7 +100,7 @@ const TasksKanbanView = ({
 				<DragOverlay>
 					{activeId && draggedItem ? (
 						<div className="sn-kanban-drag-overlay">
-							<TaskCard
+							<NoteCard
 								comment={draggedItem}
 								user={draggedItem.user || getUserById(draggedItem.user_id)}
 								onDelete={() => {}}
@@ -120,17 +120,17 @@ const TasksKanbanView = ({
 						role="presentation"
 					/>
 
-					<TaskSidebarBackdropClose
+					<NoteSidebarBackdropClose
 						onClose={handleCloseModal}
-						isManage={Boolean(editingTask)}
+						isManage={Boolean(editingNote)}
 					/>
 
-					<div className={`sn-kanban-sidebar${editingTask ? ' sn-kanban-sidebar--manage' : ''}`}>
-						{editingTask ? (
-							<ManageTaskSidebar
-								task={liveEditingTask || editingTask}
+					<div className={`sn-kanban-sidebar${editingNote ? ' sn-kanban-sidebar--manage' : ''}`}>
+						{editingNote ? (
+							<ManageNoteSidebar
+								note={liveEditingNote || editingNote}
 								onClose={handleCloseModal}
-								onUpdate={handleUpdateTask}
+								onUpdate={handleUpdateNote}
 								onDelete={handleDelete}
 								onAddReply={onAddReply}
 								onDeleteReply={onDeleteReply}
@@ -140,9 +140,9 @@ const TasksKanbanView = ({
 								onNavigateToSettingsTab={onNavigateToSettingsTab}
 							/>
 						) : (
-							<AddTaskSidebar
+							<AddNoteSidebar
 								onClose={handleCloseModal}
-								onSave={handleSaveTask}
+								onSave={handleSaveNote}
 								users={users}
 								pages={pages || []}
 								statuses={statuses}
@@ -156,4 +156,4 @@ const TasksKanbanView = ({
 	);
 };
 
-export default TasksKanbanView;
+export default NotesKanbanView;

@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { Button } from './ui';
-import { SettingsIcon, TasksIcon } from '../../shared/icons';
+import { SettingsIcon, NotesIcon } from '../../shared/icons';
 
 const AdminHeader = ({
 	currentPage = 'dashboard',
@@ -27,7 +27,7 @@ const AdminHeader = ({
 				<Button
 					variant={currentPage === 'dashboard' ? 'primary' : 'secondary'}
 					onClick={() => onNavigate && onNavigate('dashboard')}
-					icon={<TasksIcon size="md" />}
+					icon={<NotesIcon size="md" />}
 				>
 					{__('Notes', 'analogwp-site-notes')}
 				</Button>

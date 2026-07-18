@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { SidebarSelect } from '../ui';
 
-const TaskSidebarQuickFields = ({
+const NoteSidebarQuickFields = ({
 	formData,
 	onInputChange,
 	statuses,
@@ -16,7 +16,7 @@ const TaskSidebarQuickFields = ({
 	getStatusBadgeStyle,
 	getPriorityBadgeStyle,
 }) => (
-	<div className="sn-task-sidebar__quick-fields">
+	<div className="sn-note-sidebar__quick-fields">
 		<SidebarSelect
 			label={__('Status', 'analogwp-site-notes')}
 			emptyText={__('No status', 'analogwp-site-notes')}
@@ -43,4 +43,4 @@ const TaskSidebarQuickFields = ({
 	</div>
 );
 
-export default TaskSidebarQuickFields;
+export default NoteSidebarQuickFields;

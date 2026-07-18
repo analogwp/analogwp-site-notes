@@ -11,7 +11,7 @@ import { CSS } from '@dnd-kit/utilities';
 import classnames from 'classnames';
 import { TrashOutlineIcon, LinkIcon } from '../../../shared/icons';
 
-const TaskCard = ({
+const NoteCard = ({
 	comment,
 	user,
 	onDelete,
@@ -150,4 +150,4 @@ const TaskCard = ({
 	);
 };
 
-export default TaskCard;
+export default NoteCard;

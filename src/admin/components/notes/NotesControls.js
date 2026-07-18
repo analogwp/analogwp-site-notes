@@ -7,9 +7,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ViewToggle from './ViewToggle';
-import TaskFilters from './TaskFilters';
+import NoteFilters from './NoteFilters';
 
-const TasksControls = ({
+const NotesControls = ({
 	activeView,
 	onViewChange,
 	filters,
@@ -19,15 +19,15 @@ const TasksControls = ({
 	users
 }) => {
 	return (
-		<div className="sn-tasks-controls">
-			<div className="sn-tasks-controls__inner">
-				<div className="sn-tasks-controls__row">
+		<div className="sn-notes-controls">
+			<div className="sn-notes-controls__inner">
+				<div className="sn-notes-controls__row">
 					<ViewToggle
 						activeView={activeView}
 						onViewChange={onViewChange}
 					/>
 
-					<TaskFilters
+					<NoteFilters
 						filters={filters}
 						onFilterChange={onFilterChange}
 						sortBy={sortBy}
@@ -40,4 +40,4 @@ const TasksControls = ({
 	);
 };
 
-export default TasksControls;
+export default NotesControls;

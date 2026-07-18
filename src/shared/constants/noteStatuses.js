@@ -4,9 +4,9 @@
 import { __ } from '@wordpress/i18n';
 
 /**
- * Task status definitions — shared between admin and frontend.
+ * Note status definitions — shared between admin and frontend.
  */
-export const TASK_STATUSES = [
+export const NOTE_STATUSES = [
 	{
 		key: 'open',
 		title: __('Open', 'analogwp-site-notes'),
@@ -28,9 +28,9 @@ export const TASK_STATUSES = [
 ];
 
 export const getStatusByKey = (statusKey) => {
-	return TASK_STATUSES.find((status) => status.key === statusKey);
+	return NOTE_STATUSES.find((status) => status.key === statusKey);
 };
 
 export const getStatusKeys = () => {
-	return TASK_STATUSES.map((status) => status.key);
+	return NOTE_STATUSES.map((status) => status.key);
 };

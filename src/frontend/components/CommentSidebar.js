@@ -14,7 +14,7 @@ import {
 	EllipsisVerticalIcon,
 	EyeIcon,
 } from '../../shared/icons';
-import { getStatusByKey } from '../constants/taskStatuses';
+import { getStatusByKey } from '../constants/noteStatuses';
 import { Button } from './ui';
 import logger from '../../shared/utils/logger';
 import ScreenshotSelectionFrame from './ScreenshotSelectionFrame';
@@ -267,7 +267,7 @@ const CommentSidebar = ({
 				setSelectedComment(null);
 			}
 		} catch (error) {
-			logger.error('Error deleting task:', error);
+			logger.error('Error deleting note:', error);
 		}
 	};
 

@@ -6,14 +6,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getStatusByKey } from '../../constants/taskStatuses';
-import { getStatusBadgeStyle } from './taskSidebarUtils';
-import { renderUserAvatar } from './taskSidebarUserUtils';
+import { getStatusByKey } from '../../constants/noteStatuses';
+import { getStatusBadgeStyle } from './noteSidebarUtils';
+import { renderUserAvatar } from './noteSidebarUserUtils';
 
 /**
  * Resolve the primary assignee for list display.
  *
- * @param {Object} comment Task/comment object.
+ * @param {Object} comment Note/comment object.
  * @return {Object|null} Assignee user or null.
  */
 const getPrimaryAssignee = (comment) => {
@@ -52,9 +52,9 @@ const formatListDate = (dateString, formatDate) => {
 };
 
 /**
- * Single task row for the admin list view (Figma card layout).
+ * Single note row for the admin list view (Figma card layout).
  */
-const TaskListItem = ({
+const NoteListItem = ({
 	comment,
 	onClick,
 	formatDate,
@@ -68,34 +68,34 @@ const TaskListItem = ({
 	return (
 		<button
 			type="button"
-			className="sn-tasks-list__item"
+			className="sn-notes-list__item"
 			onClick={() => onClick && onClick(comment)}
 		>
-			<span className="sn-tasks-list__status-col">
+			<span className="sn-notes-list__status-col">
 				<span
-					className="sn-tasks-list__status"
+					className="sn-notes-list__status"
 					style={statusStyle}
 				>
 					{statusLabel}
 				</span>
 			</span>
 
-			<span className="sn-tasks-list__title sn-truncate" title={comment.comment_title}>
+			<span className="sn-notes-list__title sn-truncate" title={comment.comment_title}>
 				{comment.comment_title}
 			</span>
 
-			<span className="sn-tasks-list__date">
+			<span className="sn-notes-list__date">
 				{formatListDate(comment.created_at, formatDate)}
 			</span>
 
-			<span className="sn-tasks-list__assignee">
-				<span className="sn-tasks-list__assignee-name sn-truncate">
+			<span className="sn-notes-list__assignee">
+				<span className="sn-notes-list__assignee-name sn-truncate">
 					{assigneeName}
 				</span>
-				{renderUserAvatar(assignee, 'sn-avatar sn-avatar--xs sn-tasks-list__assignee-avatar')}
+				{renderUserAvatar(assignee, 'sn-avatar sn-avatar--xs sn-notes-list__assignee-avatar')}
 			</span>
 		</button>
 	);
 };
 
-export default TaskListItem;
+export default NoteListItem;

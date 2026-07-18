@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { CloseIcon } from '../../../shared/icons';
 
-const TaskSidebarBackdropClose = ({ onClose, isManage = false }) => (
+const NoteSidebarBackdropClose = ({ onClose, isManage = false }) => (
 	<button
 		type="button"
 		className={`sn-kanban-sidebar-close${isManage ? ' sn-kanban-sidebar-close--manage' : ''}`}
@@ -22,4 +22,4 @@ const TaskSidebarBackdropClose = ({ onClose, isManage = false }) => (
 	</button>
 );
 
-export default TaskSidebarBackdropClose;
+export default NoteSidebarBackdropClose;

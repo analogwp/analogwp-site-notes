@@ -7,10 +7,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { TrashOutlineIcon } from '../../../shared/icons';
-import { formatRelativeTime } from './taskSidebarUtils';
-import TaskSidebarComment from './TaskSidebarComment';
+import { formatRelativeTime } from './noteSidebarUtils';
+import NoteSidebarComment from './NoteSidebarComment';
 
-const TaskSidebarDiscussion = ({ replies = [], onDeleteReply }) => {
+const NoteSidebarDiscussion = ({ replies = [], onDeleteReply }) => {
 	const currentUserId = window.agwp_sn_ajax?.currentUser?.id;
 
 	if (!replies.length) {
@@ -24,7 +24,7 @@ const TaskSidebarDiscussion = ({ replies = [], onDeleteReply }) => {
 		const deleteAction = onDeleteReply ? (
 			<button
 				type="button"
-				className="sn-task-comment__edit-btn sn-task-comment__edit-btn--danger"
+				className="sn-note-comment__edit-btn sn-note-comment__edit-btn--danger"
 				onClick={() => onDeleteReply(reply.id)}
 				title={__('Delete comment', 'analogwp-site-notes')}
 			>
@@ -33,7 +33,7 @@ const TaskSidebarDiscussion = ({ replies = [], onDeleteReply }) => {
 		) : null;
 
 		return (
-			<TaskSidebarComment
+			<NoteSidebarComment
 				key={reply.id}
 				user={{
 					display_name: reply.display_name,
@@ -45,9 +45,9 @@ const TaskSidebarDiscussion = ({ replies = [], onDeleteReply }) => {
 				headerAction={deleteAction}
 			>
 				{reply.reply_text}
-			</TaskSidebarComment>
+			</NoteSidebarComment>
 		);
 	});
 };
 
-export default TaskSidebarDiscussion;
+export default NoteSidebarDiscussion;

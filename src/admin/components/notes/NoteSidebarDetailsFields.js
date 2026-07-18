@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { SidebarSelect, SidebarMultiSelect, FieldDate } from '../ui';
-import { buildUserSelectOptions } from './taskSidebarUtils';
+import { buildUserSelectOptions } from './noteSidebarUtils';
 import PageTargetSelect from './PageTargetSelect';
 
 const getUserInitials = (name) => {
@@ -41,7 +41,7 @@ const renderUserPill = (user) => (
 	</span>
 );
 
-const TaskSidebarDetailsFields = ({
+const NoteSidebarDetailsFields = ({
 	formData,
 	onInputChange,
 	onPageChange,
@@ -102,7 +102,7 @@ const TaskSidebarDetailsFields = ({
 							// Keep "task-priorities" — settings URL/tab key; renaming would break bookmarks (not a DB migration but stable API).
 							<button
 								type="button"
-								className="sn-task-sidebar__field-link"
+								className="sn-note-sidebar__field-link"
 								onClick={() => onNavigateToSettingsTab('task-priorities')}
 							>
 								{__('Manage Priorities', 'analogwp-site-notes')}
@@ -132,7 +132,7 @@ const TaskSidebarDetailsFields = ({
 				footerLink={onNavigateToSettingsTab && (
 					<button
 						type="button"
-						className="sn-task-sidebar__field-link"
+						className="sn-note-sidebar__field-link"
 						onClick={() => onNavigateToSettingsTab('categories')}
 					>
 						{__('Manage Categories', 'analogwp-site-notes')}
@@ -147,10 +147,10 @@ const TaskSidebarDetailsFields = ({
 				onChange={handlePageChange}
 			/>
 
-			<div className="sn-task-sidebar__row sn-task-sidebar__row--spaced">
-				<label className="sn-task-sidebar__row-label">{__('Due Date', 'analogwp-site-notes')}</label>
-				<div className="sn-task-sidebar__row-control">
-					<div className="sn-task-sidebar__row-field">
+			<div className="sn-note-sidebar__row sn-note-sidebar__row--spaced">
+				<label className="sn-note-sidebar__row-label">{__('Due Date', 'analogwp-site-notes')}</label>
+				<div className="sn-note-sidebar__row-control">
+					<div className="sn-note-sidebar__row-field">
 						<FieldDate
 							value={formData.dueDate}
 							onChange={(value) => onInputChange('dueDate', value)}
@@ -161,15 +161,15 @@ const TaskSidebarDetailsFields = ({
 			</div>
 
 			{showDescription && (
-				<div className="sn-task-sidebar__description">
-					<label className="sn-task-sidebar__description-label">
+				<div className="sn-note-sidebar__description">
+					<label className="sn-note-sidebar__description-label">
 						{__('Description', 'analogwp-site-notes')}
 					</label>
 					<textarea
 						value={formData.description}
 						onChange={(e) => onInputChange('description', e.target.value)}
 						placeholder={__('Add a note description here (optional)', 'analogwp-site-notes')}
-						className="sn-input sn-task-sidebar__description-input"
+						className="sn-input sn-note-sidebar__description-input"
 						rows="4"
 					/>
 				</div>
@@ -178,4 +178,4 @@ const TaskSidebarDetailsFields = ({
 	);
 };
 
-export default TaskSidebarDetailsFields;
+export default NoteSidebarDetailsFields;

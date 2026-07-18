@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TasksView from '../components/tasks';
+import NotesView from '../components/notes';
 import AdminHeader from '../components/AdminHeader';
 import Settings from '../components/settings';
 import { ToastProvider, showToast, showConfirmation } from '../components/ToastProvider';
@@ -167,7 +167,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
         }
     };
 
-    const handleAddTask = async (taskData) => {
+    const handleAddNote = async (taskData) => {
         try {
             const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
@@ -187,11 +187,11 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                 // Reload admin data to get the latest tasks
                 loadAdminData();
             } else {
-                logger.error('Error adding task:', data.message);
+                logger.error('Error adding note:', data.message);
                 throw new Error(data.message);
             }
         } catch (error) {
-            logger.error('Error adding task:', error);
+            logger.error('Error adding note:', error);
             throw error;
         }
     };
@@ -378,7 +378,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 
             const data = await response.json();
             if (data.success) {
-                // Remove the task from the state
+                // Remove the note from the state
                 setComments(comments.filter(comment => comment.id !== commentId));
                 showToast.success(__('Note deleted successfully!', 'analogwp-site-notes'));
             } else {
@@ -468,13 +468,13 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
             case 'dashboard':
             default:
                 return (
-                    <TasksView 
+                    <NotesView 
                         comments={filteredComments}
                         onUpdateComment={handleUpdateComment}
                         onAddReply={handleAddReply}
                         onDeleteReply={handleDeleteReply}
                         onDelete={handleDelete}
-                        onAddTask={handleAddTask}
+                        onAddNote={handleAddNote}
                         users={users}
                         categories={categories}
                         priorities={priorities}

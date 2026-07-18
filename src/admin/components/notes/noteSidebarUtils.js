@@ -1,13 +1,15 @@
 /**
- * Shared helpers for add/edit task sidebars.
+ * Shared helpers for add/edit note sidebars.
+ *
+ * Payload keys sent to AJAX/DB stay as comment_title, comment_text, etc.
  */
 import { __ } from '@wordpress/i18n';
-import { getStatusByKey } from '../../../shared/constants/taskStatuses';
+import { getStatusByKey } from '../../../shared/constants/noteStatuses';
 
 export const CUSTOM_PAGE_ID = 'custom';
 
-export const EMPTY_TASK_FORM = {
-	taskTitle: '',
+export const EMPTY_NOTE_FORM = {
+	noteTitle: '',
 	status: 'open',
 	assignedUsers: [],
 	categories: [],
@@ -122,30 +124,30 @@ export const normalizeAssignedUsersFormValue = (userIds) => [...(userIds || [])]
 	.filter(isValidAssignedUserId)
 	.map((userId) => String(userId));
 
-const mapAssignedUsersToForm = (task) => {
-	if (Array.isArray(task.assignees) && task.assignees.length > 0) {
-		return normalizeAssignedUsersFormValue(task.assignees.map((assignee) => assignee.id));
+const mapAssignedUsersToForm = (note) => {
+	if (Array.isArray(note.assignees) && note.assignees.length > 0) {
+		return normalizeAssignedUsersFormValue(note.assignees.map((assignee) => assignee.id));
 	}
 
-	if (Array.isArray(task.assigned_user_ids) && task.assigned_user_ids.length > 0) {
-		return normalizeAssignedUsersFormValue(task.assigned_user_ids);
+	if (Array.isArray(note.assigned_user_ids) && note.assigned_user_ids.length > 0) {
+		return normalizeAssignedUsersFormValue(note.assigned_user_ids);
 	}
 
-	if (isValidAssignedUserId(task.assigned_to)) {
-		return [String(task.assigned_to)];
+	if (isValidAssignedUserId(note.assigned_to)) {
+		return [String(note.assigned_to)];
 	}
 
 	return [];
 };
 
-export const mapTaskToFormData = (task, pages = []) => {
+export const mapNoteToFormData = (note, pages = []) => {
 	let pageId = '';
-	const pageUrl = task.page_url || '';
+	const pageUrl = note.page_url || '';
 
 	if (pageUrl && pages.length > 0) {
-		const normalizedTaskUrl = normalizePageUrl(pageUrl);
+		const normalizedNoteUrl = normalizePageUrl(pageUrl);
 		const matchingPage = pages.find((page) => {
-			return normalizePageUrl(page.url) === normalizedTaskUrl;
+			return normalizePageUrl(page.url) === normalizedNoteUrl;
 		});
 
 		if (matchingPage) {
@@ -153,8 +155,8 @@ export const mapTaskToFormData = (task, pages = []) => {
 		}
 	}
 
-	if (!pageId && task.post_id && task.post_id !== '0' && task.post_id !== 0) {
-		const postIdString = String(task.post_id);
+	if (!pageId && note.post_id && note.post_id !== '0' && note.post_id !== 0) {
+		const postIdString = String(note.post_id);
 		if (/^\d+$/.test(postIdString)) {
 			pageId = postIdString;
 		}
@@ -165,28 +167,28 @@ export const mapTaskToFormData = (task, pages = []) => {
 	}
 
 	return {
-		taskTitle: task.comment_title || '',
-		status: task.status || 'open',
-		assignedUsers: mapAssignedUsersToForm(task),
-		categories: task.categories || [],
+		noteTitle: note.comment_title || '',
+		status: note.status || 'open',
+		assignedUsers: mapAssignedUsersToForm(note),
+		categories: note.categories || [],
 		pageId,
 		pageUrl,
-		dueDate: task.due_date || '',
+		dueDate: note.due_date || '',
 		timeHours: '',
 		timeMinutes: '',
-		priority: task.priority || 'medium',
-		description: task.comment_text || '',
+		priority: note.priority || 'medium',
+		description: note.comment_text || '',
 	};
 };
 
 const normalizeCategories = (categories) => [...(categories || [])].sort().join('\0');
 
-export const hasTaskFormChanges = (initialFormData, currentFormData, pendingTimeEntries = []) => {
+export const hasNoteFormChanges = (initialFormData, currentFormData, pendingTimeEntries = []) => {
 	if (pendingTimeEntries.length > 0) {
 		return true;
 	}
 
-	const scalarFields = ['taskTitle', 'status', 'pageId', 'pageUrl', 'dueDate', 'priority', 'description'];
+	const scalarFields = ['noteTitle', 'status', 'pageId', 'pageUrl', 'dueDate', 'priority', 'description'];
 
 	for (const field of scalarFields) {
 		if ((initialFormData[field] || '') !== (currentFormData[field] || '')) {
@@ -220,7 +222,7 @@ export const buildPageTargetPayload = (pageId, pageUrl, pages = []) => {
 
 export const buildFieldUpdatePayload = (field, value, formData, pages) => {
 	switch (field) {
-		case 'taskTitle':
+		case 'noteTitle':
 			return { comment_title: value || formData.description };
 		case 'description':
 			return { comment_text: value };
@@ -333,12 +335,12 @@ export const buildTimesheetData = (pendingTimeEntries, formData, existingEntries
 	return JSON.stringify([...existingEntries, ...entries]);
 };
 
-export const buildTaskPayload = (formData, pages, timesheetData) => {
+export const buildNotePayload = (formData, pages, timesheetData) => {
 	const pagePayload = buildPageTargetPayload(formData.pageId, formData.pageUrl, pages);
 	const assignedUsers = normalizeAssignedUserIds(formData.assignedUsers);
 
-	const taskData = {
-		comment_title: formData.taskTitle || formData.description,
+	const noteData = {
+		comment_title: formData.noteTitle || formData.description,
 		comment_text: formData.description,
 		post_id: pagePayload.post_id,
 		page_url: pagePayload.page_url,
@@ -353,8 +355,8 @@ export const buildTaskPayload = (formData, pages, timesheetData) => {
 	};
 
 	if (timesheetData) {
-		taskData.timesheet = timesheetData;
+		noteData.timesheet = timesheetData;
 	}
 
-	return taskData;
+	return noteData;
 };

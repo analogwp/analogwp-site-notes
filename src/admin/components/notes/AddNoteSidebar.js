@@ -11,23 +11,23 @@ import { showToast } from '../ToastProvider';
 import { useSettings } from '../settings/SettingsProvider';
 import logger from '../../../shared/utils/logger';
 import { CloseIcon } from '../../../shared/icons';
-import TaskSidebarDetailsFields from './TaskSidebarDetailsFields';
-import TaskSidebarTimesheetTab from './TaskSidebarTimesheetTab';
-import TaskSidebarTabs from './TaskSidebarTabs';
-import TaskSidebarFooter from './TaskSidebarFooter';
+import NoteSidebarDetailsFields from './NoteSidebarDetailsFields';
+import NoteSidebarTimesheetTab from './NoteSidebarTimesheetTab';
+import NoteSidebarTabs from './NoteSidebarTabs';
+import NoteSidebarFooter from './NoteSidebarFooter';
 import {
-	EMPTY_TASK_FORM,
-	buildTaskPayload,
+	EMPTY_NOTE_FORM,
+	buildNotePayload,
 	buildTimeEntry,
 	buildTimesheetData,
 	getDefaultPriorityOptions,
 	getPriorityBadgeStyle,
 	getStatusBadgeStyle,
-} from './taskSidebarUtils';
+} from './noteSidebarUtils';
 
-const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNavigateToSettingsTab }) => {
+const AddNoteSidebar = ({ onClose, onSave, users, pages, statuses = [], onNavigateToSettingsTab }) => {
 	const { categories, priorities } = useSettings();
-	const [formData, setFormData] = useState(EMPTY_TASK_FORM);
+	const [formData, setFormData] = useState(EMPTY_NOTE_FORM);
 	const [activeTab, setActiveTab] = useState('details');
 	const [pendingTimeEntries, setPendingTimeEntries] = useState([]);
 
@@ -83,13 +83,13 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 	};
 
 	const resetForm = () => {
-		setFormData(EMPTY_TASK_FORM);
+		setFormData(EMPTY_NOTE_FORM);
 		setActiveTab('details');
 		setPendingTimeEntries([]);
 	};
 
 	const handleSave = async () => {
-		if (!formData.taskTitle.trim() && !formData.description.trim()) {
+		if (!formData.noteTitle.trim() && !formData.description.trim()) {
 			showToast.error(__('Please enter a note title or description', 'analogwp-site-notes'));
 			return;
 		}
@@ -105,7 +105,7 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 			[],
 			__('Initial time entry', 'analogwp-site-notes')
 		);
-		const taskData = buildTaskPayload(formData, pages, timesheetData);
+		const taskData = buildNotePayload(formData, pages, timesheetData);
 
 		try {
 			await onSave(taskData);
@@ -118,7 +118,7 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 				showToast.success(__('Note created successfully', 'analogwp-site-notes'));
 			}
 		} catch (err) {
-			logger.error('Error saving task:', err);
+			logger.error('Error saving note:', err);
 			showToast.error(__('Error saving note. Please try again.', 'analogwp-site-notes'));
 		}
 	};
@@ -129,20 +129,20 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 	};
 
 	return (
-		<div className="sn-task-sidebar">
-			<div className="sn-task-sidebar__header">
-				<div className="sn-task-sidebar__header-row">
+		<div className="sn-note-sidebar">
+			<div className="sn-note-sidebar__header">
+				<div className="sn-note-sidebar__header-row">
 					<input
 						type="text"
-						value={formData.taskTitle}
-						onChange={(e) => handleInputChange('taskTitle', e.target.value)}
-						placeholder={__('Add note Name', 'analogwp-site-notes')}
-						className="sn-task-sidebar__title-input"
+						value={formData.noteTitle}
+						onChange={(e) => handleInputChange('noteTitle', e.target.value)}
+						placeholder={__('Add note title', 'analogwp-site-notes')}
+						className="sn-note-sidebar__title-input"
 					/>
-					<div className="sn-task-sidebar__header-actions">
+					<div className="sn-note-sidebar__header-actions">
 						<button
 							type="button"
-							className="sn-task-sidebar__header-action"
+							className="sn-note-sidebar__header-action"
 							onClick={handleCancel}
 							title={__('Close', 'analogwp-site-notes')}
 						>
@@ -152,11 +152,11 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 				</div>
 			</div>
 
-			<TaskSidebarTabs activeTab={activeTab} onTabChange={setActiveTab} />
+			<NoteSidebarTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-			<div className={`sn-task-sidebar__body${activeTab === 'timesheet' ? ' sn-task-sidebar__body--timesheet' : ''}`}>
+			<div className={`sn-note-sidebar__body${activeTab === 'timesheet' ? ' sn-note-sidebar__body--timesheet' : ''}`}>
 				{activeTab === 'details' ? (
-					<TaskSidebarDetailsFields
+					<NoteSidebarDetailsFields
 						formData={formData}
 						onInputChange={handleInputChange}
 						onPageChange={handlePageChange}
@@ -170,14 +170,14 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 						onNavigateToSettingsTab={onNavigateToSettingsTab}
 					/>
 				) : (
-					<TaskSidebarTimesheetTab
+					<NoteSidebarTimesheetTab
 						entries={pendingTimeEntries}
 						onAddTime={handleAddTime}
 					/>
 				)}
 			</div>
 
-			<TaskSidebarFooter
+			<NoteSidebarFooter
 				primaryLabel={__('Create Note', 'analogwp-site-notes')}
 				onSave={handleSave}
 				onCancel={handleCancel}
@@ -186,4 +186,4 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 	);
 };
 
-export default AddTaskSidebar;
+export default AddNoteSidebar;

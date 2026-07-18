@@ -8,19 +8,19 @@ import { __ } from '@wordpress/i18n';
  */
 import { Select } from '../ui';
 import { useSettings } from '../settings/SettingsProvider';
-import { TASK_STATUSES } from '../../constants/taskStatuses';
+import { NOTE_STATUSES } from '../../constants/noteStatuses';
 
-const TaskFilters = ({ filters, onFilterChange, sortBy, onSortChange, users }) => {
+const NoteFilters = ({ filters, onFilterChange, sortBy, onSortChange, users }) => {
 	const { categories } = useSettings();
 
 	return (
-		<div className="sn-task-filters">
+		<div className="sn-note-filters">
 			<Select
 				value={filters.status}
 				onChange={(value) => onFilterChange({ status: value })}
 				options={[
 					{ value: '', label: __('Filter by Status', 'analogwp-site-notes') },
-					...TASK_STATUSES.map(status => ({
+					...NOTE_STATUSES.map(status => ({
 						value: status.key,
 						label: status.title
 					}))
@@ -67,4 +67,4 @@ const TaskFilters = ({ filters, onFilterChange, sortBy, onSortChange, users }) =
 	);
 };
 
-export default TaskFilters;
+export default NoteFilters;

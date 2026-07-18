@@ -11,17 +11,17 @@ import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 /**
  * Internal dependencies
  */
-import TasksListView from './TasksListView';
-import TasksKanbanView from './TasksKanbanView';
-import { TASK_STATUSES } from '../../constants/taskStatuses';
+import NotesListView from './NotesListView';
+import NotesKanbanView from './NotesKanbanView';
+import { NOTE_STATUSES } from '../../constants/noteStatuses';
 
-const TasksView = ({
+const NotesView = ({
 	comments,
 	onUpdateComment,
 	onAddReply,
 	onDeleteReply,
 	onDelete,
-	onAddTask,
+	onAddNote,
 	users,
 	pages,
 	activeView = 'kanban',
@@ -35,7 +35,7 @@ const TasksView = ({
 	const [draggedItem, setDraggedItem] = useState(null);
 	const [activeId, setActiveId] = useState(null);
 	const [showAddModal, setShowAddModal] = useState(false);
-	const [editingTask, setEditingTask] = useState(null);
+	const [editingNote, setEditingNote] = useState(null);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -46,42 +46,42 @@ const TasksView = ({
 	);
 
 	const handleAddNew = () => {
-		setEditingTask(null);
+		setEditingNote(null);
 		setShowAddModal(true);
 	};
 
-	const handleEditTask = (task) => {
-		setEditingTask(task);
+	const handleEditNote = (note) => {
+		setEditingNote(note);
 		setShowAddModal(true);
 	};
 
 	const handleCloseModal = () => {
 		setShowAddModal(false);
-		setEditingTask(null);
+		setEditingNote(null);
 	};
 
-	const handleSaveTask = async (taskData) => {
-		if (editingTask) {
+	const handleSaveNote = async (taskData) => {
+		if (editingNote) {
 			if (onUpdateComment) {
-				await onUpdateComment(editingTask.id, taskData);
+				await onUpdateComment(editingNote.id, taskData);
 			}
-		} else if (onAddTask) {
-			await onAddTask(taskData);
+		} else if (onAddNote) {
+			await onAddNote(taskData);
 		}
 
 		handleCloseModal();
 	};
 
-	const handleUpdateTask = useCallback(async (taskData, options = {}) => {
-		if (!editingTask || !onUpdateComment) {
+	const handleUpdateNote = useCallback(async (taskData, options = {}) => {
+		if (!editingNote || !onUpdateComment) {
 			return false;
 		}
 
-		return onUpdateComment(editingTask.id, taskData, options);
-	}, [editingTask, onUpdateComment]);
+		return onUpdateComment(editingNote.id, taskData, options);
+	}, [editingNote, onUpdateComment]);
 
-	const liveEditingTask = editingTask
-		? comments.find((comment) => String(comment.id) === String(editingTask.id)) || editingTask
+	const liveEditingNote = editingNote
+		? comments.find((comment) => String(comment.id) === String(editingNote.id)) || editingNote
 		: null;
 
 	const handleDelete = (id) => {
@@ -142,22 +142,22 @@ const TasksView = ({
 		sortBy,
 		onSortChange,
 		users,
-		statuses: TASK_STATUSES,
+		statuses: NOTE_STATUSES,
 		getCommentsByStatus,
 		getUserById,
 		handleDelete,
-		handleEditTask,
+		handleEditNote,
 		formatDate,
 		handleAddNew,
 		showAddModal,
 		handleCloseModal,
-		handleSaveTask,
-		handleUpdateTask,
-		liveEditingTask,
+		handleSaveNote,
+		handleUpdateNote,
+		liveEditingNote,
 		onAddReply,
 		onDeleteReply,
 		pages,
-		editingTask,
+		editingNote,
 		comments,
 		activeView,
 		onViewChange,
@@ -165,10 +165,10 @@ const TasksView = ({
 	};
 
 	if (activeView === 'list') {
-		return <TasksListView {...commonProps} />;
+		return <NotesListView {...commonProps} />;
 	}
 
-	return <TasksKanbanView {...commonProps} />;
+	return <NotesKanbanView {...commonProps} />;
 };
 
-export default TasksView;
+export default NotesView;

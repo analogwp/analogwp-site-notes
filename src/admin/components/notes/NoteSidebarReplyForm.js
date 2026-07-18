@@ -4,7 +4,7 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-const TaskSidebarReplyForm = ({ onSubmit, disabled = false }) => {
+const NoteSidebarReplyForm = ({ onSubmit, disabled = false }) => {
 	const [replyText, setReplyText] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,12 +29,12 @@ const TaskSidebarReplyForm = ({ onSubmit, disabled = false }) => {
 	};
 
 	return (
-		<form className="sn-task-sidebar__reply-form" onSubmit={handleSubmit}>
+		<form className="sn-note-sidebar__reply-form" onSubmit={handleSubmit}>
 			<textarea
 				value={replyText}
 				onChange={(event) => setReplyText(event.target.value)}
 				placeholder={__('Write a reply…', 'analogwp-site-notes')}
-				className="sn-input sn-task-sidebar__reply-input"
+				className="sn-input sn-note-sidebar__reply-input"
 				rows="3"
 				disabled={disabled || isSubmitting}
 			/>
@@ -49,4 +49,4 @@ const TaskSidebarReplyForm = ({ onSubmit, disabled = false }) => {
 	);
 };
 
-export default TaskSidebarReplyForm;
+export default NoteSidebarReplyForm;

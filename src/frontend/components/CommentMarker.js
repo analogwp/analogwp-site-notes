@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { ArrowUpIcon, EllipsisVerticalIcon, NoteMarkerPinIcon, TrashOutlineIcon } from '../../shared/icons';
-import { getStatusByKey } from '../constants/taskStatuses';
+import { getStatusByKey } from '../constants/noteStatuses';
 import { formatRelativeTime } from '../utils/formatRelativeTime';
 import logger from '../../shared/utils/logger';
 

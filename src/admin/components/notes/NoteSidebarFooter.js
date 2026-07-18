@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { TrashOutlineIcon } from '../../../shared/icons';
 
-const TaskSidebarFooter = ({
+const NoteSidebarFooter = ({
 	primaryLabel,
 	onSave,
 	onCancel,
@@ -17,10 +17,10 @@ const TaskSidebarFooter = ({
 	deleteOnly = false,
 	tabs = null,
 }) => (
-	<div className={`sn-task-sidebar__footer${deleteOnly ? ' sn-task-sidebar__footer--delete-only' : ''}${tabs ? ' sn-task-sidebar__footer--with-tabs' : ''}`}>
-		<div className="sn-task-sidebar__footer-bar">
+	<div className={`sn-note-sidebar__footer${deleteOnly ? ' sn-note-sidebar__footer--delete-only' : ''}${tabs ? ' sn-note-sidebar__footer--with-tabs' : ''}`}>
+		<div className="sn-note-sidebar__footer-bar">
 			{tabs}
-			<div className="sn-task-sidebar__footer-actions">
+			<div className="sn-note-sidebar__footer-actions">
 				{!deleteOnly && (
 					<button
 						type="button"
@@ -43,7 +43,7 @@ const TaskSidebarFooter = ({
 				{onDelete && (
 					<button
 						type="button"
-						className="sn-task-sidebar__footer-delete"
+						className="sn-note-sidebar__footer-delete"
 						onClick={onDelete}
 						title={__('Delete note', 'analogwp-site-notes')}
 					>
@@ -55,4 +55,4 @@ const TaskSidebarFooter = ({
 	</div>
 );
 
-export default TaskSidebarFooter;
+export default NoteSidebarFooter;

@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import { SidebarFieldSettingsIcon } from '../../../shared/icons';
 import SelectMenuSearch from '../ui/SelectMenuSearch/SelectMenuSearch';
 import logger from '../../../shared/utils/logger';
-import { CUSTOM_PAGE_ID, normalizePageUrl, resolvePagePostId } from './taskSidebarUtils';
+import { CUSTOM_PAGE_ID, normalizePageUrl, resolvePagePostId } from './noteSidebarUtils';
 
 import './PageTargetSelect.scss';
 

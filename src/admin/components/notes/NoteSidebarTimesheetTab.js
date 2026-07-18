@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { FieldTime, parseTimeInput } from '../ui';
 import { showToast } from '../ToastProvider';
-import { formatOpenedDate } from './taskSidebarUtils';
+import { formatOpenedDate } from './noteSidebarUtils';
 
 const getTotalLoggedTime = (entries) => {
 	const totalMinutes = entries.reduce((total, entry) => (
@@ -22,7 +22,7 @@ const getTotalLoggedTime = (entries) => {
 	};
 };
 
-const TaskSidebarTimesheetTab = ({ entries = [], onAddTime }) => {
+const NoteSidebarTimesheetTab = ({ entries = [], onAddTime }) => {
 	const [timeInput, setTimeInput] = useState('');
 	const totalTime = getTotalLoggedTime(entries);
 
@@ -43,13 +43,13 @@ const TaskSidebarTimesheetTab = ({ entries = [], onAddTime }) => {
 	};
 
 	return (
-		<div className="sn-task-sidebar__timesheet">
-			<div className="sn-task-sidebar__timesheet-scroll">
-				<div className="sn-task-sidebar__timesheet-total">
-					<span className="sn-task-sidebar__timesheet-total-label">
+		<div className="sn-note-sidebar__timesheet">
+			<div className="sn-note-sidebar__timesheet-scroll">
+				<div className="sn-note-sidebar__timesheet-total">
+					<span className="sn-note-sidebar__timesheet-total-label">
 						{__('Total Logged Time:', 'analogwp-site-notes')}
 					</span>
-					<span className="sn-task-sidebar__timesheet-total-value">
+					<span className="sn-note-sidebar__timesheet-total-value">
 						{totalTime.hours}h {String(totalTime.minutes).padStart(2, '0')}m
 					</span>
 				</div>
@@ -59,15 +59,15 @@ const TaskSidebarTimesheetTab = ({ entries = [], onAddTime }) => {
 						{__('No time entries yet.', 'analogwp-site-notes')}
 					</p>
 				) : (
-					<div className="sn-task-sidebar__timesheet-list">
+					<div className="sn-note-sidebar__timesheet-list">
 						{entries.map((entry) => (
-							<div key={entry.id} className="sn-task-sidebar__timesheet-entry">
-								<div className="sn-task-sidebar__timesheet-entry-main">
-									<span className="sn-task-sidebar__timesheet-duration">
+							<div key={entry.id} className="sn-note-sidebar__timesheet-entry">
+								<div className="sn-note-sidebar__timesheet-entry-main">
+									<span className="sn-note-sidebar__timesheet-duration">
 										{entry.hours}h {String(entry.minutes).padStart(2, '0')}m
 									</span>
 									{entry.description && (
-										<span className="sn-task-sidebar__timesheet-description">
+										<span className="sn-note-sidebar__timesheet-description">
 											{entry.description}
 										</span>
 									)}
@@ -84,11 +84,11 @@ const TaskSidebarTimesheetTab = ({ entries = [], onAddTime }) => {
 			</div>
 
 			{onAddTime && (
-				<div className="sn-task-sidebar__timesheet-add">
-					<label className="sn-task-sidebar__timesheet-add-label">
+				<div className="sn-note-sidebar__timesheet-add">
+					<label className="sn-note-sidebar__timesheet-add-label">
 						{__('Add time', 'analogwp-site-notes')}
 					</label>
-					<div className="sn-task-sidebar__time-row">
+					<div className="sn-note-sidebar__time-row">
 						<FieldTime
 							value={timeInput}
 							onChange={setTimeInput}
@@ -96,7 +96,7 @@ const TaskSidebarTimesheetTab = ({ entries = [], onAddTime }) => {
 						/>
 						<button
 							type="button"
-							className="sn-task-sidebar__time-log-btn"
+							className="sn-note-sidebar__time-log-btn"
 							onClick={handleLogTime}
 						>
 							{__('Log', 'analogwp-site-notes')}
@@ -108,4 +108,4 @@ const TaskSidebarTimesheetTab = ({ entries = [], onAddTime }) => {
 	);
 };
 
-export default TaskSidebarTimesheetTab;
+export default NoteSidebarTimesheetTab;

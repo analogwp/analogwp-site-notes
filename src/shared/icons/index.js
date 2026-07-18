@@ -35,7 +35,7 @@ export { default as SettingsIcon } from './SettingsIcon';
 export { default as SidebarFieldSettingsIcon } from './SidebarFieldSettingsIcon';
 export { default as SiteNotesLogoIcon } from './SiteNotesLogoIcon';
 export { default as SpinnerIcon } from './SpinnerIcon';
-export { default as TasksIcon } from './TasksIcon';
+export { default as NotesIcon } from './NotesIcon';
 export { default as TrashIcon } from './TrashIcon';
 export { default as TrashOutlineIcon } from './TrashOutlineIcon';
 export { default as WordPressLogoIcon } from './WordPressLogoIcon';
