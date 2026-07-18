@@ -33,7 +33,7 @@ const VisualCommentsApp = () => {
         }
     }, [isActive, pageFilter]);
 
-    // Handle element clicking when comments mode is active
+    // Handle element clicking when Notes mode is active
     useEffect(() => {
         if (!isActive) return;
 
@@ -307,19 +307,6 @@ const VisualCommentsApp = () => {
         const notification = document.createElement('div');
         notification.className = `sn-notification sn-notification-${type}`;
         notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: ${type === 'success' ? '#00a32a' : type === 'error' ? '#d63638' : '#2271b1'};
-            color: white;
-            padding: 12px 20px;
-            border-radius: 4px;
-            z-index: 100000;
-            font-size: 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        `;
-
         document.body.appendChild(notification);
 
         setTimeout(() => {
@@ -330,9 +317,8 @@ const VisualCommentsApp = () => {
     return (
         <div className="sn-visual-comments">
             <CommentToggle 
-                isActive={isActive} 
+                isActive={isActive}
                 onToggle={setIsActive}
-                commentsCount={comments.length}
             />
             
             {isActive && (

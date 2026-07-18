@@ -172,7 +172,7 @@ const CommentSidebar = ({
 
 	const filterLabel =
 		pageFilter === FILTER_ALL
-			? __('All Tasks', 'analogwp-site-notes')
+			? __('All Notes', 'analogwp-site-notes')
 			: __('Current Page', 'analogwp-site-notes');
 
 	const handleReplySubmit = async (commentId, e) => {
@@ -349,7 +349,7 @@ const CommentSidebar = ({
 												setFilterOpen(false);
 											}}
 										>
-											{__('All Tasks', 'analogwp-site-notes')}
+											{__('All Notes', 'analogwp-site-notes')}
 										</button>
 									</li>
 								</ul>

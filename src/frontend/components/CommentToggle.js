@@ -9,88 +9,85 @@ import { __ } from '@wordpress/i18n';
  */
 import { CommentCursorIcon, HideIcon } from '../../shared/icons';
 
-const CommentToggle = ({ isActive, onToggle, commentsCount }) => {
-    const [isVisible, setIsVisible] = useState(true);
+const CommentToggle = ({ isActive, onToggle }) => {
+	const [isVisible, setIsVisible] = useState(true);
 
-    // Update admin bar toggle status
-    useEffect(() => {
-        const adminBarToggle = document.getElementById('sn-admin-bar-toggle');
-        if (adminBarToggle) {
-            // Update the entire text content to show the action (not the current state)
-            const actionText = isActive 
-                ? __('Turn Comments OFF', 'analogwp-site-notes')
-                : __('Turn Comments ON', 'analogwp-site-notes');
-            
-            adminBarToggle.textContent = actionText;
-            
-            // Add/remove active class for styling
-            if (isActive) {
-                adminBarToggle.classList.add('sn-comments-active');
-            } else {
-                adminBarToggle.classList.remove('sn-comments-active');
-            }
-        }
-    }, [isActive]);
+	// Keep admin bar title status and dropdown label in sync with Notes mode.
+	useEffect(() => {
+		const adminBarStatus = document.getElementById('sn-admin-bar-status');
+		if (adminBarStatus) {
+			adminBarStatus.textContent = isActive
+				? __('On', 'analogwp-site-notes')
+				: __('Off', 'analogwp-site-notes');
+			adminBarStatus.classList.toggle('is-on', isActive);
+			adminBarStatus.classList.toggle('is-off', !isActive);
+		}
 
-    // Handle admin bar click
-    useEffect(() => {
-        const adminBarItem = document.querySelector('.agwp-sn-admin-bar-toggle');
-        if (adminBarItem) {
-            const handleClick = (e) => {
-                e.preventDefault();
-                onToggle(!isActive);
-            };
-            
-            adminBarItem.addEventListener('click', handleClick);
-            
-            return () => {
-                adminBarItem.removeEventListener('click', handleClick);
-            };
-        }
-    }, [isActive, onToggle]);
+		const adminBarToggle = document.getElementById('sn-admin-bar-toggle');
+		if (adminBarToggle) {
+			adminBarToggle.textContent = isActive
+				? __('Disable Notes', 'analogwp-site-notes')
+				: __('Enable Notes', 'analogwp-site-notes');
+		}
+	}, [isActive]);
 
-    if (!isVisible) {
-        return null;
-    }
+	// Parent admin bar title and dropdown item both toggle Notes mode.
+	useEffect(() => {
+		const handleToggleClick = (event) => {
+			event.preventDefault();
+			onToggle(!isActive);
+		};
 
-    return (
-        <div className={`sn-toggle-button ${isActive ? 'active' : ''}`} data-sn-ignore="true">
-            <button 
-                onClick={() => onToggle(!isActive)}
-                className="sn-toggle-btn"
-                data-sn-ignore="true"
-                aria-label={isActive ? 
-                    __('Disable Visual Comments', 'analogwp-site-notes') : 
-                    __('Enable Visual Comments', 'analogwp-site-notes')
-                }
-            >
-                <span className="sn-toggle-icon">
-                    <CommentCursorIcon />
-                </span>
-                
-                <span className="sn-toggle-text">
-                    {isActive ? 
-                        __('Comments ON', 'analogwp-site-notes') : 
-                        __('Comments OFF', 'analogwp-site-notes')
-                    }
-                    {commentsCount > 0 && (
-                        <span className="sn-comments-count">
-                            ({commentsCount})
-                        </span>
-                    )}
-                </span>
-            </button>
-            
-            <button
-                onClick={() => setIsVisible(false)}
-                className="sn-toggle-hide"
-                data-sn-ignore="true"
-                aria-label={__('Hide toggle button', 'analogwp-site-notes')}
-            >
-                <HideIcon className="sn-hide-icon" />
-            </button>
-        </div>
-    );
+		const parentItem = document.querySelector('#wp-admin-bar-agwp-sn-menu > .ab-item');
+		const dropdownItem = document.querySelector('.agwp-sn-admin-bar-toggle');
+
+		parentItem?.addEventListener('click', handleToggleClick);
+		dropdownItem?.addEventListener('click', handleToggleClick);
+
+		return () => {
+			parentItem?.removeEventListener('click', handleToggleClick);
+			dropdownItem?.removeEventListener('click', handleToggleClick);
+		};
+	}, [isActive, onToggle]);
+
+	if (!isVisible) {
+		return null;
+	}
+
+	return (
+		<div className={`sn-toggle-button ${isActive ? 'active' : ''}`} data-sn-ignore="true">
+			<button
+				onClick={() => onToggle(!isActive)}
+				className="sn-toggle-btn"
+				data-sn-ignore="true"
+				aria-label={
+					isActive
+						? __('Disable Notes mode', 'analogwp-site-notes')
+						: __('Enable Notes mode', 'analogwp-site-notes')
+				}
+			>
+				<span className="sn-toggle-icon">
+					<CommentCursorIcon />
+				</span>
+
+				<span className="sn-toggle-text">
+					{__('Notes', 'analogwp-site-notes')}
+					<span className={`sn-toggle-status ${isActive ? 'is-on' : 'is-off'}`}>
+						{isActive ? __('On', 'analogwp-site-notes') : __('Off', 'analogwp-site-notes')}
+					</span>
+				</span>
+			</button>
+
+			<button
+				onClick={() => setIsVisible(false)}
+				className="sn-toggle-hide"
+				data-sn-ignore="true"
+				aria-label={__('Hide toggle button', 'analogwp-site-notes')}
+			>
+				<HideIcon className="sn-hide-icon" />
+			</button>
+		</div>
+	);
 };
 
 export default CommentToggle;
