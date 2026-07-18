@@ -14,6 +14,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 // Delete plugin options.
 delete_option( 'agwp_sn_version' );
 delete_option( 'agwp_sn_db_version' );
+delete_option( 'agwp_sn_schema_version' );
 
 // Delete plugin tables.
 global $wpdb;

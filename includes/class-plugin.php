@@ -139,6 +139,9 @@ final class Plugin {
 		$this->assets   = Assets::get_instance();
 		$this->admin    = Admin::get_instance();
 		$this->ajax     = Ajax::get_instance();
+
+		// Apply pending DB schema migrations for existing installs.
+		$this->database->maybe_upgrade();
 	}
 
 	/**
