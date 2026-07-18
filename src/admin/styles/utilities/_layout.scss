@@ -52,6 +52,25 @@
 	white-space: nowrap;
 }
 
+/**
+ * Shared note number (List + Kanban).
+ */
+.sn-note-id {
+	flex-shrink: 0;
+	font-size: var(--sn-text-m-size);
+	font-weight: var(--sn-font-weight-regular);
+	line-height: var(--sn-text-m-line);
+	color: var(--sn-text-secondary);
+	transition: color var(--sn-transition-base);
+}
+
+.sn-notes-list__item:hover .sn-note-id,
+.sn-notes-list__item:focus-visible .sn-note-id,
+.sn-kanban-card:hover .sn-note-id,
+.sn-kanban-card:focus-within .sn-note-id {
+	color: var(--sn-accent);
+}
+
 .sn-group:hover .sn-group-hover-visible {
 	opacity: 1;
 }

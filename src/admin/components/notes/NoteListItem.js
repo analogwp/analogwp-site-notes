@@ -11,21 +11,43 @@ import { getStatusBadgeStyle } from './noteSidebarUtils';
 import { renderUserAvatar } from './noteSidebarUserUtils';
 
 /**
- * Resolve the primary assignee for list display.
+ * Resolve assignees for list display.
  *
  * @param {Object} comment Note/comment object.
- * @return {Object|null} Assignee user or null.
+ * @return {Array} Assignee users.
  */
-const getPrimaryAssignee = (comment) => {
+const getAssignees = (comment) => {
 	if (comment?.assignees?.length) {
-		return comment.assignees[0];
+		return comment.assignees;
 	}
 
 	if (comment?.assignee) {
-		return comment.assignee;
+		return [comment.assignee];
 	}
 
-	return null;
+	return [];
+};
+
+/**
+ * Resolve the note creator for list display.
+ *
+ * @param {Object} comment Note/comment object.
+ * @return {Object} Creator user-like object.
+ */
+const getCreator = (comment) => {
+	if (comment?.creator) {
+		return comment.creator;
+	}
+
+	if (comment?.user) {
+		return comment.user;
+	}
+
+	return {
+		id: comment?.user_id || 0,
+		name: comment?.display_name || comment?.user_name || __('Guest', 'analogwp-site-notes'),
+		avatar: comment?.avatar || '',
+	};
 };
 
 /**
@@ -62,8 +84,9 @@ const NoteListItem = ({
 	const status = getStatusByKey(comment.status);
 	const statusLabel = status?.title || comment.status;
 	const statusStyle = getStatusBadgeStyle(comment.status);
-	const assignee = getPrimaryAssignee(comment);
-	const assigneeName = assignee?.name || __('Unassigned', 'analogwp-site-notes');
+	const creator = getCreator(comment);
+	const assignees = getAssignees(comment);
+	const title = comment.comment_title || '';
 
 	return (
 		<button
@@ -71,28 +94,49 @@ const NoteListItem = ({
 			className="sn-notes-list__item"
 			onClick={() => onClick && onClick(comment)}
 		>
-			<span className="sn-notes-list__status-col">
-				<span
-					className="sn-notes-list__status"
-					style={statusStyle}
-				>
-					{statusLabel}
+			<span className="sn-notes-list__main">
+				<span className="sn-notes-list__title-row">
+					{comment.id && (
+						<span className="sn-note-id">{comment.id}</span>
+					)}
+					<span className="sn-notes-list__title sn-truncate" title={title}>
+						{title}
+					</span>
+					<span
+						className="sn-notes-list__status"
+						style={statusStyle}
+					>
+						{statusLabel}
+					</span>
 				</span>
 			</span>
 
-			<span className="sn-notes-list__title sn-truncate" title={comment.comment_title}>
-				{comment.comment_title}
-			</span>
-
-			<span className="sn-notes-list__date">
-				{formatListDate(comment.created_at, formatDate)}
-			</span>
-
-			<span className="sn-notes-list__assignee">
-				<span className="sn-notes-list__assignee-name sn-truncate">
-					{assigneeName}
+			<span className="sn-notes-list__meta">
+				{renderUserAvatar(creator, 'sn-avatar sn-avatar--xs sn-notes-list__avatar')}
+				<span className="sn-notes-list__on">
+					{__('on', 'analogwp-site-notes')}
 				</span>
-				{renderUserAvatar(assignee, 'sn-avatar sn-avatar--xs sn-notes-list__assignee-avatar')}
+				<span className="sn-notes-list__date">
+					{formatListDate(comment.created_at, formatDate)}
+				</span>
+				{assignees.length > 0 && (
+					<>
+						<span className="sn-notes-list__to">
+							{__('to', 'analogwp-site-notes')}
+						</span>
+						<span className="sn-notes-list__assignees">
+							{assignees.map((assignee) => (
+								<span
+									key={assignee.id || assignee.name}
+									className="sn-notes-list__assignee-avatar"
+									title={assignee.name}
+								>
+									{renderUserAvatar(assignee, 'sn-avatar sn-avatar--xs')}
+								</span>
+							))}
+						</span>
+					</>
+				)}
 			</span>
 		</button>
 	);
