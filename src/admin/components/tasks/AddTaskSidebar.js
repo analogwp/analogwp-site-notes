@@ -146,7 +146,7 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 
 			<TaskSidebarTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-			<div className="sn-task-sidebar__body">
+			<div className={`sn-task-sidebar__body${activeTab === 'timesheet' ? ' sn-task-sidebar__body--timesheet' : ''}`}>
 				{activeTab === 'details' ? (
 					<TaskSidebarDetailsFields
 						formData={formData}
@@ -156,13 +156,15 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 						users={users}
 						pages={pages}
 						categories={categories}
-						onAddTime={handleAddTime}
 						getStatusBadgeStyle={getStatusBadgeStyle}
 						getPriorityBadgeStyle={getPriorityBadgeStyle}
 						onNavigateToSettingsTab={onNavigateToSettingsTab}
 					/>
 				) : (
-					<TaskSidebarTimesheetTab entries={pendingTimeEntries} />
+					<TaskSidebarTimesheetTab
+						entries={pendingTimeEntries}
+						onAddTime={handleAddTime}
+					/>
 				)}
 			</div>
 

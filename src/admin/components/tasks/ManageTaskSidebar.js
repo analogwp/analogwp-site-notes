@@ -475,7 +475,11 @@ const ManageTaskSidebar = ({
 				</div>
 
 				<aside className="sn-task-sidebar__aside">
-					<div className="sn-task-sidebar__aside-body">
+					<div
+						className={`sn-task-sidebar__aside-body${
+							activeAsideTab === 'timesheet' ? ' sn-task-sidebar__aside-body--timesheet' : ''
+						}`}
+					>
 						{activeAsideTab === 'details' ? (
 							<>
 								{task.screenshot_url && (
@@ -496,7 +500,6 @@ const ManageTaskSidebar = ({
 										users={users}
 										pages={pages}
 										categories={categories}
-										onAddTime={handleAddTime}
 										getStatusBadgeStyle={getStatusBadgeStyle}
 										getPriorityBadgeStyle={getPriorityBadgeStyle}
 										onNavigateToSettingsTab={onNavigateToSettingsTab}
@@ -506,7 +509,10 @@ const ManageTaskSidebar = ({
 								</div>
 							</>
 						) : (
-							<TaskSidebarTimesheetTab entries={existingTimeEntries} />
+							<TaskSidebarTimesheetTab
+								entries={existingTimeEntries}
+								onAddTime={handleAddTime}
+							/>
 						)}
 					</div>
 

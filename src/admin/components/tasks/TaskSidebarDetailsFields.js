@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { SidebarSelect, SidebarMultiSelect, FieldDate, FieldTime, parseTimeInput } from '../ui';
-import { showToast } from '../ToastProvider';
+import { SidebarSelect, SidebarMultiSelect, FieldDate } from '../ui';
 import { buildUserSelectOptions } from './taskSidebarUtils';
 
 const getUserInitials = (name) => {
@@ -50,27 +48,12 @@ const TaskSidebarDetailsFields = ({
 	users,
 	pages,
 	categories,
-	onAddTime,
 	getStatusBadgeStyle,
 	getPriorityBadgeStyle,
 	onNavigateToSettingsTab,
 	showDescription = true,
 	hideQuickFields = false,
 }) => {
-	const [timeInput, setTimeInput] = useState('');
-
-	const handleLogTime = () => {
-		const parsed = parseTimeInput(timeInput);
-
-		if (!parsed.valid) {
-			showToast.error(__('Please enter time as HH:MM', 'analogwp-site-notes'));
-			return;
-		}
-
-		onAddTime(parsed.hours, parsed.minutes);
-		setTimeInput('');
-	};
-
 	const categoryOptions = categories.map((category) => ({
 		value: category.name,
 		label: category.name,
@@ -165,28 +148,6 @@ const TaskSidebarDetailsFields = ({
 							onChange={(value) => onInputChange('dueDate', value)}
 							placeholder={__('Select date', 'analogwp-site-notes')}
 						/>
-					</div>
-				</div>
-			</div>
-
-			<div className="sn-task-sidebar__row">
-				<label className="sn-task-sidebar__row-label">{__('Add time', 'analogwp-site-notes')}</label>
-				<div className="sn-task-sidebar__row-control">
-					<div className="sn-task-sidebar__row-field">
-						<div className="sn-task-sidebar__time-row">
-							<FieldTime
-								value={timeInput}
-								onChange={setTimeInput}
-								placeholder="HH:MM"
-							/>
-							<button
-								type="button"
-								className="sn-task-sidebar__time-log-btn"
-								onClick={handleLogTime}
-							>
-								{__('Log', 'analogwp-site-notes')}
-							</button>
-						</div>
 					</div>
 				</div>
 			</div>

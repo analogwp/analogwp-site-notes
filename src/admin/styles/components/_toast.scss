@@ -17,3 +17,11 @@
 	right: var(--sn-space-m);
 	z-index: var(--sn-z-sidebar);
 }
+
+.sn-confirmation-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: calc(var(--sn-z-toast) - 1);
+	background: transparent;
+	cursor: default;
+}
