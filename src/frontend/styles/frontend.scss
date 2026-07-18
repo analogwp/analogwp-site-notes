@@ -287,124 +287,296 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.45);
   z-index: 100000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+}
+
+.sn-screenshot-highlight {
+  position: fixed;
+  inset: 0;
+  z-index: 100002;
+  pointer-events: none;
+}
+
+.sn-screenshot-highlight__hitbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100003;
+  pointer-events: auto;
+  cursor: default;
+  background: transparent;
+}
+
+.sn-screenshot-frame {
+  position: fixed;
+  z-index: 100000;
+  pointer-events: none;
+  box-sizing: border-box;
+
+  &--with-overlay,
+  &--sidebar-highlight {
+    z-index: 100004;
+    // Dim everything outside the capture region (keeps the inside clear).
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+  }
+}
+
+.sn-screenshot-frame__corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: #fff;
+  border-style: solid;
+  border-width: 0;
+  box-sizing: border-box;
+
+  &--tl {
+    top: -2px;
+    left: -2px;
+    border-top-width: 3px;
+    border-left-width: 3px;
+  }
+
+  &--tr {
+    top: -2px;
+    right: -2px;
+    border-top-width: 3px;
+    border-right-width: 3px;
+  }
+
+  &--bl {
+    bottom: -2px;
+    left: -2px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+  }
+
+  &--br {
+    bottom: -2px;
+    right: -2px;
+    border-bottom-width: 3px;
+    border-right-width: 3px;
+  }
 }
 
 .sn-comment-popup {
   background: $background-color;
-  border-radius: 8px;
-  width: 350px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border-radius: 14px;
+  width: 340px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
   animation: popupSlideIn 0.2s ease;
-  
-  .sn-popup-header {
+  overflow: visible;
+
+  form {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid $border-color;
-    cursor: move; // Indicate drag handle
-    user-select: none; // Prevent text selection while dragging
-    position: relative;
-    
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.02);
-    }
-    
-    &::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 10px;
-      transform: translateY(-50%);
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background-color: #ccc;
-      box-shadow: 
-        0 -8px 0 #ccc,
-        0 8px 0 #ccc,
-        8px -8px 0 #ccc,
-        8px 0 0 #ccc,
-        8px 8px 0 #ccc;
-      opacity: 0.5;
-    }
-    
-    h4 {
-      margin: 0;
-      font-size: 16px;
-      color: $text-color;
-      margin-left: 20px; // Space for drag handle
-    }
-    
-    .sn-popup-close {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: #646970;
-      padding: 4px;
-      
-      &:hover {
-        color: $danger-color;
-      }
-    }
+    flex-direction: column;
   }
-  
+
   .sn-popup-body {
-    padding: 20px;
-    
-    .sn-element-info {
-      margin-bottom: 12px;
-      
-      small {
-        color: #646970;
-        font-size: 12px;
-      }
-      
-      code {
-        background: #f0f0f1;
-        padding: 2px 6px;
-        border-radius: 3px;
-        font-size: 11px;
-      }
-    }
-    
-    .sn-comment-textarea {
-      width: 100%;
-      border: 1px solid $border-color;
-      border-radius: 4px;
-      padding: 12px;
-      font-size: 14px;
-      resize: vertical;
-      
-      &:focus {
-        outline: none;
-        border-color: $primary-color;
-        box-shadow: 0 0 0 1px $primary-color;
-      }
+    padding: 18px 18px 10px;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
     }
   }
-  
+
+  .sn-comment-title {
+    width: 100%;
+    margin: 0 0 8px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: $text-color;
+    font-family: inherit;
+    box-shadow: none;
+    border-radius: 0;
+
+    &::placeholder {
+      color: #b0b5bb;
+      font-weight: 400;
+    }
+
+    &:focus {
+      outline: none;
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  .sn-comment-textarea {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    line-height: 1.5;
+    color: $text-color;
+    resize: none;
+    min-height: 72px;
+    font-family: inherit;
+    box-shadow: none;
+    border-radius: 0;
+
+    &::placeholder {
+      color: #b0b5bb;
+    }
+
+    &:focus {
+      outline: none;
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  .sn-comment-popup__honeypot {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .sn-popup-footer {
-    padding: 16px 20px;
-    border-top: 1px solid $border-color;
     display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px 14px;
+    border-top: 1px solid #ececec;
+  }
+}
+
+.sn-priority-select {
+  position: relative;
+  min-width: 0;
+}
+
+.sn-priority-select__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #fff;
+  color: #1d2327;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  .sn-icon {
+    width: 14px;
+    height: 14px;
+    color: #6b7280;
+    flex-shrink: 0;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: #d1d5db;
+    background: #fafafa;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.sn-priority-select__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sn-priority-select__label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sn-priority-select__menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 10;
+  min-width: 140px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.sn-priority-select__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+  color: #1d2327;
+  cursor: pointer;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+
+  &--selected {
+    background: #f0f3ff;
+    font-weight: 600;
+  }
+}
+
+.sn-popup-send {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: $primary-color;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+
+  .sn-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover:not(:disabled) {
+    background: darken($primary-color, 8%);
+    transform: scale(1.04);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
   }
 }
 
 // Comments Display Container
 .sn-comments-display {
   position: relative;
-  pointer-events: none; // Allow clicks to pass through to page elements
-  
-  // Ensure markers are clickable
+  pointer-events: none;
+
   .sn-comment-marker {
     pointer-events: auto;
   }
@@ -870,11 +1042,6 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     transform: scale(0.95);
   }
   
-  // When sidebar is hidden
-  &.sn-sidebar-hidden {
-    right: 20px;
-  }
-  
   // When sidebar is hidden, position button at right edge
   &.sn-sidebar-hidden {
     right: 20px;
@@ -888,8 +1055,8 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   width: 380px;
   height: 100vh;
   background: $background-color;
-  border-left: 1px solid $border-color;
-  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  border-left: 1px solid #e8e8e8;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.06);
   z-index: 99999;
   display: flex;
   flex-direction: column;
@@ -907,22 +1074,85 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   }
   
   .sn-sidebar-header {
-    background: #f9f9f9;
-    padding: 20px;
-    border-bottom: 1px solid $border-color;
+    padding: 24px 24px 16px;
     flex-shrink: 0;
     
     h3 {
-      margin: 0 0 5px 0;
-      font-size: 16px;
-      font-weight: 600;
-      color: $text-color;
+      margin: 0 0 14px;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #111;
+      letter-spacing: -0.02em;
     }
-    
-    .sn-comments-count {
-      font-size: 14px;
-      color: #646970;
-      margin: 0;
+  }
+
+  .sn-sidebar-filter {
+    position: relative;
+    display: inline-block;
+  }
+
+  .sn-sidebar-filter__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: #fff;
+    border: 1px solid #d8d8d8;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d2327;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+
+    .sn-icon {
+      width: 14px;
+      height: 14px;
+      color: #6b7280;
+    }
+
+    &:hover {
+      border-color: #bdbdbd;
+      background: #fafafa;
+    }
+  }
+
+  .sn-sidebar-filter__menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 10;
+    min-width: 160px;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .sn-sidebar-filter__option {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    text-align: left;
+    font-size: 13px;
+    color: #1d2327;
+    cursor: pointer;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+
+    &--selected {
+      background: #f0f3ff;
+      color: $primary-color;
+      font-weight: 600;
     }
   }
   
@@ -933,7 +1163,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   }
   
   .sn-no-comments-sidebar {
-    padding: 40px 20px;
+    padding: 40px 24px;
     text-align: center;
     color: #646970;
     
@@ -947,177 +1177,233 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
       }
     }
   }
-  
-  .sn-comments-list {
-    padding: 0;
-  }
 }
 
-/* Status Groups */
-.sn-status-group {
-  margin-bottom: 20px;
-  
-  .sn-status-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 15px 20px 10px 20px;
-    background: #f9f9f9;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    
-    &:hover {
-      background: #f0f0f0;
-    }
-    
-    .sn-status-icon {
-      font-size: 16px;
-      line-height: 1;
-      margin-right: 8px;
-    }
-    
-    h4 {
-      margin: 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: $text-color;
-      flex: 1;
-    }
-    
-    .sn-toggle-arrow {
-      background: none;
-      border: none;
-      color: #646970;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s ease, background-color 0.2s ease;
-
-      .sn-icon {
-        width: 14px;
-        height: 14px;
-      }
-      
-      &:hover {
-        color: $text-color;
-        background: rgba(0, 0, 0, 0.05);
-      }
-    }
-  }
+.sn-notes-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-/* Comment Tasks */
-.sn-comment-task {
-  padding: 16px 20px;
-  border-bottom: 1px solid #eee;
-  transition: background-color 0.2s ease;
-  
-  &:hover {
+.sn-note-item {
+  padding: 18px 24px;
+  border-bottom: 1px solid #ececec;
+
+  &--expanded {
     background: #fafafa;
   }
-  
-  &.selected {
-    background: #e7f3ff;
-    border-left: 3px solid $primary-color;
-  }
-  
-  .sn-task-header {
+
+  &__main {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__header {
+    display: flex;
     align-items: center;
-    margin-bottom: 10px;
-    
-    .sn-task-info {
-      display: flex;
+    gap: 12px;
+  }
+
+  &__badge {
+    flex-shrink: 0;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    border-radius: 50%;
+    background: $primary-color;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  &__body {
+    padding-left: 40px; // badge width (28) + gap (12)
+    min-width: 0;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__meta-left {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__author {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111;
+    line-height: 1.3;
+  }
+
+  &__time {
+    font-size: 12px;
+    color: #9ca3af;
+    line-height: 1.3;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #111;
+    word-break: break-word;
+    min-width: 0;
+
+    &--empty {
+      font-weight: 500;
+      color: #9ca3af;
+    }
+  }
+
+  &__text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #1d2327;
+    word-break: break-word;
+  }
+
+  &__author-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    min-width: 0;
+  }
+
+  &__avatar {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #e5e7eb;
+
+    &--fallback {
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      
-      .sn-task-id {
-        background: $primary-color;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 10px;
-        font-size: 11px;
-        font-weight: bold;
-      }
-      
-      .sn-task-author {
-        font-weight: 500;
-        font-size: 13px;
-        color: $text-color;
-      }
-      
-      .sn-task-date {
-        font-size: 11px;
-        color: #646970;
-      }
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4b5563;
     }
-    
-    .sn-locate-btn {
-      background: none;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  &__icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: color 0.15s ease, background-color 0.15s ease;
+
+    .sn-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      color: #4b5563;
+      background: #f3f4f6;
+    }
+  }
+
+  &__menu-wrap {
+    position: relative;
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 20;
+    min-width: 148px;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
       border: none;
+      border-radius: 6px;
+      background: transparent;
+      text-align: left;
+      font-size: 13px;
+      color: #1d2327;
       cursor: pointer;
-      font-size: 16px;
-      padding: 4px;
-      border-radius: 4px;
-      transition: background-color 0.2s ease;
-      
+
       &:hover {
-        background: #e0e0e0;
+        background: #f5f5f5;
       }
     }
   }
-  
-  .sn-task-content {
+
+  &__menu-danger {
+    color: $danger-color !important;
+  }
+
+  &__details {
+    margin-top: 14px;
+    margin-left: 40px;
+    padding-top: 12px;
+    border-top: 1px solid #ececec;
+  }
+
+  &__status {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     margin-bottom: 12px;
-    
-    .sn-task-text {
-      margin: 0 0 8px 0;
-      font-size: 14px;
-      line-height: 1.4;
-      color: $text-color;
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #646970;
     }
-    
-    .sn-task-selector {
-      margin-bottom: 8px;
-      
-      code {
-        background: #f1f1f1;
-        padding: 2px 6px;
-        border-radius: 3px;
-        font-size: 11px;
-        color: #666;
-      }
-    }
-    
-    .sn-task-screenshot {
-			margin-top: 8px;
-      margin-bottom: 8px;
-      
-      img {
-        width: 100%;
-        max-width: 200px;
-        height: auto;
-        border-radius: 4px;
-        border: 1px solid #ddd;
-        cursor: pointer;
-        transition: opacity 0.2s ease;
-        
-        &:hover {
-          opacity: 0.8;
-        }
-      }
-    }
-  }
-  
-  .sn-task-status {
-    margin-bottom: 10px;
-    
+
     .sn-status-select {
       width: 100%;
       padding: 6px 8px;
@@ -1127,123 +1413,73 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
       background: $background-color;
     }
   }
-  
-  .sn-task-replies {
+
+  &__replies {
     margin-bottom: 12px;
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 4px;
-    border-left: 3px solid #ddd;
-    
-    .sn-replies-header {
-      margin-bottom: 8px;
-      
-      strong {
-        font-size: 12px;
-        color: $text-color;
-      }
+  }
+
+  &__reply {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: #f3f4f6;
+    border-radius: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
     }
-    
-    .sn-task-reply {
+
+    p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #374151;
+    }
+  }
+
+  &__reply-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+
+    strong {
+      font-size: 12px;
+      color: #111;
+    }
+
+    span {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+  }
+
+  &__reply-form {
+    position: relative;
+
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.4;
+      resize: vertical;
+      min-height: 64px;
       margin-bottom: 8px;
-      
-      &:last-child {
-        margin-bottom: 0;
-      }
-      
-      .sn-reply-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 4px;
-        
-        strong {
-          font-size: 12px;
-          color: $text-color;
-        }
-        
-        .sn-reply-date {
-          font-size: 10px;
-          color: #646970;
-        }
-      }
-      
-      .sn-reply-text {
-        margin: 0;
-        font-size: 13px;
-        line-height: 1.4;
-        color: #555;
+      font-family: inherit;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 1px $primary-color;
       }
     }
   }
-  
-  .sn-task-actions {
-    .sn-reply-btn {
-      background: $primary-color;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      
-      &:hover {
-        background: darken($primary-color, 10%);
-      }
-    }
-    
-    .sn-reply-form {
-      .sn-reply-textarea {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid $border-color;
-        border-radius: 4px;
-        font-size: 13px;
-        line-height: 1.4;
-        resize: vertical;
-        min-height: 60px;
-        margin-bottom: 8px;
-      }
-      
-      .sn-reply-actions {
-        display: flex;
-        gap: 8px;
-        
-        .sn-reply-submit {
-          background: $primary-color;
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          font-size: 12px;
-          cursor: pointer;
-          
-          &:hover:not(:disabled) {
-            background: darken($primary-color, 10%);
-          }
-          
-          &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-          }
-        }
-        
-        .sn-reply-cancel {
-          background: transparent;
-          color: #666;
-          border: 1px solid #ccc;
-          padding: 6px 12px;
-          border-radius: 4px;
-          font-size: 12px;
-          cursor: pointer;
-          
-          &:hover {
-            background: #f0f0f0;
-          }
-        }
-      }
-    }
+
+  &__reply-actions {
+    display: flex;
+    gap: 8px;
   }
 }
 
@@ -1277,6 +1513,14 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     bottom: 52vh; // Just above the sidebar (50vh + 2vh margin)
     right: 20px;
   }
+
+  .sn-note-item__details {
+    margin-left: 40px;
+  }
+
+  .sn-note-item__body {
+    padding-left: 40px;
+  }
 }
 
 /* Priority Badges */
@@ -1308,64 +1552,12 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   }
 }
 
-/* Priority Selector in Comment Popup */
-.sn-priority-selector {
-  margin-top: 10px;
-  
-  label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 4px;
-  }
-  
-  select {
-    width: 100%;
-    padding: 6px 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 13px;
-    background-color: white;
-    
-    &:focus {
-      outline: none;
-      border-color: $primary-color;
-      box-shadow: 0 0 0 1px $primary-color;
-    }
-  }
-}
-
-// Title elements styles
-.sn-task-title,
-.sn-comment-title {
+.sn-task-title {
   font-weight: 600;
   font-size: 14px;
   color: #1d2327;
   margin-bottom: 6px;
   line-height: 1.4;
-}
-
-.sn-comment-title {
-  font-size: 13px;
-  margin-bottom: 4px;
-}
-
-// Comment input styles for title field
-.sn-comment-title {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid $border-color;
-  border-radius: 6px;
-  font-size: 14px;
-  line-height: 1.4;
-  margin-bottom: 8px;
-  
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 1px $primary-color;
-  }
 }
 
 // UI Components
