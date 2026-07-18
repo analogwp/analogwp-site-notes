@@ -28,6 +28,7 @@ export { default as InfoIcon } from './InfoIcon';
 export { default as LinkIcon } from './LinkIcon';
 export { default as InformationCircleIcon } from './InformationCircleIcon';
 export { default as PencilIcon } from './PencilIcon';
+export { default as PhotoFrameIcon } from './PhotoFrameIcon';
 export { default as PlusIcon } from './PlusIcon';
 export { default as SettingsIcon } from './SettingsIcon';
 export { default as SidebarFieldSettingsIcon } from './SidebarFieldSettingsIcon';
