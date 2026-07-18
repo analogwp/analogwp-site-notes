@@ -21,6 +21,7 @@ build-package/
 .env.development.local
 .env.test.local
 .env.production.local
+project/
 
 # Logs
 npm-debug.log*
