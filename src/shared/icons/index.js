@@ -2,6 +2,7 @@ export { default as Icon, ICON_SIZE_MAP, resolveIconPixelSize } from './Icon';
 
 export { default as AddIcon } from './AddIcon';
 export { default as ArrowLeftIcon } from './ArrowLeftIcon';
+export { default as ArrowUpIcon } from './ArrowUpIcon';
 export { default as CalendarIcon } from './CalendarIcon';
 export { default as CheckCircleIcon } from './CheckCircleIcon';
 export { default as CheckIcon } from './CheckIcon';
@@ -18,7 +19,9 @@ export { default as CloseSmallIcon } from './CloseSmallIcon';
 export { default as CommentCursorIcon } from './CommentCursorIcon';
 export { default as DeleteIcon } from './DeleteIcon';
 export { default as EditIcon } from './EditIcon';
+export { default as EllipsisVerticalIcon } from './EllipsisVerticalIcon';
 export { default as ExclamationTriangleIcon } from './ExclamationTriangleIcon';
+export { default as EyeIcon } from './EyeIcon';
 export { default as GlobeIcon } from './GlobeIcon';
 export { default as HideIcon } from './HideIcon';
 export { default as InfoIcon } from './InfoIcon';
