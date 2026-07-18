@@ -238,6 +238,49 @@ class Ajax {
 	}
 
 	/**
+	 * Get allowed priority keys from saved settings.
+	 *
+	 * @since 1.5.0
+	 * @return string[]
+	 */
+	private function get_allowed_priority_keys() {
+		$default_priorities = array(
+			array(
+				'id'    => 1,
+				'key'   => 'high',
+				'name'  => 'High',
+				'color' => '#ef4444',
+			),
+			array(
+				'id'    => 2,
+				'key'   => 'medium',
+				'name'  => 'Medium',
+				'color' => '#f59e0b',
+			),
+			array(
+				'id'    => 3,
+				'key'   => 'low',
+				'name'  => 'Low',
+				'color' => '#10b981',
+			),
+		);
+
+		$priorities = get_option( 'agwp_sn_priorities', $default_priorities );
+		if ( ! is_array( $priorities ) || empty( $priorities ) ) {
+			$priorities = $default_priorities;
+		}
+
+		$keys = array();
+		foreach ( $priorities as $priority ) {
+			if ( ! empty( $priority['key'] ) ) {
+				$keys[] = sanitize_key( $priority['key'] );
+			}
+		}
+
+		return ! empty( $keys ) ? $keys : array( 'medium' );
+	}
+
+	/**
 	 * Validate basic anti-bot fields for anonymous-style frontend requests.
 	 *
 	 * @since 1.0.0
@@ -386,8 +429,9 @@ class Ajax {
 		$this->enforce_max_length( $comment_title, 255, __( 'Comment title is too long.', 'analogwp-site-notes' ) );
 		$this->enforce_max_length( $comment_text, 5000, __( 'Comment text is too long.', 'analogwp-site-notes' ) );
 
-		if ( ! in_array( $priority, array( 'low', 'medium', 'high' ), true ) ) {
-			$priority = 'medium';
+		$allowed_priorities = $this->get_allowed_priority_keys();
+		if ( ! in_array( $priority, $allowed_priorities, true ) ) {
+			$priority = in_array( 'medium', $allowed_priorities, true ) ? 'medium' : $allowed_priorities[0];
 		}
 
 		// Sanitize and handle screenshot URL if provided.
@@ -448,6 +492,7 @@ class Ajax {
 
 		$submitted_page_url   = isset( $_POST['page_url'] ) ? sanitize_text_field( wp_unslash( $_POST['page_url'] ) ) : '';
 		$submitted_page_token = isset( $_POST['page_token'] ) ? sanitize_text_field( wp_unslash( $_POST['page_token'] ) ) : '';
+		$scope                = isset( $_POST['scope'] ) ? sanitize_key( wp_unslash( $_POST['scope'] ) ) : 'page';
 
 		$page_url = $this->verify_page_request(
 			$submitted_page_url,
@@ -458,7 +503,10 @@ class Ajax {
 			$this->send_error( __( 'Page URL is required', 'analogwp-site-notes' ) );
 		}
 
-		$comments = $this->database->get_comments( $page_url );
+		// `all` returns every task; default `page` keeps current-page filtering.
+		$comments = ( 'all' === $scope )
+			? $this->database->get_comments()
+			: $this->database->get_comments( $page_url );
 		$comments = $this->sanitize_public_comments_response( $comments );
 
 		if ( null === $comments ) {

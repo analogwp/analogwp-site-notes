@@ -219,15 +219,50 @@ class Assets {
 			'pageUrl'              => $current_page_url,
 			'pageToken'            => wp_create_nonce( 'agwp_sn_page_' . $current_page_url ),
 			'renderTimestamp'      => time(),
+			'adminDashboardUrl'    => admin_url( 'admin.php?page=agwp-sn-dashboard' ),
 			'currentUser'          => $this->get_current_user_data(),
 			'canAddComments'       => Plugin::current_visitor_can_access_frontend_comments(),
 			'canManageComments'    => Plugin::user_has_access(),
 			'canUploadScreenshots' => Plugin::current_visitor_can_access_frontend_comments(),
 			'settings'             => $settings,
+			'priorities'           => $this->get_task_priorities(),
 			'strings'              => $this->get_frontend_strings(),
 			'debug'                => $debug_enabled,
 			'logLevel'             => $log_level,
 		);
+	}
+
+	/**
+	 * Get saved task priorities with defaults.
+	 *
+	 * @since 1.5.0
+	 * @return array Priority definitions.
+	 */
+	private function get_task_priorities() {
+		$default_priorities = array(
+			array(
+				'id'    => 1,
+				'key'   => 'high',
+				'name'  => 'High',
+				'color' => '#ef4444',
+			),
+			array(
+				'id'    => 2,
+				'key'   => 'medium',
+				'name'  => 'Medium',
+				'color' => '#f59e0b',
+			),
+			array(
+				'id'    => 3,
+				'key'   => 'low',
+				'name'  => 'Low',
+				'color' => '#10b981',
+			),
+		);
+
+		$priorities = get_option( 'agwp_sn_priorities', $default_priorities );
+
+		return is_array( $priorities ) && ! empty( $priorities ) ? array_values( $priorities ) : $default_priorities;
 	}
 
 	/**

@@ -305,6 +305,14 @@ class Database {
 			$comment->display_name = ! empty( $comment->user_name ) ? $comment->user_name : __( 'Guest', 'analogwp-site-notes' );
 			$comment->user_email   = ! empty( $comment->user_email ) ? $comment->user_email : '';
 
+			if ( ! empty( $comment->user_id ) ) {
+				$comment->avatar = get_avatar_url( $comment->user_id, array( 'size' => 64 ) );
+			} elseif ( ! empty( $comment->user_email ) ) {
+				$comment->avatar = get_avatar_url( $comment->user_email, array( 'size' => 64 ) );
+			} else {
+				$comment->avatar = get_avatar_url( 0, array( 'size' => 64 ) );
+			}
+
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Replies fetched per comment, part of parent query result.
 			$comment->replies = $wpdb->get_results(
 				$wpdb->prepare(
