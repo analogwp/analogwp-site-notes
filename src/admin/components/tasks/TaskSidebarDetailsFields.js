@@ -99,6 +99,7 @@ const TaskSidebarDetailsFields = ({
 						}))}
 						getOptionStyle={(value) => getPriorityBadgeStyle(value, priorityOptions)}
 						footerLink={onNavigateToSettingsTab && (
+							// Keep "task-priorities" — settings URL/tab key; renaming would break bookmarks (not a DB migration but stable API).
 							<button
 								type="button"
 								className="sn-task-sidebar__field-link"
@@ -167,7 +168,7 @@ const TaskSidebarDetailsFields = ({
 					<textarea
 						value={formData.description}
 						onChange={(e) => onInputChange('description', e.target.value)}
-						placeholder={__('Add a task description here (optional)', 'analogwp-site-notes')}
+						placeholder={__('Add a note description here (optional)', 'analogwp-site-notes')}
 						className="sn-input sn-task-sidebar__description-input"
 						rows="4"
 					/>

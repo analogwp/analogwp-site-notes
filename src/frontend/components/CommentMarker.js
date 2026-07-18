@@ -177,6 +177,7 @@ const CommentMarker = ({
 			return;
 		}
 		const url = new URL(adminDashboardUrl, window.location.origin);
+		// Keep query param "task" — deep-link URL contract; renaming needs a compat alias (no DB change, but leave as-is).
 		url.searchParams.set('task', String(comment.id));
 		window.open(url.toString(), '_blank', 'noopener,noreferrer');
 	};
@@ -243,7 +244,7 @@ const CommentMarker = ({
 						<h4 className="sn-note-thread__title">{title}</h4>
 					) : (
 						<span className="sn-note-thread__title sn-note-thread__title--empty">
-							{__('Untitled task', 'analogwp-site-notes')}
+							{__('Untitled note', 'analogwp-site-notes')}
 						</span>
 					)}
 				</div>

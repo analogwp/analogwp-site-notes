@@ -30,7 +30,7 @@
 
 **For Administrators:**
 1. View all feedback at **Site Notes → Dashboard**
-2. Track tasks with status (Open, In Progress, Resolved)
+2. Track notes with status (Open, In Progress, Resolved)
 3. Reply to comments and update priorities
 4. Manage user access and settings
 
@@ -45,17 +45,17 @@
 - **Reply threads** - Full conversation support
 - **User avatars** - WordPress Gravatar integration
 
-### Task Management ✅
+### Note Management ✅
 - **Kanban board** - Organize by status (Open, In Progress, Resolved)
 - **Priority levels** - High, Medium, Low classification
 - **Category system** - Custom categories for organization
-- **Task editing** - Update comments and details
+- **Note editing** - Update comments and details
 - **Advanced filtering** - Search, filter by status/category/priority
 
 ### Timesheet Tracking ✅
-- **Time logging** - Track hours per task
+- **Time logging** - Track hours per note
 - **Persistent storage** - All time entries saved to database
-- **Time reports** - View total hours by task/category
+- **Time reports** - View total hours by note/category
 - **Edit capabilities** - Modify or delete time entries
 
 ### Access Control ✅
@@ -91,25 +91,25 @@
    - Click any marker to view details and replies
    - Add replies or update status (if permitted)
 
-### Managing Tasks (Admin)
+### Managing Notes (Admin)
 
 1. **Dashboard Overview**
    - Access via **Site Notes → Dashboard**
-   - View statistics: total tasks, open, in progress, resolved
+   - View statistics: total notes, open, in progress, resolved
    - Filter by status, category, or priority
    - Search across all comments
 
-2. **Task Actions**
-   - **Edit**: Click edit icon to modify task details
+2. **Note Actions**
+   - **Edit**: Click edit icon to modify note details
    - **Reply**: Add threaded replies with avatars
    - **Status**: Change between Open, In Progress, Resolved
-   - **Delete**: Remove tasks (admin only)
-   - **Log Time**: Track hours spent on tasks
+   - **Delete**: Remove notes (admin only)
+   - **Log Time**: Track hours spent on notes
 
 3. **Timesheet**
    - Access via **Site Notes → Timesheet**
-   - View all time entries across tasks
-   - Filter by date range, task, or user
+   - View all time entries across notes
+   - Filter by date range, note, or user
    - Export reports (coming soon)
 
 ### Configuration

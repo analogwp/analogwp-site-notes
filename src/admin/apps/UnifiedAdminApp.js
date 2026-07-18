@@ -29,6 +29,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
     const getInitialSettingsTab = () => {
         try {
             const tab = new URLSearchParams(window.location.search).get('tab');
+            // Keep "task-priorities" — settings URL/tab key; renaming would break bookmarks (not a DB migration but stable API).
             const validTabs = ['general', 'access-control', 'task-priorities', 'categories', 'advanced'];
 
             return validTabs.includes(tab) ? tab : 'general';
@@ -174,6 +175,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
+                    // Keep action agwp_sn_add_new_task — public AJAX contract; renaming needs a compat alias (no DB change, but leave as-is).
                     action: 'agwp_sn_add_new_task',
                     nonce: agwp_sn_ajax.nonce,
                     ...taskData
@@ -244,7 +246,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                     return updatedComment;
                 }));
                 if (!options.silent) {
-                    showToast.success(__('Task updated successfully!', 'analogwp-site-notes'));
+                    showToast.success(__('Note updated successfully!', 'analogwp-site-notes'));
                 }
                 return true;
             } else {
@@ -252,14 +254,14 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                 logger.error('Error updating comment:', errorMessage);
                 logger.error('Full response:', data);
                 if (!options.silent) {
-                    showToast.error(__('Error updating task. Please try again.', 'analogwp-site-notes'));
+                    showToast.error(__('Error updating note. Please try again.', 'analogwp-site-notes'));
                 }
                 return false;
             }
         } catch (err) {
             logger.error('Error updating comment:', err);
             if (!options.silent) {
-                showToast.error(__('Error updating task. Please try again.', 'analogwp-site-notes'));
+                showToast.error(__('Error updating note. Please try again.', 'analogwp-site-notes'));
             }
             return false;
         }
@@ -353,7 +355,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
     const handleDelete = async (commentId) => {
         // Show modern confirmation dialog
         const confirmed = await showConfirmation(
-            __('Are you sure you want to delete this task? This action cannot be undone.', 'analogwp-site-notes'),
+            __('Are you sure you want to delete this note? This action cannot be undone.', 'analogwp-site-notes'),
             { confirmText: __('Delete', 'analogwp-site-notes') }
         );
         
@@ -378,14 +380,14 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
             if (data.success) {
                 // Remove the task from the state
                 setComments(comments.filter(comment => comment.id !== commentId));
-                showToast.success(__('Task deleted successfully!', 'analogwp-site-notes'));
+                showToast.success(__('Note deleted successfully!', 'analogwp-site-notes'));
             } else {
                 logger.error('Error deleting comment:', data.message);
-                showToast.error(__('Error deleting task. Please try again.', 'analogwp-site-notes'));
+                showToast.error(__('Error deleting note. Please try again.', 'analogwp-site-notes'));
             }
         } catch (err) {
             logger.error('Error deleting comment:', err);
-            showToast.error(__('Error deleting task. Please try again.', 'analogwp-site-notes'));
+            showToast.error(__('Error deleting note. Please try again.', 'analogwp-site-notes'));
         }
     };
 

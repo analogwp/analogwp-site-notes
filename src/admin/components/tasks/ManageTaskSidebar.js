@@ -267,7 +267,7 @@ const ManageTaskSidebar = ({
 		const newEntry = buildTimeEntry(
 			hours,
 			minutes,
-			__('Time entry from task update', 'analogwp-site-notes')
+			__('Time entry from note update', 'analogwp-site-notes')
 		);
 		const updatedEntries = [...existingTimeEntries, newEntry];
 
@@ -321,7 +321,7 @@ const ManageTaskSidebar = ({
 		}
 
 		const confirmed = await showConfirmation(
-			__('Are you sure you want to delete this task? This action cannot be undone.', 'analogwp-site-notes'),
+			__('Are you sure you want to delete this note? This action cannot be undone.', 'analogwp-site-notes'),
 			{ confirmText: __('Delete', 'analogwp-site-notes') }
 		);
 
@@ -334,7 +334,7 @@ const ManageTaskSidebar = ({
 			onClose();
 		} catch (err) {
 			logger.error('Error deleting task:', err);
-			showToast.error(__('Error deleting task. Please try again.', 'analogwp-site-notes'));
+			showToast.error(__('Error deleting note. Please try again.', 'analogwp-site-notes'));
 		}
 	};
 
@@ -394,7 +394,7 @@ const ManageTaskSidebar = ({
 									value={formData.taskTitle}
 									onChange={(event) => handleAutoFieldChange('taskTitle', event.target.value)}
 									onBlur={handleTitleBlur}
-									placeholder={__('Add task Name', 'analogwp-site-notes')}
+									placeholder={__('Add note Name', 'analogwp-site-notes')}
 									className="sn-task-sidebar__title-input"
 								/>
 							) : (
@@ -403,7 +403,7 @@ const ManageTaskSidebar = ({
 										'sn-task-sidebar__title-display--placeholder': !formData.taskTitle.trim(),
 									})}
 								>
-									{formData.taskTitle.trim() || __('Add task Name', 'analogwp-site-notes')}
+									{formData.taskTitle.trim() || __('Add note Name', 'analogwp-site-notes')}
 								</div>
 							)}
 							<div className="sn-task-sidebar__header-actions">
@@ -414,7 +414,7 @@ const ManageTaskSidebar = ({
 											className="sn-task-sidebar__header-action"
 											onMouseDown={(event) => event.preventDefault()}
 											onClick={handleTitleSave}
-											title={__('Save task title', 'analogwp-site-notes')}
+											title={__('Save note title', 'analogwp-site-notes')}
 										>
 											<CheckmarkIcon size="xl" />
 										</button>
@@ -434,7 +434,7 @@ const ManageTaskSidebar = ({
 										className="sn-task-sidebar__header-action"
 										onMouseDown={(event) => event.preventDefault()}
 										onClick={() => setIsTitleEditing(true)}
-										title={__('Edit task title', 'analogwp-site-notes')}
+										title={__('Edit note title', 'analogwp-site-notes')}
 									>
 										<PencilIcon size="xl" />
 									</button>
@@ -465,7 +465,7 @@ const ManageTaskSidebar = ({
 										value={formData.description}
 										onChange={(event) => handleAutoFieldChange('description', event.target.value)}
 										onBlur={handleDescriptionBlur}
-										placeholder={__('Add a task description here (optional)', 'analogwp-site-notes')}
+										placeholder={__('Add a note description here (optional)', 'analogwp-site-notes')}
 										className="sn-task-comment__description-input"
 										rows="4"
 									/>
@@ -475,7 +475,7 @@ const ManageTaskSidebar = ({
 											'sn-task-comment__description-text--placeholder': !formData.description.trim(),
 										})}
 									>
-										{formData.description.trim() || __('Add a task description here (optional)', 'analogwp-site-notes')}
+										{formData.description.trim() || __('Add a note description here (optional)', 'analogwp-site-notes')}
 									</div>
 								)}
 							</TaskSidebarComment>
@@ -502,7 +502,7 @@ const ManageTaskSidebar = ({
 									<div className="sn-task-sidebar__screenshot">
 										<img
 											src={task.screenshot_url}
-											alt={__('Task screenshot', 'analogwp-site-notes')}
+											alt={__('Note screenshot', 'analogwp-site-notes')}
 										/>
 									</div>
 								)}

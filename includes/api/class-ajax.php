@@ -61,6 +61,7 @@ class Ajax {
 		add_action( 'wp_ajax_agwp_sn_get_admin_data', array( $this, 'get_admin_data' ) );
 		add_action( 'wp_ajax_agwp_sn_get_pages', array( $this, 'get_pages' ) );
 		add_action( 'wp_ajax_agwp_sn_search_pages', array( $this, 'search_pages' ) );
+		// Keep action agwp_sn_add_new_task — public AJAX contract; renaming needs a compat alias (no DB change, but leave as-is).
 		add_action( 'wp_ajax_agwp_sn_add_new_task', array( $this, 'add_new_task' ) );
 		add_action( 'wp_ajax_agwp_sn_admin_add_reply', array( $this, 'admin_add_reply' ) );
 		add_action( 'wp_ajax_agwp_sn_admin_delete_reply', array( $this, 'admin_delete_reply' ) );
@@ -504,7 +505,7 @@ class Ajax {
 			$this->send_error( __( 'Page URL is required', 'analogwp-site-notes' ) );
 		}
 
-		// `all` returns every task; default `page` keeps current-page filtering.
+		// `all` returns every note; default `page` keeps current-page filtering.
 		$comments = ( 'all' === $scope )
 			? $this->database->get_comments()
 			: $this->database->get_comments( $page_url );
@@ -871,7 +872,7 @@ class Ajax {
 			$this->database->create_tables();
 		}
 
-		// Get all comments/tasks for the admin dashboard.
+		// Get all comments/notes for the admin dashboard.
 		$comments = $this->database->get_comments();
 		if ( ! is_array( $comments ) ) {
 			$comments = array();
@@ -1297,6 +1298,8 @@ class Ajax {
 	/**
 	 * Handle add new task AJAX request.
 	 *
+	 * Keep method name add_new_task — public AJAX handler bound to agwp_sn_add_new_task (no migration).
+	 *
 	 * @since 1.0.0
 	 */
 	public function add_new_task() {
@@ -1359,13 +1362,13 @@ class Ajax {
 		$task_id = $this->database->save_comment( $task_data );
 
 		if ( ! $task_id ) {
-			$this->send_error( __( 'Failed to save task', 'analogwp-site-notes' ) );
+			$this->send_error( __( 'Failed to save note', 'analogwp-site-notes' ) );
 		}
 
 		$this->send_success(
 			array(
 				'id'      => $task_id,
-				'message' => __( 'Task created successfully', 'analogwp-site-notes' ),
+				'message' => __( 'Note created successfully', 'analogwp-site-notes' ),
 			)
 		);
 	}

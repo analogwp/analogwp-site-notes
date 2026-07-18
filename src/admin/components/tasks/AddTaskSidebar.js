@@ -90,12 +90,12 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 
 	const handleSave = async () => {
 		if (!formData.taskTitle.trim() && !formData.description.trim()) {
-			showToast.error(__('Please enter a task title or description', 'analogwp-site-notes'));
+			showToast.error(__('Please enter a note title or description', 'analogwp-site-notes'));
 			return;
 		}
 
 		if (!formData.pageUrl) {
-			showToast.error(__('Please select a page for this task', 'analogwp-site-notes'));
+			showToast.error(__('Please select a page for this note', 'analogwp-site-notes'));
 			return;
 		}
 
@@ -113,13 +113,13 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 			onClose();
 
 			if (timesheetData) {
-				showToast.success(__('Task created and time entry added to timesheet', 'analogwp-site-notes'));
+				showToast.success(__('Note created and time entry added to timesheet', 'analogwp-site-notes'));
 			} else {
-				showToast.success(__('Task created successfully', 'analogwp-site-notes'));
+				showToast.success(__('Note created successfully', 'analogwp-site-notes'));
 			}
 		} catch (err) {
 			logger.error('Error saving task:', err);
-			showToast.error(__('Error saving task. Please try again.', 'analogwp-site-notes'));
+			showToast.error(__('Error saving note. Please try again.', 'analogwp-site-notes'));
 		}
 	};
 
@@ -136,7 +136,7 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 						type="text"
 						value={formData.taskTitle}
 						onChange={(e) => handleInputChange('taskTitle', e.target.value)}
-						placeholder={__('Add task Name', 'analogwp-site-notes')}
+						placeholder={__('Add note Name', 'analogwp-site-notes')}
 						className="sn-task-sidebar__title-input"
 					/>
 					<div className="sn-task-sidebar__header-actions">
@@ -178,7 +178,7 @@ const AddTaskSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 			</div>
 
 			<TaskSidebarFooter
-				primaryLabel={__('Create Task', 'analogwp-site-notes')}
+				primaryLabel={__('Create Note', 'analogwp-site-notes')}
 				onSave={handleSave}
 				onCancel={handleCancel}
 			/>

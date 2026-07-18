@@ -219,7 +219,7 @@ const CommentSidebar = ({
 			return;
 		}
 
-		// Fallback for older tasks without stored capture coordinates.
+		// Fallback for older notes without stored capture coordinates.
 		const element = document.querySelector(comment.element_selector);
 		if (element) {
 			element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -243,6 +243,7 @@ const CommentSidebar = ({
 			return;
 		}
 		const url = new URL(adminDashboardUrl, window.location.origin);
+		// Keep query param "task" — deep-link URL contract; renaming needs a compat alias (no DB change, but leave as-is).
 		url.searchParams.set('task', String(comment.id));
 		window.open(url.toString(), '_blank', 'noopener,noreferrer');
 	};
@@ -254,7 +255,7 @@ const CommentSidebar = ({
 		}
 
 		const confirmed = window.confirm(
-			__('Are you sure you want to delete this task?', 'analogwp-site-notes')
+			__('Are you sure you want to delete this note?', 'analogwp-site-notes')
 		);
 		if (!confirmed) {
 			return;
@@ -277,8 +278,8 @@ const CommentSidebar = ({
 
 	const emptyMessage =
 		pageFilter === FILTER_ALL
-			? __('No tasks yet.', 'analogwp-site-notes')
-			: __('No tasks on this page yet.', 'analogwp-site-notes');
+			? __('No notes yet.', 'analogwp-site-notes')
+			: __('No notes on this page yet.', 'analogwp-site-notes');
 
 	return (
 		<>
@@ -397,7 +398,7 @@ const CommentSidebar = ({
 																<h4 className="sn-note-item__title">{title}</h4>
 															) : (
 																<span className="sn-note-item__title sn-note-item__title--empty">
-																	{__('Untitled task', 'analogwp-site-notes')}
+																	{__('Untitled note', 'analogwp-site-notes')}
 																</span>
 															)}
 														</div>

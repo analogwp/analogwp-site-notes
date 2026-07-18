@@ -48,6 +48,7 @@ const SettingsContent = ({ activeTab, setActiveTab }) => {
 				return <GeneralSettings />;
 			case 'access-control':
 				return <AccessControlSettings />;
+			// Keep "task-priorities" — settings URL/tab key; renaming would break bookmarks (not a DB migration but stable API).
 			case 'task-priorities':
 				return <LabelsAndFiltersSettings />;
 			case 'categories':

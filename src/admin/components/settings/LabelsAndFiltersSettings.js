@@ -110,8 +110,8 @@ const LabelsAndFiltersSettings = () => {
 
     return (
         <SettingsSection
-            title={__('Task Priorities', 'analogwp-site-notes')}
-            description={__('Define priority levels for tasks with customizable colors.', 'analogwp-site-notes')}
+            title={__('Note Priorities', 'analogwp-site-notes')}
+            description={__('Define priority levels for notes with customizable colors.', 'analogwp-site-notes')}
         >
             <SettingsCard title={__('Add New Priority', 'analogwp-site-notes')}>
                 <div className="sn-settings-grid-2">

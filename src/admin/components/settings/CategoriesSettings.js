@@ -103,7 +103,7 @@ const CategoriesSettings = () => {
     return (
         <SettingsSection
             title={__('Categories', 'analogwp-site-notes')}
-            description={__('Organize comments and tasks into categories for better project management.', 'analogwp-site-notes')}
+            description={__('Organize comments and notes into categories for better project management.', 'analogwp-site-notes')}
         >
             <SettingsCard title={__('Add New Category', 'analogwp-site-notes')}>
                 <TextInputField

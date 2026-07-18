@@ -403,8 +403,8 @@ class Database {
 		global $wpdb;
 
 		// Validate required fields.
-		// For comments we require comment_text and page_url, but for tasks
-		// we allow a title-only task (comment_title) with an empty comment_text.
+		// For comments we require comment_text and page_url, but for notes
+		// we allow a title-only note (comment_title) with an empty comment_text.
 		// So require that page_url is present and at least one of comment_text or comment_title is non-empty.
 		if ( empty( $data['page_url'] ) ) {
 			return false;

@@ -51,7 +51,7 @@ const TasksListView = ({
 			<div className="sn-tasks-list">
 				{comments.length === 0 ? (
 					<div className="sn-tasks-list__empty">
-						{__('No tasks found.', 'analogwp-site-notes')}
+						{__('No notes found.', 'analogwp-site-notes')}
 					</div>
 				) : (
 					comments.map((comment) => (

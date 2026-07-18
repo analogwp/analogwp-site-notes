@@ -1,6 +1,6 @@
 === Site Notes: Site Feedback, Site Notes with Sitewide Visual Commenting ===
 Contributors: analogwp, lushkant, johnpixle
-Tags: notes, feedback, user feedback, website feedback, task management
+Tags: notes, feedback, user feedback, website feedback, note management
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 7.4
@@ -8,21 +8,21 @@ Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Site Notes is a one-stop solution for agency-client transitions with visual commenting and task management. Site Notes helps get easy Site feedback.
+Site Notes is a one-stop solution for agency-client transitions with visual commenting and note management. Site Notes helps get easy Site feedback.
 
 == Description ==
 
-Site Notes streamlines the process of handing over websites from agencies to clients. It provides a visual commenting system that allows teams to annotate web pages with feedback, manage tasks, and collaborate effectively during the transition period.
+Site Notes streamlines the process of handing over websites from agencies to clients. It provides a visual commenting system that allows teams to annotate web pages with feedback, manage notes, and collaborate effectively during the transition period.
 
 = Key Features =
 
 * **Visual Commenting System** - Click on any element to add comments with screenshots
-* **Task Management** - Create, assign, and track tasks with priority levels
+* **Note Management** - Create, assign, and track notes with priority levels
 * **Status Tracking** - Monitor progress with open, in-progress, and resolved statuses
 * **Screenshot Capture** - Automatic screenshot generation for visual context
 * **Responsive Design** - Works seamlessly on desktop and mobile devices
 * **User Permissions** - Proper role-based access control
-* **Admin Dashboard** - Comprehensive overview of all comments and tasks
+* **Admin Dashboard** - Comprehensive overview of all comments and notes
 * **Translation Ready** - Full internationalization support
 
 = Perfect For =
@@ -93,7 +93,7 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 
 1. Visual commenting interface on the frontend
 2. Comment details sidebar with screenshot
-3. Admin dashboard with Task management interface
+3. Admin dashboard with Note management interface
 4. Comment/note details page inside Admin dashboard
 5. Admin settings page
 
@@ -147,7 +147,7 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 = 1.0.0 =
 * Initial release
 * Visual commenting system with click-to-comment functionality
-* Task management with priority levels (High, Medium, Low)
+* Note management with priority levels (High, Medium, Low)
 * Status tracking (Open, In Progress, Resolved)
 * Screenshot capture for visual context
 * Admin dashboard for comprehensive management

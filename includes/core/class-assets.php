@@ -235,6 +235,8 @@ class Assets {
 	/**
 	 * Get saved task priorities with defaults.
 	 *
+	 * Keep method name get_task_priorities — option storage predates Notes naming (no migration).
+	 *
 	 * @since 1.5.0
 	 * @return array Priority definitions.
 	 */

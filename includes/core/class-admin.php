@@ -186,7 +186,7 @@ class Admin {
 				wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'analogwp-site-notes' ) );
 			}
 		} else {
-			// Dashboard/Tasks page requires user to have access based on allowed roles.
+			// Dashboard/Notes page requires user to have access based on allowed roles.
 			if ( ! Plugin::user_has_access() ) {
 				wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'analogwp-site-notes' ) );
 			}

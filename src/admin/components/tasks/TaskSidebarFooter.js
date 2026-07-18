@@ -45,7 +45,7 @@ const TaskSidebarFooter = ({
 						type="button"
 						className="sn-task-sidebar__footer-delete"
 						onClick={onDelete}
-						title={__('Delete task', 'analogwp-site-notes')}
+						title={__('Delete note', 'analogwp-site-notes')}
 					>
 						<TrashOutlineIcon size="md" />
 					</button>
