@@ -175,8 +175,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
-                    // Keep action agwp_sn_add_new_task — public AJAX contract; renaming needs a compat alias (no DB change, but leave as-is).
-                    action: 'agwp_sn_add_new_task',
+                    action: 'agwp_sn_add_new_note',
                     nonce: agwp_sn_ajax.nonce,
                     ...taskData
                 })

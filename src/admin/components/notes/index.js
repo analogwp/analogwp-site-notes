@@ -1,9 +1,8 @@
 /**
  * Admin notes board UI.
  *
- * AJAX actions and URL params that form the public contract still use "task"
- * (e.g. agwp_sn_add_new_task, ?task=). Settings tab key task-priorities is also
- * left unchanged for bookmark/compat stability.
+ * Deep-link URL param (?task=) and settings tab key (task-priorities) stay
+ * unchanged for bookmark/compat stability. AJAX uses agwp_sn_add_new_note.
  */
 export { default } from './NotesView';
 export { default as NotesView } from './NotesView';

@@ -61,8 +61,7 @@ class Ajax {
 		add_action( 'wp_ajax_agwp_sn_get_admin_data', array( $this, 'get_admin_data' ) );
 		add_action( 'wp_ajax_agwp_sn_get_pages', array( $this, 'get_pages' ) );
 		add_action( 'wp_ajax_agwp_sn_search_pages', array( $this, 'search_pages' ) );
-		// Keep action agwp_sn_add_new_task — public AJAX contract; renaming needs a compat alias (no DB change, but leave as-is).
-		add_action( 'wp_ajax_agwp_sn_add_new_task', array( $this, 'add_new_task' ) );
+		add_action( 'wp_ajax_agwp_sn_add_new_note', array( $this, 'add_new_note' ) );
 		add_action( 'wp_ajax_agwp_sn_admin_add_reply', array( $this, 'admin_add_reply' ) );
 		add_action( 'wp_ajax_agwp_sn_admin_delete_reply', array( $this, 'admin_delete_reply' ) );
 
@@ -1296,13 +1295,11 @@ class Ajax {
 	}
 
 	/**
-	 * Handle add new task AJAX request.
-	 *
-	 * Keep method name add_new_task — public AJAX handler bound to agwp_sn_add_new_task (no migration).
+	 * Handle add new note AJAX request.
 	 *
 	 * @since 1.0.0
 	 */
-	public function add_new_task() {
+	public function add_new_note() {
 		// Nonce verification is in place via wp_verify_nonce() call.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
 			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
@@ -1344,8 +1341,7 @@ class Ajax {
 			$post_id = 0;
 		}
 
-		// Prepare task data.
-		$task_data = array(
+		$note_data = array(
 			'post_id'         => $post_id,
 			'comment_title'   => isset( $_POST['comment_title'] ) ? sanitize_text_field( wp_unslash( $_POST['comment_title'] ) ) : '',
 			'comment_text'    => isset( $_POST['comment_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comment_text'] ) ) : '',
@@ -1359,15 +1355,15 @@ class Ajax {
 			'timesheet'       => isset( $_POST['timesheet'] ) ? sanitize_textarea_field( wp_unslash( $_POST['timesheet'] ) ) : '',
 		);
 
-		$task_id = $this->database->save_comment( $task_data );
+		$note_id = $this->database->save_comment( $note_data );
 
-		if ( ! $task_id ) {
+		if ( ! $note_id ) {
 			$this->send_error( __( 'Failed to save note', 'analogwp-site-notes' ) );
 		}
 
 		$this->send_success(
 			array(
-				'id'      => $task_id,
+				'id'      => $note_id,
 				'message' => __( 'Note created successfully', 'analogwp-site-notes' ),
 			)
 		);
