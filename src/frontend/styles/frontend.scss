@@ -27,27 +27,54 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   flex-shrink: 0;
 }
 
-// Admin Bar Toggle Status
-#wp-admin-bar-agwp-sn-toggle,
-#wp-admin-bar-sn-toggle {
-  #sn-admin-bar-toggle {
-    // Default state: Green when comments are OFF (showing "Turn Comments ON")
-    color: $success-color;
-    font-weight: 600;
-    
-    // When comments are active (showing "Turn Comments OFF"), use normal color
-    &.sn-comments-active {
-      color: inherit;
-      font-weight: normal;
+// Admin Bar
+#wp-admin-bar-agwp-sn-menu {
+  > .ab-item {
+    .sn-admin-bar-status {
+      font-weight: 600;
+
+      &.is-on {
+        color: #46b450;
+      }
+
+      &.is-off {
+        color: rgba(240, 246, 252, 0.7);
+      }
     }
   }
-}
 
-// Admin Bar Menu Styling
-#wp-admin-bar-agwp-sn-menu {
   .ab-submenu {
-    li {
+    #wp-admin-bar-agwp-sn-toggle,
+    #wp-admin-bar-agwp-sn-tasks-board,
+    #wp-admin-bar-agwp-sn-settings-link {
       min-width: 180px;
+      height: auto;
+    }
+
+    .ab-item {
+      display: flex !important;
+      align-items: center;
+      box-sizing: border-box;
+      height: 20px !important;
+      min-height: 32px;
+      padding: 0 12px !important;
+      line-height: 1.4 !important;
+      font-size: 13px !important;
+      font-weight: 400 !important;
+      color: #c3c4c7 !important;
+    }
+
+    #sn-admin-bar-toggle {
+      display: inline;
+      color: inherit;
+      font-weight: inherit;
+      font-size: inherit;
+      line-height: inherit;
+    }
+
+    .ab-item:hover,
+    .ab-item:focus {
+      color: #00b9eb !important;
     }
   }
 }
@@ -111,7 +138,19 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   .sn-toggle-text {
     display: flex;
     align-items: center;
+    gap: 8px;
     white-space: nowrap;
+  }
+  
+  .sn-toggle-status {
+    padding: 2px 8px;
+    background: rgba(56, 88, 233, 0.1);
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #3858e9;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
   }
   
   .sn-toggle-hide {
@@ -139,17 +178,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
 		}
   }
   
-  .sn-comments-count {
-    margin-left: 6px;
-    padding: 2px 8px;
-    background: rgba(56, 88, 233, 0.1);
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #3858e9;
-  }
-  
-  // Inactive state (Comments OFF) - Clean white/gray
+  // Inactive state (Notes Off) - Clean white/gray
   &:not(.active) {
     background: rgba(255, 255, 255, 0.95);
     
@@ -162,7 +191,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     }
   }
   
-  // Active state (Comments ON) - Vibrant primary color
+  // Active state (Notes On) - Vibrant primary color
   &.active {
     background: linear-gradient(135deg, #3858e9 0%, #4f6bff 100%);
     
@@ -184,99 +213,158 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
       }
     }
     
-    .sn-comments-count {
+    .sn-toggle-status {
       background: rgba(255, 255, 255, 0.25);
       color: white;
     }
   }
 }
 
-// Overlay
+// Notes mode welcome overlay
 .sn-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: $overlay-bg;
+  background: rgba(0, 0, 0, 0.45);
   z-index: 99998;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.25s ease;
   cursor: pointer;
-  
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+
   .sn-overlay-message {
-    background: $background-color;
-    padding: 30px;
-    border-radius: 8px;
-    max-width: 400px;
-    text-align: center;
-    animation: slideUp 0.4s ease;
     position: relative;
-    cursor: default;
-    
-    .sn-overlay-close {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: #646970;
-      
-      &:hover {
-        color: $danger-color;
-      }
-    }
-    
-    h3 {
-      margin: 0 0 10px 0;
-      color: $primary-color;
-      font-size: 18px;
-    }
-    
-    p {
-      margin: 0 0 20px 0;
-      color: #646970;
-    }
-    
-    .sn-overlay-hint {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #f0f0f1;
-      
-      small {
-        color: #a0a5aa;
-        font-style: italic;
-      }
-    }
-  }
-  
-  .sn-overlay-instructions {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    width: min(360px, calc(100vw - 40px));
+    padding: 28px 28px 24px;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
     text-align: left;
+    animation: slideUp 0.3s ease;
+    cursor: default;
   }
-  
-  .sn-instruction-item {
+
+  .sn-overlay-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 0;
-    
-    .sn-instruction-icon {
-      font-size: 18px;
-      width: 24px;
-      text-align: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 22px;
+    line-height: 1;
+    color: #8c8f94;
+    cursor: pointer;
+
+    &:hover {
+      background: #f3f4f5;
+      color: #111;
     }
-    
-    span:last-child {
+  }
+
+  .sn-overlay-eyebrow {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #8c8f94;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #111;
+  }
+
+  .sn-overlay-lead {
+    margin: 0 0 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #646970;
+  }
+
+  .sn-overlay-instructions {
+    margin: 0 0 18px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    li {
+      position: relative;
+      padding-left: 16px;
       font-size: 14px;
-      color: $text-color;
+      line-height: 1.4;
+      color: #1d2327;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 7px;
+        left: 0;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #3858e9;
+      }
     }
+  }
+
+  .sn-overlay-hint {
+    margin: 0;
+    padding-top: 14px;
+    border-top: 1px solid #eee;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #8c8f94;
+  }
+}
+
+// Transient toast notifications
+.sn-notification {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  z-index: 100001;
+  max-width: min(340px, calc(100vw - 40px));
+  padding: 14px 18px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  color: #111;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: slideUp 0.25s ease;
+
+  &.sn-notification-success {
+    border-left: 3px solid #3858e9;
+  }
+
+  &.sn-notification-error {
+    border-left: 3px solid #d63638;
+  }
+
+  &.sn-notification-info {
+    border-left: 3px solid #8c8f94;
   }
 }
 
@@ -983,7 +1071,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   
   .sn-overlay .sn-overlay-message {
     margin: 20px;
-    padding: 20px;
+    padding: 24px 22px 20px;
   }
 }
 
