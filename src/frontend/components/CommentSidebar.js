@@ -450,7 +450,7 @@ const CommentSidebar = ({
 																					role="menuitem"
 																					onClick={() => handleViewAtAdmin(comment)}
 																				>
-																					{__('View at admin', 'analogwp-site-notes')}
+																					{__('View at Dashboard', 'analogwp-site-notes')}
 																				</button>
 																			</li>
 																		)}

@@ -55,6 +55,7 @@ class Ajax {
 		add_action( 'wp_ajax_agwp_sn_update_comment', array( $this, 'update_comment' ) );
 		add_action( 'wp_ajax_agwp_sn_update_comment_status', array( $this, 'update_comment_status' ) );
 		add_action( 'wp_ajax_agwp_sn_add_reply', array( $this, 'add_reply' ) );
+		add_action( 'wp_ajax_agwp_sn_delete_reply', array( $this, 'delete_reply' ) );
 		add_action( 'wp_ajax_agwp_sn_delete_comment', array( $this, 'delete_comment' ) );
 		add_action( 'wp_ajax_agwp_sn_get_dashboard_stats', array( $this, 'get_dashboard_stats' ) );
 		add_action( 'wp_ajax_agwp_sn_get_admin_data', array( $this, 'get_admin_data' ) );
@@ -755,6 +756,40 @@ class Ajax {
 			array(
 				'id'      => $reply_id,
 				'message' => __( 'Reply added successfully', 'analogwp-site-notes' ),
+			)
+		);
+	}
+
+	/**
+	 * Handle frontend delete reply AJAX request.
+	 *
+	 * @since 1.5.0
+	 */
+	public function delete_reply() {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
+			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
+		}
+
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
+		}
+
+		$reply_id = isset( $_POST['reply_id'] ) ? absint( wp_unslash( $_POST['reply_id'] ) ) : 0;
+
+		if ( empty( $reply_id ) ) {
+			$this->send_error( __( 'Reply ID is required', 'analogwp-site-notes' ) );
+		}
+
+		$result = $this->database->delete_reply( $reply_id );
+
+		if ( ! $result ) {
+			$this->send_error( __( 'Failed to delete reply', 'analogwp-site-notes' ) );
+		}
+
+		$this->send_success(
+			array(
+				'reply_id' => $reply_id,
+				'message'  => __( 'Reply deleted successfully', 'analogwp-site-notes' ),
 			)
 		);
 	}
