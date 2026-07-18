@@ -84,104 +84,13 @@
 
 .sn-task-filters {
 	display: flex;
+	flex-wrap: wrap;
 	gap: var(--sn-space-s);
 	align-items: center;
-}
 
-/* List view */
-.sn-tasks-list {
-	background-color: var(--sn-surface-body-ultra-light);
-	border: 1px solid var(--sn-border-light);
-	border-radius: var(--sn-radius-button);
-	box-shadow: var(--sn-shadow-card);
-}
-
-.sn-tasks-list__header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: var(--sn-space-m);
-	border-bottom: 1px solid var(--sn-border-light);
-}
-
-.sn-tasks-list__title {
-	font-size: var(--sn-title-s-size);
-	font-weight: var(--sn-font-weight-semibold);
-	color: var(--sn-text-primary);
-}
-
-.sn-tasks-list__subtitle {
-	font-size: var(--sn-text-m-size);
-	color: var(--sn-text-secondary);
-}
-
-.sn-tasks-list__row {
-	padding: var(--sn-space-m);
-	transition: background-color var(--sn-transition-base);
-	cursor: pointer;
-
-	&:hover {
-		background-color: var(--sn-surface-body-light);
+	.sn-select select {
+		border-color: var(--sn-border-light) !important;
+		min-width: 9.5rem;
 	}
-}
-
-.sn-tasks-list__row-inner {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-}
-
-.sn-tasks-list__row-main {
-	display: flex;
-	align-items: center;
-	gap: var(--sn-space-s);
-	flex: 1;
-	min-width: 0;
-}
-
-.sn-tasks-list__row-content {
-	flex: 1;
-	min-width: 0;
-}
-
-.sn-tasks-list__row-title {
-	font-size: var(--sn-text-m-size);
-	font-weight: var(--sn-font-weight-medium);
-	color: var(--sn-text-primary);
-}
-
-.sn-tasks-list__row-meta {
-	display: flex;
-	align-items: center;
-	gap: var(--sn-space-m);
-	margin-top: var(--sn-space-2xs);
-	font-size: var(--sn-text-s-size);
-	color: var(--sn-text-secondary);
-}
-
-.sn-tasks-list__row-actions {
-	display: flex;
-	align-items: center;
-	gap: var(--sn-space-s);
-	margin-left: var(--sn-space-m);
-}
-
-.sn-tasks-list__status-select {
-	font-size: var(--sn-text-s-size);
-	border: 1px solid var(--sn-border-strong);
-	border-radius: var(--sn-radius-button);
-	padding: var(--sn-space-2xs) var(--sn-space-xs);
-	background-color: var(--sn-surface-body-ultra-light);
-
-	&:focus {
-		outline: none;
-		border-color: var(--sn-accent);
-		box-shadow: 0 0 0 2px rgba(56, 88, 233, 0.15);
-	}
-}
-
-.sn-tasks-list__drag-preview {
-	transform: rotate(3deg);
-	box-shadow: var(--sn-shadow-ui);
 }
 
