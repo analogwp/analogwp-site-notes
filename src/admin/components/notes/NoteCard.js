@@ -58,6 +58,15 @@ const NoteCard = ({
 		</div>
 	);
 
+	const creator = user || comment.creator || comment.user || {
+		name: comment.display_name || comment.user_name || __('Unknown User', 'analogwp-site-notes'),
+		avatar: comment.avatar || '',
+	};
+
+	const assignees = comment.assignees?.length
+		? comment.assignees
+		: (comment.assignee ? [comment.assignee] : []);
+
 	return (
 		<div
 			ref={setNodeRef}
@@ -72,9 +81,7 @@ const NoteCard = ({
 			<div className="sn-kanban-card-header">
 				<div className="sn-kanban-card-title-row">
 					{comment.id && (
-						<h4 className="sn-kanban-card-id">
-							#{comment.id}
-						</h4>
+						<span className="sn-note-id">{comment.id}</span>
 					)}
 					{comment.comment_title && (
 						<h4 className="sn-kanban-card-title" title={comment.comment_title}>
@@ -98,42 +105,34 @@ const NoteCard = ({
 			</div>
 
 			<div className="sn-kanban-card-body">
-				{comment.categories && comment.categories.length > 0 && (
-					<div className="sn-flex sn-flex-wrap sn-gap-1 sn-mb-2">
-						{comment.categories.map((category, index) => (
-							<span key={index} className="sn-badge sn-badge--default sn-badge--small">
-								{category}
-							</span>
-						))}
-					</div>
-				)}
 				{comment.page_url && (
 					<div className="sn-kanban-card-meta">
 						<LinkIcon size={12} className="sn-mr-1" />
 						<span className="sn-truncate">{new URL(comment.page_url).pathname}</span>
 					</div>
 				)}
+				<div className="sn-kanban-card-creator">
+					<div className="sn-kanban-card-creator-user">
+						{renderAvatar(creator)}
+						<span className="sn-kanban-card-creator-name">
+							{creator?.name || __('Unknown User', 'analogwp-site-notes')}
+						</span>
+					</div>
+					{comment.created_at && formatDate && (
+						<span className="sn-kanban-card-date">
+							{formatDate(comment.created_at)}
+						</span>
+					)}
+				</div>
 			</div>
 
-			<div className="sn-kanban-card-footer">
-				<div className="sn-kanban-card-users">
-					<div className="sn-kanban-card-user-field">
-						<small className="sn-kanban-card-user-label">{__('Added by', 'analogwp-site-notes')}</small>
-						<div className="sn-kanban-card-user-row">
-							{renderAvatar(user)}
-							<span className="sn-kanban-card-user-name">
-								{user?.name || __('Unknown User', 'analogwp-site-notes')}
-							</span>
-							<span className="sn-kanban-card-date">
-								{formatDate(comment.created_at)}
-							</span>
-						</div>
-					</div>
-					{(comment.assignees?.length > 0 || comment.assignee) && (
+			{assignees.length > 0 && (
+				<div className="sn-kanban-card-footer">
+					<div className="sn-kanban-card-users">
 						<div className="sn-kanban-card-user-field">
 							<small className="sn-kanban-card-user-label">{__('Assignees', 'analogwp-site-notes')}</small>
 							<div className="sn-kanban-card-user-row sn-kanban-card-user-row--assignees">
-								{(comment.assignees?.length ? comment.assignees : [comment.assignee]).map((assignee) => (
+								{assignees.map((assignee) => (
 									<div key={assignee.id} className="sn-kanban-card-assignee">
 										{renderAvatar(assignee)}
 										<span className="sn-kanban-card-user-name">
@@ -143,9 +142,9 @@ const NoteCard = ({
 								))}
 							</div>
 						</div>
-					)}
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 };

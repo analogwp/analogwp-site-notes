@@ -75,7 +75,7 @@ const NotesKanbanView = ({
 									<NoteCard
 										key={comment.id}
 										comment={comment}
-										user={comment.user || getUserById(comment.user_id)}
+										user={comment.user || comment.creator || getUserById(comment.user_id)}
 										onDelete={handleDelete}
 										onCardClick={handleEditNote}
 										formatDate={formatDate}
@@ -102,7 +102,7 @@ const NotesKanbanView = ({
 						<div className="sn-kanban-drag-overlay">
 							<NoteCard
 								comment={draggedItem}
-								user={draggedItem.user || getUserById(draggedItem.user_id)}
+								user={draggedItem.user || draggedItem.creator || getUserById(draggedItem.user_id)}
 								onDelete={() => {}}
 								onCardClick={() => {}}
 								formatDate={formatDate}
