@@ -24,16 +24,6 @@ class Database {
 	use Has_Instance;
 
 	/**
-	 * Current database schema revision.
-	 *
-	 * Bump when adding migrations in upgrade_database().
-	 *
-	 * @since 1.4.0
-	 * @var int
-	 */
-	const SCHEMA_VERSION = 2;
-
-	/**
 	 * Return table name by key
 	 *
 	 * @param  string $table table key.
@@ -207,93 +197,7 @@ class Database {
 			}
 		}
 
-		// Run database upgrades and mark schema current only when verified.
-		$this->upgrade_database();
-		$this->mark_schema_current();
-	}
-
-	/**
-	 * Run pending schema upgrades when the installed revision is behind.
-	 *
-	 * Safe to call on every request — no-ops once schema is current.
-	 * Does not advance the stored revision until required columns exist.
-	 *
-	 * @since 1.4.0
-	 */
-	public function maybe_upgrade() {
-		$installed = (int) get_option( 'agwp_sn_schema_version', 0 );
-
-		if ( $installed >= self::SCHEMA_VERSION ) {
-			return;
-		}
-
-		$this->upgrade_database();
-		$this->mark_schema_current();
-	}
-
-	/**
-	 * Persist schema/db version options only after required columns exist.
-	 *
-	 * @since 1.4.0
-	 * @return bool True when schema is current and options were updated.
-	 */
-	private function mark_schema_current() {
-		if ( ! $this->schema_requirements_met() ) {
-			return false;
-		}
-
-		update_option( 'agwp_sn_schema_version', self::SCHEMA_VERSION );
-		update_option( 'agwp_sn_db_version', AGWP_SN_VERSION );
-
-		return true;
-	}
-
-	/**
-	 * Whether the schema satisfies the current SCHEMA_VERSION requirements.
-	 *
-	 * @since 1.4.0
-	 * @return bool
-	 */
-	private function schema_requirements_met() {
-		$comments_table = self::tables( 'comments', 'name' );
-
-		// Schema revision 2 requires multi-assignee storage.
-		return self::column_exists( $comments_table, 'assigned_users' );
-	}
-
-	/**
-	 * Upgrade database schema if needed.
-	 *
-	 * @since 1.0.0
-	 */
-	public function upgrade_database() {
-		global $wpdb;
-
-		$comments_table = self::tables( 'comments', 'name' );
-
-		// Check if timesheet column exists, if not add it.
-		$column_exists = self::column_exists( $comments_table, 'timesheet' );
-
-		if ( empty( $column_exists ) ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Required schema update; table via %i.
-			$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD COLUMN timesheet longtext DEFAULT NULL AFTER time_estimation', $comments_table ) );
-		}
-
-		// Check if comment_title column exists, if not add it.
-		$title_column_exists = self::column_exists( $comments_table, 'comment_title' );
-
-		if ( empty( $title_column_exists ) ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Required schema update; table via %i.
-			$wpdb->query( $wpdb->prepare( "ALTER TABLE %i ADD COLUMN comment_title varchar(255) DEFAULT '' AFTER assigned_to", $comments_table ) );
-		}
-
-		// Check if assigned_users column exists, if not add it.
-		$assigned_users_column_exists = self::column_exists( $comments_table, 'assigned_users' );
-
-		if ( empty( $assigned_users_column_exists ) ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Required schema update; table via %i.
-			$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD COLUMN assigned_users text DEFAULT NULL AFTER assigned_to', $comments_table ) );
-		}
+		Migrations::get_instance()->maybe_run();
 	}
 
 	/**

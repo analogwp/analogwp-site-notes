@@ -4,7 +4,7 @@ Tags: notes, feedback, user feedback, website feedback, task management
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,10 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 5. Admin settings page
 
 == Changelog ==
+
+= 1.5.0 =
+* Add versioned database migrations runner for plugin upgrades
+* Fix missing assigned_users column blocking front-end comment saves
 
 = 1.4.0 =
 * Fix page url verification fail
