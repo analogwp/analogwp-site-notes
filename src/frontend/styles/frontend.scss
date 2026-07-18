@@ -312,6 +312,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
   z-index: 100000;
   pointer-events: none;
   box-sizing: border-box;
+  border-radius: 8px;
 
   &--with-overlay,
   &--sidebar-highlight {
@@ -335,6 +336,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     left: -2px;
     border-top-width: 3px;
     border-left-width: 3px;
+    border-top-left-radius: 8px;
   }
 
   &--tr {
@@ -342,6 +344,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     right: -2px;
     border-top-width: 3px;
     border-right-width: 3px;
+    border-top-right-radius: 8px;
   }
 
   &--bl {
@@ -349,6 +352,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     left: -2px;
     border-bottom-width: 3px;
     border-left-width: 3px;
+    border-bottom-left-radius: 8px;
   }
 
   &--br {
@@ -356,6 +360,7 @@ $overlay-bg: rgba(0, 0, 0, 0.8);
     right: -2px;
     border-bottom-width: 3px;
     border-right-width: 3px;
+    border-bottom-right-radius: 8px;
   }
 }
 
