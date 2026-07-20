@@ -100,8 +100,19 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 == Changelog ==
 
 = 1.5.0 =
-* Add versioned database migrations runner for plugin upgrades
+* Rename Tasks to Notes across the admin dashboard, menu, and frontend
+* Add on-page note markers with thread cards and a markers toggle
+* Add infinite scroll for notes in list and kanban views
+* Add notes-per-load setting to control how many notes load at a time
+* Add multi-assignee support when managing notes
+* Add searchable page picker when creating notes from the dashboard
+* Add reply deletion from the manage sidebar and marker cards
+* Improve the manage note sidebar with timeline discussion and editing
+* Improve settings screens with auto-save and clearer layouts
+* Move the time tracking toggle into General settings
+* Restyle the frontend Page Notes sidebar and Add Comment popup
 * Fix missing assigned_users column blocking front-end comment saves
+* Add versioned database migrations for safer plugin upgrades
 
 = 1.4.0 =
 * Fix page url verification fail
