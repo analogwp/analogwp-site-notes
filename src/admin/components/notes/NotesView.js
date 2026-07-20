@@ -13,6 +13,7 @@ import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
  */
 import NotesListView from './NotesListView';
 import NotesKanbanView from './NotesKanbanView';
+import NotesControls from './NotesControls';
 import { NOTE_STATUSES } from '../../constants/noteStatuses';
 
 const NotesView = ({
@@ -145,10 +146,6 @@ const NotesView = ({
 		draggedItem,
 		handleDragStart,
 		handleDragEnd,
-		filters,
-		onFilterChange,
-		sortBy,
-		onSortChange,
 		users,
 		statuses: NOTE_STATUSES,
 		getCommentsByStatus,
@@ -168,8 +165,6 @@ const NotesView = ({
 		pages,
 		editingNote,
 		comments,
-		activeView,
-		onViewChange,
 		onNavigateToSettingsTab,
 		pagination,
 		loadingMore,
@@ -177,11 +172,25 @@ const NotesView = ({
 		notesPerLoad,
 	};
 
-	if (activeView === 'list') {
-		return <NotesListView {...commonProps} />;
-	}
-
-	return <NotesKanbanView {...commonProps} />;
+	return (
+		<>
+			{/* Keep controls outside view swap so the toggle does not remount. */}
+			<NotesControls
+				activeView={activeView}
+				onViewChange={onViewChange}
+				filters={filters}
+				onFilterChange={onFilterChange}
+				sortBy={sortBy}
+				onSortChange={onSortChange}
+				users={users}
+			/>
+			{activeView === 'list' ? (
+				<NotesListView {...commonProps} />
+			) : (
+				<NotesKanbanView {...commonProps} />
+			)}
+		</>
+	);
 };
 
 export default NotesView;

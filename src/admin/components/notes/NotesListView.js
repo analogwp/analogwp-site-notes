@@ -10,18 +10,12 @@ import NoteListItem from './NoteListItem';
 import AddNoteSidebar from './AddNoteSidebar';
 import ManageNoteSidebar from './ManageNoteSidebar';
 import NoteSidebarBackdropClose from './NoteSidebarBackdropClose';
-import NotesControls from './NotesControls';
 import NotesInfiniteScrollSentinel from './NotesInfiniteScrollSentinel';
 
 const NotesListView = ({
 	comments,
 	showAddModal,
 	editingNote,
-	onViewChange,
-	filters,
-	onFilterChange,
-	sortBy,
-	onSortChange,
 	users,
 	statuses,
 	formatDate,
@@ -34,7 +28,6 @@ const NotesListView = ({
 	onAddReply,
 	onDeleteReply,
 	pages,
-	activeView,
 	onNavigateToSettingsTab,
 	pagination = {},
 	loadingMore = {},
@@ -45,16 +38,6 @@ const NotesListView = ({
 
 	return (
 		<>
-			<NotesControls
-				activeView={activeView}
-				onViewChange={onViewChange}
-				filters={filters}
-				onFilterChange={onFilterChange}
-				sortBy={sortBy}
-				onSortChange={onSortChange}
-				users={users}
-			/>
-
 			<div className="sn-notes-list">
 				{comments.length === 0 && !isLoadingMore ? (
 					<div className="sn-notes-list__empty">

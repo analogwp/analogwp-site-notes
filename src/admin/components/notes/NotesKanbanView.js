@@ -5,7 +5,6 @@ import NoteCard from './NoteCard';
 import AddNoteSidebar from './AddNoteSidebar';
 import ManageNoteSidebar from './ManageNoteSidebar';
 import NoteSidebarBackdropClose from './NoteSidebarBackdropClose';
-import NotesControls from './NotesControls';
 import DroppableColumn from './DroppableColumn';
 import NotesInfiniteScrollSentinel from './NotesInfiniteScrollSentinel';
 import { AddIcon } from '../../../shared/icons';
@@ -17,10 +16,6 @@ const NotesKanbanView = ({
 	draggedItem,
 	handleDragStart,
 	handleDragEnd,
-	filters,
-	onFilterChange,
-	sortBy,
-	onSortChange,
 	users,
 	statuses,
 	getCommentsByStatus,
@@ -39,8 +34,6 @@ const NotesKanbanView = ({
 	onDeleteReply,
 	pages,
 	editingNote,
-	activeView,
-	onViewChange,
 	onNavigateToSettingsTab,
 	pagination = {},
 	loadingMore = {},
@@ -53,15 +46,6 @@ const NotesKanbanView = ({
 				onDragStart={handleDragStart}
 				onDragEnd={handleDragEnd}
 			>
-				<NotesControls
-					activeView={activeView}
-					onViewChange={onViewChange}
-					filters={filters}
-					onFilterChange={onFilterChange}
-					sortBy={sortBy}
-					onSortChange={onSortChange}
-					users={users}
-				/>
 				<div className="sn-kanban-board">
 					{statuses.map((status) => {
 						const columnNotes = getCommentsByStatus(status.key);

@@ -62,6 +62,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 	});
 	const [sortBy, setSortBy] = useState('created_at');
 	const skipNextNotesReload = useRef(true);
+	const hasLoadedDashboard = useRef(false);
 	const filtersRef = useRef(filters);
 	const sortByRef = useRef(sortBy);
 	const activeViewRef = useRef(activeView);
@@ -108,7 +109,15 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 	};
 
 	const loadAdminData = useCallback(async (view = activeViewRef.current) => {
-		setLoading(true);
+		// Only blank the dashboard on the first load. Later reloads (view / filter /
+		// sort changes) keep the shell mounted so the Kanban ↔ List toggle does not flash.
+		const isInitialLoad = !hasLoadedDashboard.current;
+		const requestView = view;
+
+		if (isInitialLoad) {
+			setLoading(true);
+		}
+
 		try {
 			const response = await fetch(agwp_sn_ajax.ajaxUrl, {
 				method: 'POST',
@@ -122,6 +131,12 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 			});
 
 			const data = await response.json();
+
+			// Ignore outdated responses when the user switches views quickly.
+			if (requestView !== activeViewRef.current) {
+				return;
+			}
+
 			if (data.success) {
 				setComments(data.data.comments || []);
 				setUsers(data.data.users || []);
@@ -137,7 +152,12 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 		} catch (error) {
 			logger.error('Error loading admin data', error);
 		} finally {
-			setLoading(false);
+			if (requestView === activeViewRef.current) {
+				hasLoadedDashboard.current = true;
+				if (isInitialLoad) {
+					setLoading(false);
+				}
+			}
 		}
 	}, [buildNotesParams]);
 
