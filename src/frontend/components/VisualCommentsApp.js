@@ -369,6 +369,7 @@ const VisualCommentsApp = () => {
                         onAddReply={addReply}
                         onUpdateStatus={updateCommentStatus}
                         onDelete={agwp_sn_ajax.canManageComments ? deleteComment : undefined}
+                        onDeleteReply={agwp_sn_ajax.canManageComments ? deleteReply : undefined}
                         canManageComments={agwp_sn_ajax.canManageComments}
                         isVisible={sidebarVisible}
                         onClose={() => setSidebarVisible(!sidebarVisible)}
