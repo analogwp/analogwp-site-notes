@@ -76,25 +76,55 @@ export const ToggleField = ({
 );
 
 export const SelectField = ({
+	id,
 	value,
 	onChange,
 	options,
 	disabled = false,
 	label,
 	description,
-	className = ''
-}) => (
-	<FieldGroup className={className}>
-		<Select
-			label={label}
-			help={description}
-			value={value}
-			onChange={onChange}
-			options={options}
-			disabled={disabled}
-		/>
-	</FieldGroup>
-);
+	className = '',
+	variant = 'default'
+}) => {
+	if (variant === 'compact') {
+		return (
+			<FieldGroup className={classnames('sn-settings-field', className)}>
+				{label && (
+					<FieldLabel htmlFor={id} className="sn-settings-field__label">
+						{label}
+					</FieldLabel>
+				)}
+				<div className="sn-field-control">
+					<Select
+						id={id}
+						className="sn-select--compact"
+						label={label}
+						hideLabelFromVision
+						value={value}
+						onChange={onChange}
+						options={options}
+						disabled={disabled}
+					/>
+				</div>
+				{description && <FieldHelp>{description}</FieldHelp>}
+			</FieldGroup>
+		);
+	}
+
+	return (
+		<FieldGroup className={className}>
+			<Select
+				id={id}
+				label={label}
+				help={description}
+				value={value}
+				onChange={onChange}
+				options={options}
+				disabled={disabled}
+			/>
+		</FieldGroup>
+	);
+};
 
 export const FieldHelp = ({ children, className = '' }) => (
 	<p className={classnames('sn-field-help', className)}>{children}</p>
