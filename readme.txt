@@ -2,7 +2,7 @@
 Contributors: analogwp, lushkant, johnpixle
 Tags: notes, feedback, user feedback, website feedback, note management
 Requires at least: 6.5
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
 Stable tag: 1.5.0
 License: GPLv2 or later
@@ -102,6 +102,7 @@ Yes, the plugin is designed to work with any WordPress theme. It uses non-intrus
 = 1.5.0 =
 * Rename Tasks to Notes across the admin dashboard, menu, and frontend
 * Add on-page note markers with thread cards and a markers toggle
+* Add full single-note view to the frontend sidebar
 * Add infinite scroll for notes in list and kanban views
 * Add notes-per-load setting to control how many notes load at a time
 * Add multi-assignee support when managing notes
