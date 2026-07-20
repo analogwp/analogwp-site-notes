@@ -305,7 +305,7 @@ class Database {
 	/**
 	 * Query admin notes with filters and pagination.
 	 *
-	 * @since 1.6.0
+	 * @since 1.5.0
 	 * @param array $args {
 	 *     Optional. Query arguments.
 	 *
@@ -418,7 +418,7 @@ class Database {
 	/**
 	 * Hydrate comment rows with avatars, replies, categories, and assignees.
 	 *
-	 * @since 1.6.0
+	 * @since 1.5.0
 	 * @param array $comments Comment rows.
 	 * @return array
 	 */

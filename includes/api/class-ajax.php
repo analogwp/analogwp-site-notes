@@ -976,7 +976,7 @@ class Ajax {
 	/**
 	 * Handle load more notes AJAX request.
 	 *
-	 * @since 1.6.0
+	 * @since 1.5.0
 	 */
 	public function load_more_notes() {
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
@@ -1022,7 +1022,7 @@ class Ajax {
 	/**
 	 * Build shared admin notes query args from the current request.
 	 *
-	 * @since 1.6.0
+	 * @since 1.5.0
 	 * @return array
 	 */
 	private function get_admin_notes_query_args_from_request() {
@@ -1050,7 +1050,7 @@ class Ajax {
 	/**
 	 * Get notes-per-load setting with legacy key migration.
 	 *
-	 * @since 1.6.0
+	 * @since 1.5.0
 	 * @return int
 	 */
 	private function get_notes_per_load() {
@@ -1067,7 +1067,7 @@ class Ajax {
 	/**
 	 * Enrich admin comment objects with creator/assignee payloads.
 	 *
-	 * @since 1.6.0
+	 * @since 1.5.0
 	 * @param array $comments Comment rows.
 	 * @return array
 	 */
