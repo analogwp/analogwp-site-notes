@@ -354,7 +354,7 @@
 			height: 20px;
 			border-radius: var(--sn-radius-pill);
 			border-color: var(--sn-border-strong);
-			background-color: var(--sn-border-strong);
+			background-color: var(--sn-surface-body-light);
 		}
 
 		.components-form-toggle__thumb {
@@ -378,7 +378,19 @@
 .sn-settings-checkbox-list {
 	display: flex;
 	flex-direction: column;
-	gap: var(--sn-space-xs);
+	gap: var(--sn-space-s);
+}
+
+.sn-settings-role-item {
+	display: flex;
+	align-items: center;
+	gap: var(--sn-space-s);
+	cursor: pointer;
+	padding: var(--sn-space-2xs) 0;
+
+	&:has(.sn-checkbox:disabled) {
+		cursor: default;
+	}
 }
 
 .sn-settings-item-stack {
@@ -431,13 +443,6 @@
 .sn-settings-item-name {
 	font-weight: var(--sn-font-weight-medium);
 	color: var(--sn-text-primary);
-}
-
-.sn-settings-role-item {
-	display: flex;
-	align-items: center;
-	gap: var(--sn-space-xs);
-	cursor: pointer;
 }
 
 .sn-settings-advanced-card {

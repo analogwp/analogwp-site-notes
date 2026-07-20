@@ -282,11 +282,11 @@ export const MultiSelect = ({
 					<label key={option.value} className="sn-multi-select-option">
 						<input
 							type="checkbox"
+							className="sn-checkbox"
 							checked={value.includes(option.value)}
 							onChange={() => handleChange(option.value)}
 							disabled={disabled}
 						/>
-						<span className="sn-checkmark" />
 						{option.label}
 					</label>
 				))}
