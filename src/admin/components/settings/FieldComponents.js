@@ -64,7 +64,7 @@ export const ToggleField = ({
 	description,
 	className = ''
 }) => (
-	<FieldGroup className={className}>
+	<FieldGroup className={classnames('sn-settings-field', className)}>
 		<Toggle
 			label={label}
 			help={description}
@@ -96,6 +96,10 @@ export const SelectField = ({
 	</FieldGroup>
 );
 
+export const FieldHelp = ({ children, className = '' }) => (
+	<p className={classnames('sn-field-help', className)}>{children}</p>
+);
+
 export const NumberInput = ({
 	id,
 	value,
@@ -107,7 +111,7 @@ export const NumberInput = ({
 	label,
 	description,
 	unit,
-	className = 'sn-field-row',
+	className = '',
 	variant = 'default'
 }) => {
 	const inputClasses = classnames(
@@ -118,25 +122,29 @@ export const NumberInput = ({
 	);
 
 	return (
-		<FieldGroup className={className}>
-			{label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
-			<div className="sn-relative sn-flex-col">
-				<input
-					type="number"
-					id={id}
-					className={inputClasses}
-					value={value}
-					onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-					min={min}
-					max={max}
-					step={step}
-					disabled={disabled}
-				/>
-				{unit && <span className="sn-field-hint">{unit}</span>}
-				{description && (
-					<FieldDescription>{description}</FieldDescription>
+		<FieldGroup className={classnames('sn-settings-field', className)}>
+			<div className="sn-field-control-row">
+				{label && (
+					<FieldLabel htmlFor={id} className="sn-settings-field__label">
+						{label}
+					</FieldLabel>
 				)}
+				<div className="sn-field-control">
+					<input
+						type="number"
+						id={id}
+						className={inputClasses}
+						value={value}
+						onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+						min={min}
+						max={max}
+						step={step}
+						disabled={disabled}
+					/>
+					{unit && <span className="sn-field-hint">{unit}</span>}
+				</div>
 			</div>
+			{description && <FieldHelp>{description}</FieldHelp>}
 		</FieldGroup>
 	);
 };
