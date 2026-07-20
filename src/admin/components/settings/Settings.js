@@ -7,7 +7,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useSettings } from './SettingsProvider';
 import ExtensionsProvider from './extensions/ExtensionsProvider';
 import SettingsHeader from './SettingsHeader';
 import GeneralSettings from './GeneralSettings';
@@ -25,13 +24,6 @@ const ModernSettings = ({ initialTab = 'general' }) => {
 		setActiveTab(initialTab);
 	}, [initialTab]);
 
-	useEffect(() => {
-		const handleBeforeUnload = () => {};
-
-		window.addEventListener('beforeunload', handleBeforeUnload);
-		return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-	}, []);
-
 	return (
 		<ExtensionsProvider>
 			<SettingsContent activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -40,8 +32,6 @@ const ModernSettings = ({ initialTab = 'general' }) => {
 };
 
 const SettingsContent = ({ activeTab, setActiveTab }) => {
-	const { hasUnsavedChanges, saving, saveSettings } = useSettings();
-
 	const renderTabContent = () => {
 		switch (activeTab) {
 			case 'general':
@@ -60,10 +50,6 @@ const SettingsContent = ({ activeTab, setActiveTab }) => {
 		}
 	};
 
-	const handleSaveSettings = async () => {
-		await saveSettings();
-	};
-
 	return (
 		<div className="sn-settings">
 			<SettingsHeader
@@ -75,19 +61,6 @@ const SettingsContent = ({ activeTab, setActiveTab }) => {
 				<div className="sn-settings-main">
 					<div className="sn-settings-main__tabs">
 						{renderTabContent()}
-					</div>
-
-					<div className="sn-settings-main__footer">
-						<Button
-							variant="primary"
-							onClick={handleSaveSettings}
-							loading={saving}
-							disabled={!hasUnsavedChanges || saving}
-						>
-							{saving
-								? __('Saving...', 'analogwp-site-notes')
-								: __('Save Settings', 'analogwp-site-notes')}
-						</Button>
 					</div>
 				</div>
 
