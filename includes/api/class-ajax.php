@@ -59,6 +59,7 @@ class Ajax {
 		add_action( 'wp_ajax_agwp_sn_delete_comment', array( $this, 'delete_comment' ) );
 		add_action( 'wp_ajax_agwp_sn_get_dashboard_stats', array( $this, 'get_dashboard_stats' ) );
 		add_action( 'wp_ajax_agwp_sn_get_admin_data', array( $this, 'get_admin_data' ) );
+		add_action( 'wp_ajax_agwp_sn_load_more_notes', array( $this, 'load_more_notes' ) );
 		add_action( 'wp_ajax_agwp_sn_get_pages', array( $this, 'get_pages' ) );
 		add_action( 'wp_ajax_agwp_sn_search_pages', array( $this, 'search_pages' ) );
 		add_action( 'wp_ajax_agwp_sn_add_new_note', array( $this, 'add_new_note' ) );
@@ -871,13 +872,210 @@ class Ajax {
 			$this->database->create_tables();
 		}
 
-		// Get all comments/notes for the admin dashboard.
-		$comments = $this->database->get_comments();
-		if ( ! is_array( $comments ) ) {
-			$comments = array();
+		$view           = isset( $_POST['view'] ) ? sanitize_key( wp_unslash( $_POST['view'] ) ) : 'kanban';
+		$notes_per_load = $this->get_notes_per_load();
+		$query_args     = $this->get_admin_notes_query_args_from_request();
+		$query_args['limit']  = $notes_per_load;
+		$query_args['offset'] = 0;
+
+		$comments   = array();
+		$pagination = array();
+
+		if ( 'list' === $view ) {
+			$result                 = $this->database->query_admin_comments( $query_args );
+			$comments               = $this->enrich_admin_comments( $result['comments'] );
+			$pagination['list']     = array(
+				'total'   => (int) $result['total'],
+				'loaded'  => count( $comments ),
+				'hasMore' => count( $comments ) < (int) $result['total'],
+			);
+		} else {
+			$statuses = array( 'open', 'in_progress', 'resolved' );
+			$status_filter = isset( $query_args['status'] ) ? $query_args['status'] : '';
+
+			foreach ( $statuses as $status ) {
+				if ( '' !== $status_filter && $status_filter !== $status ) {
+					$pagination[ $status ] = array(
+						'total'   => 0,
+						'loaded'  => 0,
+						'hasMore' => false,
+					);
+					continue;
+				}
+
+				$status_args           = $query_args;
+				$status_args['status'] = $status;
+				$result                = $this->database->query_admin_comments( $status_args );
+				$batch                 = $this->enrich_admin_comments( $result['comments'] );
+				$comments              = array_merge( $comments, $batch );
+				$pagination[ $status ] = array(
+					'total'   => (int) $result['total'],
+					'loaded'  => count( $batch ),
+					'hasMore' => count( $batch ) < (int) $result['total'],
+				);
+			}
 		}
 
-		// Enhance comments with complete user data including avatars.
+		// Get all users who can manage comments or who have created comments.
+		$users = get_users(
+			array(
+				'fields' => array( 'ID', 'display_name', 'user_email' ),
+			)
+		);
+
+		// Format users for frontend.
+		$formatted_users = array();
+		foreach ( $users as $user ) {
+			$formatted_users[] = array(
+				'id'     => (int) $user->ID,
+				'name'   => $user->display_name,
+				'email'  => $user->user_email,
+				'avatar' => get_avatar_url( $user->ID, array( 'size' => 40 ) ),
+			);
+		}
+
+		// Get categories (we can use post categories or create custom ones later).
+		$categories           = get_categories( array( 'hide_empty' => false ) );
+		$formatted_categories = array();
+		foreach ( $categories as $category ) {
+			$formatted_categories[] = array(
+				'id'   => $category->term_id,
+				'name' => $category->name,
+				'slug' => $category->slug,
+			);
+		}
+
+		// Return admin-specific data.
+		$stats = $this->database->get_dashboard_stats();
+		if ( ! is_array( $stats ) ) {
+			$stats = array(
+				'open_count'      => 0,
+				'resolved_count'  => 0,
+				'total_count'     => 0,
+				'recent_comments' => array(),
+			);
+		}
+
+		$admin_data = array(
+			'comments'       => $comments,
+			'users'          => $formatted_users,
+			'categories'     => $formatted_categories,
+			'capabilities'   => array(
+				'manage_comments' => Plugin::user_has_access(),
+				'delete_comments' => Plugin::user_has_access(),
+			),
+			'stats'          => $stats,
+			'notes_per_load' => $notes_per_load,
+			'pagination'     => $pagination,
+			'view'           => $view,
+		);
+
+		$this->send_success( $admin_data );
+	}
+
+	/**
+	 * Handle load more notes AJAX request.
+	 *
+	 * @since 1.6.0
+	 */
+	public function load_more_notes() {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'agwp_sn_nonce' ) ) {
+			$this->send_error( __( 'Security check failed', 'analogwp-site-notes' ), 403 );
+		}
+
+		if ( ! Plugin::user_has_access() ) {
+			$this->send_error( __( 'Unauthorized', 'analogwp-site-notes' ), 403 );
+		}
+
+		$view           = isset( $_POST['view'] ) ? sanitize_key( wp_unslash( $_POST['view'] ) ) : 'list';
+		$notes_per_load = $this->get_notes_per_load();
+		$offset         = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
+		$query_args     = $this->get_admin_notes_query_args_from_request();
+		$query_args['limit']  = $notes_per_load;
+		$query_args['offset'] = $offset;
+
+		if ( 'kanban' === $view ) {
+			$status = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : '';
+			if ( ! in_array( $status, array( 'open', 'in_progress', 'resolved' ), true ) ) {
+				$this->send_error( __( 'Invalid status.', 'analogwp-site-notes' ) );
+			}
+			$query_args['status'] = $status;
+		}
+
+		$result   = $this->database->query_admin_comments( $query_args );
+		$comments = $this->enrich_admin_comments( $result['comments'] );
+		$loaded   = $offset + count( $comments );
+
+		$this->send_success(
+			array(
+				'comments'       => $comments,
+				'total'          => (int) $result['total'],
+				'loaded'         => $loaded,
+				'hasMore'        => $loaded < (int) $result['total'],
+				'notes_per_load' => $notes_per_load,
+				'status'         => isset( $query_args['status'] ) ? $query_args['status'] : '',
+				'view'           => $view,
+			)
+		);
+	}
+
+	/**
+	 * Build shared admin notes query args from the current request.
+	 *
+	 * @since 1.6.0
+	 * @return array
+	 */
+	private function get_admin_notes_query_args_from_request() {
+		$status   = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : '';
+		$user_id  = isset( $_POST['user'] ) ? absint( $_POST['user'] ) : 0;
+		$category = isset( $_POST['category'] ) ? sanitize_text_field( wp_unslash( $_POST['category'] ) ) : '';
+		$orderby  = isset( $_POST['sort_by'] ) ? sanitize_key( wp_unslash( $_POST['sort_by'] ) ) : 'created_at';
+
+		if ( ! in_array( $orderby, array( 'created_at', 'updated_at', 'priority' ), true ) ) {
+			$orderby = 'created_at';
+		}
+
+		if ( ! in_array( $status, array( 'open', 'in_progress', 'resolved' ), true ) ) {
+			$status = '';
+		}
+
+		return array(
+			'status'   => $status,
+			'user_id'  => $user_id,
+			'category' => $category,
+			'orderby'  => $orderby,
+		);
+	}
+
+	/**
+	 * Get notes-per-load setting with legacy key migration.
+	 *
+	 * @since 1.6.0
+	 * @return int
+	 */
+	private function get_notes_per_load() {
+		$settings = get_option( 'agwp_sn_settings', array() );
+		$general  = isset( $settings['general'] ) && is_array( $settings['general'] ) ? $settings['general'] : array();
+
+		if ( isset( $general['notes_per_load'] ) ) {
+			return max( 1, min( 100, absint( $general['notes_per_load'] ) ) );
+		}
+
+		return 10;
+	}
+
+	/**
+	 * Enrich admin comment objects with creator/assignee payloads.
+	 *
+	 * @since 1.6.0
+	 * @param array $comments Comment rows.
+	 * @return array
+	 */
+	private function enrich_admin_comments( $comments ) {
+		if ( ! is_array( $comments ) ) {
+			return array();
+		}
+
 		foreach ( $comments as &$comment ) {
 			// Creator information.
 			if ( ! empty( $comment->user_id ) ) {
@@ -935,66 +1133,11 @@ class Ajax {
 			// Keep backward compatibility with user field (using creator).
 			$comment->user = $comment->creator;
 		}
+		unset( $comment );
 
-		// Get all users who can manage comments or who have created comments.
-		$users = get_users(
-			array(
-				'fields' => array( 'ID', 'display_name', 'user_email' ),
-			)
-		);
-
-		// Format users for frontend.
-		$formatted_users = array();
-		foreach ( $users as $user ) {
-			$formatted_users[] = array(
-				'id'     => (int) $user->ID,
-				'name'   => $user->display_name,
-				'email'  => $user->user_email,
-				'avatar' => get_avatar_url( $user->ID, array( 'size' => 40 ) ),
-			);
-		}
-
-		// Get categories (we can use post categories or create custom ones later).
-		$categories           = get_categories( array( 'hide_empty' => false ) );
-		$formatted_categories = array();
-		foreach ( $categories as $category ) {
-			$formatted_categories[] = array(
-				'id'   => $category->term_id,
-				'name' => $category->name,
-				'slug' => $category->slug,
-			);
-		}
-
-		// Return admin-specific data.
-		$stats = $this->database->get_dashboard_stats();
-		if ( ! is_array( $stats ) ) {
-			$stats = array(
-				'open_count'      => 0,
-				'resolved_count'  => 0,
-				'total_count'     => 0,
-				'recent_comments' => array(),
-			);
-		}
-
-		$admin_data = array(
-			'comments'     => $comments,
-			'users'        => $formatted_users,
-			'categories'   => $formatted_categories,
-			'capabilities' => array(
-				'manage_comments' => Plugin::user_has_access(),
-				'delete_comments' => Plugin::user_has_access(),
-			),
-			'stats'        => $stats,
-		);
-
-		$this->send_success( $admin_data );
+		return $comments;
 	}
 
-	/**
-	 * Handle get pages AJAX request.
-	 *
-	 * @since 1.0.0
-	 */
 	/**
 	 * Build a page-target list item.
 	 *
@@ -1466,7 +1609,7 @@ class Ajax {
 				'allow_anonymous_frontend_comments' => false,
 				'auto_screenshot'                   => true,
 				'screenshot_quality'                => 0.8,
-				'comments_per_page'                 => 20,
+				'notes_per_load'                    => 10,
 				'auto_save_drafts'                  => true,
 			),
 			'advanced' => array(
@@ -1478,6 +1621,25 @@ class Ajax {
 		// Get saved settings.
 		$saved_settings = get_option( 'agwp_sn_settings', array() );
 		$settings       = wp_parse_args( $saved_settings, $default_settings );
+
+		// Migrate legacy comments_per_page → notes_per_load.
+		if ( isset( $settings['general'] ) && is_array( $settings['general'] ) ) {
+			$did_migrate = false;
+			if ( ! isset( $settings['general']['notes_per_load'] ) ) {
+				// Legacy key was unused in the UI; adopt the new default instead of copying it.
+				$settings['general']['notes_per_load'] = 10;
+				$did_migrate = true;
+			}
+			if ( isset( $settings['general']['comments_per_page'] ) ) {
+				unset( $settings['general']['comments_per_page'] );
+				$did_migrate = true;
+			}
+			$settings['general']['notes_per_load'] = max( 1, min( 100, absint( $settings['general']['notes_per_load'] ) ) );
+
+			if ( $did_migrate ) {
+				update_option( 'agwp_sn_settings', $settings );
+			}
+		}
 
 		// Get categories.
 		$categories = get_option( 'agwp_sn_categories', array() );
@@ -1546,7 +1708,11 @@ class Ajax {
 			$settings['general']['allow_anonymous_frontend_comments'] = isset( $settings['general']['allow_anonymous_frontend_comments'] ) ? (bool) $settings['general']['allow_anonymous_frontend_comments'] : false;
 			$settings['general']['auto_screenshot']                   = isset( $settings['general']['auto_screenshot'] ) ? (bool) $settings['general']['auto_screenshot'] : false;
 			$settings['general']['screenshot_quality']                = isset( $settings['general']['screenshot_quality'] ) ? floatval( $settings['general']['screenshot_quality'] ) : 0.8;
-			$settings['general']['comments_per_page']                 = isset( $settings['general']['comments_per_page'] ) ? intval( $settings['general']['comments_per_page'] ) : 20;
+			$notes_per_load = isset( $settings['general']['notes_per_load'] )
+				? intval( $settings['general']['notes_per_load'] )
+				: 10;
+			$settings['general']['notes_per_load'] = max( 1, min( 100, $notes_per_load ) );
+			unset( $settings['general']['comments_per_page'] );
 			$settings['general']['auto_save_drafts']                  = isset( $settings['general']['auto_save_drafts'] ) ? (bool) $settings['general']['auto_save_drafts'] : true;
 		}
 

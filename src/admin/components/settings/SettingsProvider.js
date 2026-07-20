@@ -28,7 +28,7 @@ const defaultSettings = {
         allowed_roles: ['administrator', 'editor'],
         auto_screenshot: true,
         screenshot_quality: 0.8,
-        comments_per_page: 20,
+        notes_per_load: 10,
         enable_frontend_comments: false,
         allow_anonymous_frontend_comments: false
     },
@@ -44,7 +44,7 @@ const settingsSchema = {
         allowed_roles: { type: 'array', required: true },
         auto_screenshot: { type: 'boolean', required: true },
         screenshot_quality: { type: 'number', min: 0.1, max: 1, required: true },
-        comments_per_page: { type: 'number', min: 5, max: 100, required: true },
+        notes_per_load: { type: 'number', min: 5, max: 100, required: true },
         enable_frontend_comments: { type: 'boolean', required: true },
         allow_anonymous_frontend_comments: { type: 'boolean', required: true }
     },
@@ -167,7 +167,21 @@ export const SettingsProvider = ({ children }) => {
 
             const data = await response.json();
             if (data.success) {
-                const loadedSettings = { ...defaultSettings, ...data.data.settings };
+                const incoming = data.data.settings || {};
+                const general = {
+                    ...defaultSettings.general,
+                    ...(incoming.general || {}),
+                };
+                if (general.notes_per_load == null) {
+                    general.notes_per_load = defaultSettings.general.notes_per_load;
+                }
+                delete general.comments_per_page;
+
+                const loadedSettings = {
+                    ...defaultSettings,
+                    ...incoming,
+                    general,
+                };
                 setSettings(loadedSettings);
                 setCategories(data.data.categories || []);
                 setPriorities(data.data.priorities || [
@@ -280,7 +294,7 @@ export const SettingsProvider = ({ children }) => {
                 allow_anonymous_frontend_comments: settings.general?.allow_anonymous_frontend_comments ?? defaultSettings.general.allow_anonymous_frontend_comments,
                 auto_screenshot: settings.general?.auto_screenshot ?? defaultSettings.general.auto_screenshot,
                 screenshot_quality: settings.general?.screenshot_quality ?? defaultSettings.general.screenshot_quality,
-                comments_per_page: settings.general?.comments_per_page ?? defaultSettings.general.comments_per_page,
+                notes_per_load: settings.general?.notes_per_load ?? defaultSettings.general.notes_per_load,
                 theme_mode: settings.general?.theme_mode ?? defaultSettings.general.theme_mode
             },
             advanced: {

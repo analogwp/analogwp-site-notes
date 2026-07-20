@@ -261,7 +261,6 @@ class Database {
 		global $wpdb;
 
 		$comments_table = self::tables( 'comments', 'name' );
-		$replies_table  = self::tables( 'comment_replies', 'name' );
 
 		// Prepare query based on whether page_url is provided.
 		if ( empty( $page_url ) ) {
@@ -300,7 +299,134 @@ class Database {
 			return array();
 		}
 
-		// Get replies for each comment.
+		return $this->hydrate_comments( $comments );
+	}
+
+	/**
+	 * Query admin notes with filters and pagination.
+	 *
+	 * @since 1.6.0
+	 * @param array $args {
+	 *     Optional. Query arguments.
+	 *
+	 *     @type string $status   Note status slug.
+	 *     @type int    $user_id  Creator user ID.
+	 *     @type string $category Category name to match in JSON.
+	 *     @type string $orderby  created_at|updated_at|priority.
+	 *     @type int    $limit    Max rows to return.
+	 *     @type int    $offset   Offset for pagination.
+	 * }
+	 * @return array{comments: array, total: int}
+	 */
+	public function query_admin_comments( $args = array() ) {
+		global $wpdb;
+
+		$args = wp_parse_args(
+			$args,
+			array(
+				'status'   => '',
+				'user_id'  => 0,
+				'category' => '',
+				'orderby'  => 'created_at',
+				'limit'    => 10,
+				'offset'   => 0,
+			)
+		);
+
+		$comments_table = self::tables( 'comments', 'name' );
+		$limit          = max( 1, absint( $args['limit'] ) );
+		$offset         = max( 0, absint( $args['offset'] ) );
+		$user_id        = absint( $args['user_id'] );
+		$status         = sanitize_key( $args['status'] );
+		$category       = sanitize_text_field( $args['category'] );
+		$orderby        = sanitize_key( $args['orderby'] );
+
+		$where  = array( '1=1' );
+		$values = array( $comments_table );
+
+		if ( '' !== $status ) {
+			$where[]  = 'c.status = %s';
+			$values[] = $status;
+		}
+
+		if ( $user_id > 0 ) {
+			$where[]  = 'c.user_id = %d';
+			$values[] = $user_id;
+		}
+
+		if ( '' !== $category ) {
+			$where[]  = 'c.category LIKE %s';
+			$values[] = '%' . $wpdb->esc_like( $category ) . '%';
+		}
+
+		$where_sql = implode( ' AND ', $where );
+
+		switch ( $orderby ) {
+			case 'updated_at':
+				$order_sql = 'c.updated_at DESC';
+				break;
+			case 'priority':
+				$order_sql = "FIELD(c.priority, 'high', 'medium', 'low') ASC, c.created_at DESC";
+				break;
+			case 'created_at':
+			default:
+				$order_sql = 'c.created_at DESC';
+				break;
+		}
+
+		$count_values = $values;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Dynamic WHERE built with placeholders.
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM %i c WHERE {$where_sql}",
+				...$count_values
+			)
+		);
+
+		$query_values   = $values;
+		$query_values[] = $limit;
+		$query_values[] = $offset;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Dynamic WHERE/ORDER built with placeholders.
+		$comments = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT c.*, u.display_name as user_name, u.user_email,
+				        a.display_name as assigned_name, a.user_email as assigned_email
+				FROM %i c
+				LEFT JOIN {$wpdb->users} u ON c.user_id = u.ID
+				LEFT JOIN {$wpdb->users} a ON c.assigned_to = a.ID
+				WHERE {$where_sql}
+				ORDER BY {$order_sql}
+				LIMIT %d OFFSET %d",
+				...$query_values
+			)
+		);
+
+		if ( empty( $comments ) ) {
+			return array(
+				'comments' => array(),
+				'total'    => $total,
+			);
+		}
+
+		return array(
+			'comments' => $this->hydrate_comments( $comments ),
+			'total'    => $total,
+		);
+	}
+
+	/**
+	 * Hydrate comment rows with avatars, replies, categories, and assignees.
+	 *
+	 * @since 1.6.0
+	 * @param array $comments Comment rows.
+	 * @return array
+	 */
+	private function hydrate_comments( $comments ) {
+		global $wpdb;
+
+		$replies_table = self::tables( 'comment_replies', 'name' );
+
 		foreach ( $comments as $comment ) {
 			$comment->display_name = ! empty( $comment->user_name ) ? $comment->user_name : __( 'Guest', 'analogwp-site-notes' );
 			$comment->user_email   = ! empty( $comment->user_email ) ? $comment->user_email : '';
@@ -326,7 +452,6 @@ class Database {
 				)
 			);
 
-			// Add avatar URLs to replies.
 			if ( is_array( $comment->replies ) ) {
 				foreach ( $comment->replies as $reply ) {
 					$reply->display_name = ! empty( $reply->display_name ) ? $reply->display_name : __( 'Guest', 'analogwp-site-notes' );
@@ -342,7 +467,6 @@ class Database {
 				}
 			}
 
-			// Decode categories from JSON.
 			if ( ! empty( $comment->category ) ) {
 				$decoded_categories  = json_decode( $comment->category, true );
 				$comment->categories = is_array( $decoded_categories ) ? $decoded_categories : array();
@@ -350,9 +474,8 @@ class Database {
 				$comment->categories = array();
 			}
 
-			// Decode assignees from JSON.
 			if ( ! empty( $comment->assigned_users ) ) {
-				$decoded_assignees     = json_decode( $comment->assigned_users, true );
+				$decoded_assignees          = json_decode( $comment->assigned_users, true );
 				$comment->assigned_user_ids = is_array( $decoded_assignees )
 					? array_values( array_filter( array_map( 'absint', $decoded_assignees ) ) )
 					: array();
