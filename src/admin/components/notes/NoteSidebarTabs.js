@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 
-const NoteSidebarTabs = ({ activeTab, onTabChange }) => (
+const NoteSidebarTabs = ({ activeTab, onTabChange, showTimesheet = true }) => (
 	<div className="sn-note-sidebar__tabs">
 		<button
 			type="button"
@@ -12,13 +12,15 @@ const NoteSidebarTabs = ({ activeTab, onTabChange }) => (
 		>
 			{__('Details', 'analogwp-site-notes')}
 		</button>
-		<button
-			type="button"
-			className={`sn-note-sidebar__tab ${activeTab === 'timesheet' ? 'sn-note-sidebar__tab--active' : 'sn-note-sidebar__tab--inactive'}`}
-			onClick={() => onTabChange('timesheet')}
-		>
-			{__('Timesheet', 'analogwp-site-notes')}
-		</button>
+		{showTimesheet && (
+			<button
+				type="button"
+				className={`sn-note-sidebar__tab ${activeTab === 'timesheet' ? 'sn-note-sidebar__tab--active' : 'sn-note-sidebar__tab--inactive'}`}
+				onClick={() => onTabChange('timesheet')}
+			>
+				{__('Timesheet', 'analogwp-site-notes')}
+			</button>
+		)}
 	</div>
 );
 

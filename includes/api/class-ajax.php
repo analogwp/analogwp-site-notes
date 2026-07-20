@@ -1610,6 +1610,7 @@ class Ajax {
 				'auto_screenshot'                   => true,
 				'screenshot_quality'                => 0.8,
 				'notes_per_load'                    => 10,
+				'enable_time_tracking'              => true,
 				'auto_save_drafts'                  => true,
 			),
 			'advanced' => array(
@@ -1621,6 +1622,18 @@ class Ajax {
 		// Get saved settings.
 		$saved_settings = get_option( 'agwp_sn_settings', array() );
 		$settings       = wp_parse_args( $saved_settings, $default_settings );
+
+		if ( ! isset( $settings['general'] ) || ! is_array( $settings['general'] ) ) {
+			$settings['general'] = $default_settings['general'];
+		} else {
+			$settings['general'] = wp_parse_args( $settings['general'], $default_settings['general'] );
+		}
+
+		if ( ! isset( $settings['advanced'] ) || ! is_array( $settings['advanced'] ) ) {
+			$settings['advanced'] = $default_settings['advanced'];
+		} else {
+			$settings['advanced'] = wp_parse_args( $settings['advanced'], $default_settings['advanced'] );
+		}
 
 		// Migrate legacy comments_per_page → notes_per_load.
 		if ( isset( $settings['general'] ) && is_array( $settings['general'] ) ) {
@@ -1635,6 +1648,15 @@ class Ajax {
 				$did_migrate = true;
 			}
 			$settings['general']['notes_per_load'] = max( 1, min( 100, absint( $settings['general']['notes_per_load'] ) ) );
+
+			// Migrate enable_time_tracking from advanced → general.
+			if ( isset( $settings['advanced']['enable_time_tracking'] ) ) {
+				if ( ! isset( $saved_settings['general']['enable_time_tracking'] ) ) {
+					$settings['general']['enable_time_tracking'] = (bool) $settings['advanced']['enable_time_tracking'];
+				}
+				unset( $settings['advanced']['enable_time_tracking'] );
+				$did_migrate = true;
+			}
 
 			if ( $did_migrate ) {
 				update_option( 'agwp_sn_settings', $settings );
@@ -1713,13 +1735,15 @@ class Ajax {
 				: 10;
 			$settings['general']['notes_per_load'] = max( 1, min( 100, $notes_per_load ) );
 			unset( $settings['general']['comments_per_page'] );
-			$settings['general']['auto_save_drafts']                  = isset( $settings['general']['auto_save_drafts'] ) ? (bool) $settings['general']['auto_save_drafts'] : true;
+			$settings['general']['auto_save_drafts']     = isset( $settings['general']['auto_save_drafts'] ) ? (bool) $settings['general']['auto_save_drafts'] : true;
+			$settings['general']['enable_time_tracking'] = isset( $settings['general']['enable_time_tracking'] ) ? (bool) $settings['general']['enable_time_tracking'] : true;
 		}
 
 		// Sanitize advanced settings.
 		if ( isset( $settings['advanced'] ) ) {
 			$settings['advanced']['enable_debug_mode'] = isset( $settings['advanced']['enable_debug_mode'] ) ? (bool) $settings['advanced']['enable_debug_mode'] : false;
 			$settings['advanced']['log_level']         = isset( $settings['advanced']['log_level'] ) ? sanitize_text_field( $settings['advanced']['log_level'] ) : 'error';
+			unset( $settings['advanced']['enable_time_tracking'] );
 		}
 
 		// Sanitize categories.

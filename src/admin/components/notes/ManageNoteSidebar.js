@@ -62,7 +62,7 @@ const ManageNoteSidebar = ({
 	statuses = [],
 	onNavigateToSettingsTab,
 }) => {
-	const { categories, priorities } = useSettings();
+	const { categories, priorities, settings } = useSettings();
 	const titleInputRef = useRef(null);
 	const descriptionInputRef = useRef(null);
 	const [formData, setFormData] = useState(() => mapNoteToFormData(note, pages));
@@ -75,6 +75,7 @@ const ManageNoteSidebar = ({
 	const pagesRef = useRef(pages);
 	const onUpdateRef = useRef(onUpdate);
 	const priorityOptions = getDefaultPriorityOptions(priorities);
+	const enableTimeTracking = settings.general?.enable_time_tracking ?? true;
 
 	noteRef.current = note;
 	pagesRef.current = pages;
@@ -91,6 +92,12 @@ const ManageNoteSidebar = ({
 		setIsDescriptionEditing(false);
 		setActiveAsideTab('details');
 	}, [note?.id, pages]);
+
+	useEffect(() => {
+		if (!enableTimeTracking && activeAsideTab === 'timesheet') {
+			setActiveAsideTab('details');
+		}
+	}, [enableTimeTracking, activeAsideTab]);
 
 	useEffect(() => {
 		if (isTitleEditing && titleInputRef.current) {
@@ -496,10 +503,12 @@ const ManageNoteSidebar = ({
 				<aside className="sn-note-sidebar__aside">
 					<div
 						className={`sn-note-sidebar__aside-body${
-							activeAsideTab === 'timesheet' ? ' sn-note-sidebar__aside-body--timesheet' : ''
+							enableTimeTracking && activeAsideTab === 'timesheet'
+								? ' sn-note-sidebar__aside-body--timesheet'
+								: ''
 						}`}
 					>
-						{activeAsideTab === 'details' ? (
+						{!enableTimeTracking || activeAsideTab === 'details' ? (
 							<>
 								{note.screenshot_url && (
 									<div className="sn-note-sidebar__screenshot">
@@ -543,6 +552,7 @@ const ManageNoteSidebar = ({
 							<NoteSidebarTabs
 								activeTab={activeAsideTab}
 								onTabChange={setActiveAsideTab}
+								showTimesheet={enableTimeTracking}
 							/>
 						)}
 					/>

@@ -30,7 +30,8 @@ const defaultSettings = {
 		screenshot_quality: 0.8,
 		notes_per_load: 10,
 		enable_frontend_comments: false,
-		allow_anonymous_frontend_comments: false
+		allow_anonymous_frontend_comments: false,
+		enable_time_tracking: true
 	},
 	advanced: {
 		enable_debug_mode: false,
@@ -46,7 +47,8 @@ const settingsSchema = {
 		screenshot_quality: { type: 'number', min: 0.1, max: 1, required: true },
 		notes_per_load: { type: 'number', min: 5, max: 100, required: true },
 		enable_frontend_comments: { type: 'boolean', required: true },
-		allow_anonymous_frontend_comments: { type: 'boolean', required: true }
+		allow_anonymous_frontend_comments: { type: 'boolean', required: true },
+		enable_time_tracking: { type: 'boolean', required: true }
 	},
 	advanced: {
 		enable_debug_mode: { type: 'boolean', required: true },
@@ -182,10 +184,25 @@ export const SettingsProvider = ({ children }) => {
 				}
 				delete general.comments_per_page;
 
+				const advanced = {
+					...defaultSettings.advanced,
+					...(incoming.advanced || {}),
+				};
+
+				// Migrate enable_time_tracking from advanced → general if needed.
+				if (
+					general.enable_time_tracking == null &&
+					advanced.enable_time_tracking != null
+				) {
+					general.enable_time_tracking = advanced.enable_time_tracking;
+				}
+				delete advanced.enable_time_tracking;
+
 				const loadedSettings = {
 					...defaultSettings,
 					...incoming,
 					general,
+					advanced,
 				};
 				setSettings(loadedSettings);
 				settingsRef.current = loadedSettings;
@@ -333,6 +350,7 @@ export const SettingsProvider = ({ children }) => {
 				auto_screenshot: settings.general?.auto_screenshot ?? defaultSettings.general.auto_screenshot,
 				screenshot_quality: settings.general?.screenshot_quality ?? defaultSettings.general.screenshot_quality,
 				notes_per_load: settings.general?.notes_per_load ?? defaultSettings.general.notes_per_load,
+				enable_time_tracking: settings.general?.enable_time_tracking ?? defaultSettings.general.enable_time_tracking,
 				theme_mode: settings.general?.theme_mode ?? defaultSettings.general.theme_mode
 			},
 			advanced: {

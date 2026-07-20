@@ -26,12 +26,13 @@ import {
 } from './noteSidebarUtils';
 
 const AddNoteSidebar = ({ onClose, onSave, users, pages, statuses = [], onNavigateToSettingsTab }) => {
-	const { categories, priorities } = useSettings();
+	const { categories, priorities, settings } = useSettings();
 	const [formData, setFormData] = useState(EMPTY_NOTE_FORM);
 	const [activeTab, setActiveTab] = useState('details');
 	const [pendingTimeEntries, setPendingTimeEntries] = useState([]);
 
 	const priorityOptions = getDefaultPriorityOptions(priorities);
+	const enableTimeTracking = settings.general?.enable_time_tracking ?? true;
 
 	const handleInputChange = (field, value) => {
 		setFormData((prev) => ({
@@ -99,12 +100,14 @@ const AddNoteSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 			return;
 		}
 
-		const timesheetData = buildTimesheetData(
-			pendingTimeEntries,
-			formData,
-			[],
-			__('Initial time entry', 'analogwp-site-notes')
-		);
+		const timesheetData = enableTimeTracking
+			? buildTimesheetData(
+				pendingTimeEntries,
+				formData,
+				[],
+				__('Initial time entry', 'analogwp-site-notes')
+			)
+			: null;
 		const taskData = buildNotePayload(formData, pages, timesheetData);
 
 		try {
@@ -152,10 +155,18 @@ const AddNoteSidebar = ({ onClose, onSave, users, pages, statuses = [], onNaviga
 				</div>
 			</div>
 
-			<NoteSidebarTabs activeTab={activeTab} onTabChange={setActiveTab} />
+			<NoteSidebarTabs
+				activeTab={activeTab}
+				onTabChange={setActiveTab}
+				showTimesheet={enableTimeTracking}
+			/>
 
-			<div className={`sn-note-sidebar__body${activeTab === 'timesheet' ? ' sn-note-sidebar__body--timesheet' : ''}`}>
-				{activeTab === 'details' ? (
+			<div
+				className={`sn-note-sidebar__body${
+					enableTimeTracking && activeTab === 'timesheet' ? ' sn-note-sidebar__body--timesheet' : ''
+				}`}
+			>
+				{!enableTimeTracking || activeTab === 'details' ? (
 					<NoteSidebarDetailsFields
 						formData={formData}
 						onInputChange={handleInputChange}

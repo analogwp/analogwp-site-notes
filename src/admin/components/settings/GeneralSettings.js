@@ -55,6 +55,16 @@ const GeneralSettings = () => {
 					step={5}
 				/>
 			</SettingsCard>
+
+			<SettingsCard title={__('Time tracking', 'analogwp-site-notes')}>
+				<ToggleField
+					id="enable_time_tracking"
+					label={__('Enable time tracking', 'analogwp-site-notes')}
+					description={__('Optionally add time entries to your notes', 'analogwp-site-notes')}
+					checked={settings.general?.enable_time_tracking ?? true}
+					onChange={(value) => updateSetting('general.enable_time_tracking', value)}
+				/>
+			</SettingsCard>
 		</SettingsSection>
 	);
 };
