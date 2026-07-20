@@ -7,6 +7,7 @@ import ManageNoteSidebar from './ManageNoteSidebar';
 import NoteSidebarBackdropClose from './NoteSidebarBackdropClose';
 import NotesControls from './NotesControls';
 import DroppableColumn from './DroppableColumn';
+import NotesInfiniteScrollSentinel from './NotesInfiniteScrollSentinel';
 import { AddIcon } from '../../../shared/icons';
 import StatusDot from '../../../shared/components/StatusDot';
 
@@ -23,6 +24,7 @@ const NotesKanbanView = ({
 	users,
 	statuses,
 	getCommentsByStatus,
+	getStatusTotal,
 	getUserById,
 	handleDelete,
 	handleEditNote,
@@ -40,6 +42,9 @@ const NotesKanbanView = ({
 	activeView,
 	onViewChange,
 	onNavigateToSettingsTab,
+	pagination = {},
+	loadingMore = {},
+	onLoadMore,
 }) => {
 	return (
 		<div>
@@ -58,43 +63,55 @@ const NotesKanbanView = ({
 					users={users}
 				/>
 				<div className="sn-kanban-board">
-					{statuses.map((status) => (
-						<DroppableColumn key={status.key} id={status.key} status={status.key}>
-							<div className="sn-kanban-column-header">
-								<div className="sn-kanban-column-title">
-									<StatusDot statusKey={status.key} size="md" />
-									<span className="sn-kanban-column-name">{status.title}</span>
-								</div>
-								<div className="sn-kanban-column-count">
-									{getCommentsByStatus(status.key).length}
-								</div>
-							</div>
+					{statuses.map((status) => {
+						const columnNotes = getCommentsByStatus(status.key);
+						const hasMore = Boolean(pagination?.[status.key]?.hasMore);
+						const isLoadingMore = Boolean(loadingMore?.[status.key]);
 
-							<div className="sn-kanban-cards">
-								{getCommentsByStatus(status.key).map((comment) => (
-									<NoteCard
-										key={comment.id}
-										comment={comment}
-										user={comment.user || comment.creator || getUserById(comment.user_id)}
-										onDelete={handleDelete}
-										onCardClick={handleEditNote}
-										formatDate={formatDate}
+						return (
+							<DroppableColumn key={status.key} id={status.key} status={status.key}>
+								<div className="sn-kanban-column-header">
+									<div className="sn-kanban-column-title">
+										<StatusDot statusKey={status.key} size="md" />
+										<span className="sn-kanban-column-name">{status.title}</span>
+									</div>
+									<div className="sn-kanban-column-count">
+										{getStatusTotal(status.key)}
+									</div>
+								</div>
+
+								<div className="sn-kanban-cards">
+									{columnNotes.map((comment) => (
+										<NoteCard
+											key={comment.id}
+											comment={comment}
+											user={comment.user || comment.creator || getUserById(comment.user_id)}
+											onDelete={handleDelete}
+											onCardClick={handleEditNote}
+											formatDate={formatDate}
+										/>
+									))}
+
+									<NotesInfiniteScrollSentinel
+										enabled={hasMore}
+										loading={isLoadingMore}
+										onLoadMore={() => onLoadMore?.(status.key)}
 									/>
-								))}
 
-								{status.key !== 'resolved' && (
-									<button
-										type="button"
-										className="sn-kanban-add-btn"
-										onClick={handleAddNew}
-									>
-										<AddIcon />
-										<span className="sn-text-m sn-font-medium">{__('Add new', 'analogwp-site-notes')}</span>
-									</button>
-								)}
-							</div>
-						</DroppableColumn>
-					))}
+									{status.key !== 'resolved' && (
+										<button
+											type="button"
+											className="sn-kanban-add-btn"
+											onClick={handleAddNew}
+										>
+											<AddIcon />
+											<span className="sn-text-m sn-font-medium">{__('Add new', 'analogwp-site-notes')}</span>
+										</button>
+									)}
+								</div>
+							</DroppableColumn>
+						);
+					})}
 				</div>
 
 				<DragOverlay>

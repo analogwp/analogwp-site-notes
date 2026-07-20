@@ -31,6 +31,10 @@ const NotesView = ({
 	sortBy,
 	onSortChange,
 	onNavigateToSettingsTab,
+	pagination = {},
+	loadingMore = {},
+	onLoadMore,
+	notesPerLoad = 10,
 }) => {
 	const [draggedItem, setDraggedItem] = useState(null);
 	const [activeId, setActiveId] = useState(null);
@@ -94,6 +98,10 @@ const NotesView = ({
 		return comments.filter((comment) => comment.status === status);
 	};
 
+	const getStatusTotal = (status) => {
+		return pagination?.[status]?.total ?? getCommentsByStatus(status).length;
+	};
+
 	const getUserById = (userId) => {
 		return users.find((user) => user.id === parseInt(userId, 10));
 	};
@@ -144,6 +152,7 @@ const NotesView = ({
 		users,
 		statuses: NOTE_STATUSES,
 		getCommentsByStatus,
+		getStatusTotal,
 		getUserById,
 		handleDelete,
 		handleEditNote,
@@ -162,6 +171,10 @@ const NotesView = ({
 		activeView,
 		onViewChange,
 		onNavigateToSettingsTab,
+		pagination,
+		loadingMore,
+		onLoadMore,
+		notesPerLoad,
 	};
 
 	if (activeView === 'list') {

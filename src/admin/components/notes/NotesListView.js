@@ -11,6 +11,7 @@ import AddNoteSidebar from './AddNoteSidebar';
 import ManageNoteSidebar from './ManageNoteSidebar';
 import NoteSidebarBackdropClose from './NoteSidebarBackdropClose';
 import NotesControls from './NotesControls';
+import NotesInfiniteScrollSentinel from './NotesInfiniteScrollSentinel';
 
 const NotesListView = ({
 	comments,
@@ -35,7 +36,13 @@ const NotesListView = ({
 	pages,
 	activeView,
 	onNavigateToSettingsTab,
+	pagination = {},
+	loadingMore = {},
+	onLoadMore,
 }) => {
+	const hasMore = Boolean(pagination?.list?.hasMore);
+	const isLoadingMore = Boolean(loadingMore?.list);
+
 	return (
 		<>
 			<NotesControls
@@ -49,7 +56,7 @@ const NotesListView = ({
 			/>
 
 			<div className="sn-notes-list">
-				{comments.length === 0 ? (
+				{comments.length === 0 && !isLoadingMore ? (
 					<div className="sn-notes-list__empty">
 						{__('No notes found.', 'analogwp-site-notes')}
 					</div>
@@ -63,6 +70,13 @@ const NotesListView = ({
 						/>
 					))
 				)}
+
+				<NotesInfiniteScrollSentinel
+					enabled={hasMore}
+					loading={isLoadingMore}
+					onLoadMore={() => onLoadMore?.()}
+					className="sn-notes-list__infinite-scroll"
+				/>
 			</div>
 
 			{showAddModal && (

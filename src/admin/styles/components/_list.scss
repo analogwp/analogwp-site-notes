@@ -148,3 +148,7 @@
 	border: 1px dashed var(--sn-border-light);
 	border-radius: var(--sn-radius-card);
 }
+
+.sn-notes-list__infinite-scroll {
+	padding: var(--sn-space-s) 0;
+}
