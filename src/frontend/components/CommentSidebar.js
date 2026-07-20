@@ -1,287 +1,723 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * External dependencies
- */
-import { ChevronRightIcon, ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 /**
  * Internal dependencies
  */
-import { TASK_STATUSES, getStatusByKey } from '../constants/taskStatuses';
+import {
+	ArrowLeftIcon,
+	ArrowUpIcon,
+	ChevronDownIcon,
+	ChevronLeftIcon,
+	ChevronRightIcon,
+	EllipsisVerticalIcon,
+	EyeIcon,
+	TrashOutlineIcon,
+} from '../../shared/icons';
+import { getStatusByKey } from '../constants/noteStatuses';
+import { formatRelativeTime } from '../utils/formatRelativeTime';
 import { Button } from './ui';
+import StatusSelect from './StatusSelect';
 import logger from '../../shared/utils/logger';
+import ScreenshotSelectionFrame from './ScreenshotSelectionFrame';
 
-const CommentSidebar = ({ comments, onAddReply, onUpdateStatus, canManageComments, isVisible, onClose }) => {
-    const [selectedComment, setSelectedComment] = useState(null);
-    const [replyTexts, setReplyTexts] = useState({});
-    const [showReplyForms, setShowReplyForms] = useState({});
-    const [isSubmittingReply, setIsSubmittingReply] = useState({});
-    const [collapsedGroups, setCollapsedGroups] = useState({});
-    const [replyHoney, setReplyHoney] = useState({});
+const FILTER_CURRENT = 'current';
+const FILTER_ALL = 'all';
 
-    // Group comments by status
-    const groupedComments = {
-        open: comments.filter(comment => comment.status === 'open'),
-        in_progress: comments.filter(comment => comment.status === 'in_progress'),
-        resolved: comments.filter(comment => comment.status === 'resolved')
-    };
+/**
+ * Render a note's main content block (badge, title, body, author).
+ *
+ * @param {Object}   props
+ * @param {Object}   props.comment          Note data.
+ * @param {string}   props.statusDotColor   Status indicator color.
+ * @param {Function} props.onScrollTo       Optional "view on page" handler.
+ * @param {Function} props.onMenuToggle     Optional menu toggle handler.
+ * @param {boolean}  props.menuOpen         Whether the actions menu is open.
+ * @param {Object}   props.menuRef          Ref for open menu click-outside.
+ * @param {Array}    props.menuItems        Optional menu item nodes.
+ * @param {boolean}  props.showActions      Whether to show eye/menu actions.
+ * @return {JSX.Element}
+ */
+const NoteMainContent = ({
+	comment,
+	statusDotColor,
+	onScrollTo,
+	onMenuToggle,
+	menuOpen = false,
+	menuRef = null,
+	menuItems = null,
+	showActions = true,
+}) => {
+	const title = (comment.comment_title || '').trim();
+	const description = (comment.comment_text || '').trim();
 
-    const getStatusIcon = (status) => {
-        const statusObj = getStatusByKey(status);
-        return statusObj ? statusObj.icon : '📋';
-    };
+	return (
+		<div className="sn-note-item__main">
+			<div className="sn-note-item__header">
+				<div className="sn-note-item__badge" aria-hidden="true">
+					{comment.id}
+				</div>
 
-    const getStatusLabel = (status) => {
-        const statusObj = getStatusByKey(status);
-        return statusObj ? statusObj.title : status;
-    };
+				<div className="sn-note-item__meta">
+					<div className="sn-note-item__meta-left">
+						{statusDotColor && (
+							<span
+								className="sn-note-item__status-dot"
+								style={{ backgroundColor: statusDotColor }}
+								aria-hidden="true"
+							/>
+						)}
+						{title ? (
+							<h4 className="sn-note-item__title">{title}</h4>
+						) : (
+							<span className="sn-note-item__title sn-note-item__title--empty">
+								{__('Untitled note', 'analogwp-site-notes')}
+							</span>
+						)}
+					</div>
 
-    const handleReplySubmit = async (commentId, e) => {
-        e.preventDefault();
-        const replyText = replyTexts[commentId];
-        if (!replyText?.trim()) return;
+					{showActions && (
+						<div className="sn-note-item__actions">
+							{onScrollTo && (
+								<button
+									type="button"
+									className="sn-note-item__icon-btn"
+									onClick={(event) => {
+										event.stopPropagation();
+										onScrollTo();
+									}}
+									title={__('View on page', 'analogwp-site-notes')}
+									aria-label={__('View on page', 'analogwp-site-notes')}
+								>
+									<EyeIcon className="sn-icon" size="sm" />
+								</button>
+							)}
 
-        setIsSubmittingReply(prev => ({ ...prev, [commentId]: true }));
-        try {
-            await onAddReply(commentId, replyText.trim(), replyHoney[commentId] || '');
-            setReplyTexts(prev => ({ ...prev, [commentId]: '' }));
-            setReplyHoney(prev => ({ ...prev, [commentId]: '' }));
-            setShowReplyForms(prev => ({ ...prev, [commentId]: false }));
-        } catch (error) {
-            logger.error('Error submitting reply:', error);
-        } finally {
-            setIsSubmittingReply(prev => ({ ...prev, [commentId]: false }));
-        }
-    };
+							{menuItems && (
+								<div
+									className="sn-note-item__menu-wrap"
+									ref={menuOpen ? menuRef : null}
+								>
+									<button
+										type="button"
+										className="sn-note-item__icon-btn"
+										onClick={(event) => {
+											event.stopPropagation();
+											onMenuToggle?.();
+										}}
+										aria-expanded={menuOpen}
+										aria-haspopup="menu"
+										aria-label={__('More options', 'analogwp-site-notes')}
+									>
+										<EllipsisVerticalIcon className="sn-icon" size="sm" />
+									</button>
 
-    const scrollToElement = (comment) => {
-        // Highlight the element on the page
-        const element = document.querySelector(comment.element_selector);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            // Add temporary highlight
-            element.style.outline = '3px solid #2271b1';
-            element.style.outlineOffset = '2px';
-            setTimeout(() => {
-                element.style.outline = '';
-                element.style.outlineOffset = '';
-            }, 2000);
-        }
-    };
+									{menuOpen && (
+										<ul className="sn-note-item__menu" role="menu">
+											{menuItems}
+										</ul>
+									)}
+								</div>
+							)}
+						</div>
+					)}
+				</div>
+			</div>
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
+			<div className="sn-note-item__body">
+				{description ? (
+					<p className="sn-note-item__text">{description}</p>
+				) : (
+					!title && (
+						<p className="sn-note-item__text">
+							{__('(No content)', 'analogwp-site-notes')}
+						</p>
+					)
+				)}
 
-    const toggleStatusGroup = (status) => {
-        setCollapsedGroups(prev => ({
-            ...prev,
-            [status]: !prev[status]
-        }));
-    };
+				<div className="sn-note-item__author-row">
+					{comment.avatar ? (
+						<img
+							className="sn-note-item__avatar"
+							src={comment.avatar}
+							alt=""
+							width={32}
+							height={32}
+						/>
+					) : (
+						<span
+							className="sn-note-item__avatar sn-note-item__avatar--fallback"
+							aria-hidden="true"
+						>
+							{(comment.display_name || '?').charAt(0).toUpperCase()}
+						</span>
+					)}
+					<span className="sn-note-item__author">{comment.display_name}</span>
+					<span className="sn-note-item__time">
+						{formatRelativeTime(comment.created_at)}
+					</span>
+				</div>
+			</div>
+		</div>
+	);
+};
 
-    // Don't render anything if no comments
-    // Always show sidebar when commenting is active, even with no comments
+/**
+ * Reply block styled like the main note body.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.reply
+ * @param {boolean}  props.canDelete
+ * @param {Function} props.onDelete
+ * @return {JSX.Element}
+ */
+const NoteReplyItem = ({ reply, canDelete = false, onDelete }) => {
+	const text = (reply.reply_text || '').trim();
+	if (!text) {
+		return null;
+	}
 
-    return (
-        <>
-            {/* Toggle button always visible when commenting is active */}
-            <Button
-                variant={isVisible ? 'primary' : 'secondary'}
-                className={`sn-sidebar-close ${!isVisible ? 'sn-sidebar-hidden' : ''}`}
-                onClick={onClose}
-                ariaLabel={__('Toggle Sidebar', 'analogwp-site-notes')}
-                icon={isVisible ? <ChevronRightIcon className="sn-icon" /> : <ChevronLeftIcon className="sn-icon" />}
-                iconPosition="left"
-            />
-            
-            {/* Sidebar content - only visible when isVisible is true */}
-            {isVisible && (
-                <div className="sn-comment-sidebar">
-                <div className="sn-sidebar-header">
-                    <h3>{__('Page Tasks & Comments', 'analogwp-site-notes')}</h3>
-                    <div className="sn-comments-count">
-                        {comments.length} {comments.length === 1 ? __('comment', 'analogwp-site-notes') : __('comments', 'analogwp-site-notes')}
-                    </div>
-                </div>
+	return (
+		<div className="sn-note-detail__reply">
+			<p className="sn-note-item__text">{text}</p>
+			<div className="sn-note-item__author-row">
+				{reply.avatar ? (
+					<img
+						className="sn-note-item__avatar"
+						src={reply.avatar}
+						alt=""
+						width={32}
+						height={32}
+					/>
+				) : (
+					<span
+						className="sn-note-item__avatar sn-note-item__avatar--fallback"
+						aria-hidden="true"
+					>
+						{(reply.display_name || '?').charAt(0).toUpperCase()}
+					</span>
+				)}
+				<span className="sn-note-item__author">{reply.display_name}</span>
+				<span className="sn-note-item__time">
+					{formatRelativeTime(reply.created_at)}
+				</span>
+				{canDelete && onDelete && (
+					<button
+						type="button"
+						className="sn-note-detail__reply-delete"
+						onClick={onDelete}
+						aria-label={__('Delete reply', 'analogwp-site-notes')}
+						title={__('Delete reply', 'analogwp-site-notes')}
+					>
+						<TrashOutlineIcon size="sm" />
+					</button>
+				)}
+			</div>
+		</div>
+	);
+};
 
-            <div className="sn-sidebar-content">
-                {comments.length === 0 ? (
-                    <div className="sn-no-comments-sidebar">
-                        <p>{__('No comments on this page yet.', 'analogwp-site-notes')}</p>
-                        <p className="sn-instruction">{__('Click on any element to add a comment.', 'analogwp-site-notes')}</p>
-                    </div>
-                ) : (
-                    <div className="sn-comments-list">
-                        {['open', 'in_progress', 'resolved'].map(status => {
-                            const statusComments = groupedComments[status];
-                            if (statusComments.length === 0) return null;
+const CommentSidebar = ({
+	comments,
+	pageFilter = FILTER_CURRENT,
+	onPageFilterChange,
+	onAddReply,
+	onUpdateStatus,
+	onDelete,
+	onDeleteReply,
+	canManageComments,
+	isVisible,
+	onClose,
+	pageUrl = '',
+	adminDashboardUrl = '',
+}) => {
+	const [selectedCommentId, setSelectedCommentId] = useState(null);
+	const [openMenuId, setOpenMenuId] = useState(null);
+	const [filterOpen, setFilterOpen] = useState(false);
+	const [replyText, setReplyText] = useState('');
+	const [replyHoney, setReplyHoney] = useState('');
+	const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+	const [highlightPosition, setHighlightPosition] = useState(null);
+	const filterRef = useRef(null);
+	const menuRef = useRef(null);
+	const highlightTimerRef = useRef(null);
 
-                            return (
-                                <div key={status} className="sn-status-group">
-                                <div 
-                                    className="sn-status-header"
-                                    onClick={() => toggleStatusGroup(status)}
-                                >
-                                    <span className="sn-status-icon">
-                                        {getStatusIcon(status)}
-                                    </span>
-                                    <h4>{getStatusLabel(status)} ({statusComments.length})</h4>
-                                    <button className="sn-toggle-arrow">
-                                        {collapsedGroups[status] ? <ChevronDownIcon className="sn-icon" /> : <ChevronUpIcon className="sn-icon" />}
-                                    </button>
-                                </div>                                    {!collapsedGroups[status] && (
-                                        <div className="sn-status-content">
+	const selectedComment = comments.find(
+		(comment) => comment.id === selectedCommentId
+	);
 
-                                    {statusComments.map(comment => (
-                                        <div key={comment.id} className={`sn-comment-task ${selectedComment === comment.id ? 'selected' : ''}`}>
-                                            <div className="sn-task-header">
-                                                <div className="sn-task-info">
-                                                    <span className="sn-task-id">#{comment.id}</span>
-                                                    <span className="sn-task-author">{comment.display_name}</span>
-                                                    <span className="sn-task-date">{formatDate(comment.created_at)}</span>
-                                                </div>
-                                                <button
-                                                    className="sn-locate-btn"
-                                                    onClick={() => scrollToElement(comment)}
-                                                    title={__('Locate element', 'analogwp-site-notes')}
-                                                >
-                                                    🎯
-                                                </button>
-                                            </div>
+	useEffect(() => {
+		if (selectedCommentId && !selectedComment) {
+			setSelectedCommentId(null);
+		}
+	}, [selectedCommentId, selectedComment]);
 
-                                            <div className="sn-task-content">
-                                                {comment.comment_title && (
-                                                    <h5 className="sn-task-title">{comment.comment_title}</h5>
-                                                )}
-                                                <p className="sn-task-text">{comment.comment_text}</p>
-                                                
-                                                <div className="sn-task-meta">
-                                                    <span className={`sn-priority-badge sn-priority-${comment.priority || 'medium'}`}>
-                                                        {comment.priority ? comment.priority.charAt(0).toUpperCase() + comment.priority.slice(1) : 'Medium'}
-                                                    </span>
-                                                </div>
+	useEffect(() => {
+		const handleClickOutside = (event) => {
+			if (filterRef.current && !filterRef.current.contains(event.target)) {
+				setFilterOpen(false);
+			}
+			if (menuRef.current && !menuRef.current.contains(event.target)) {
+				setOpenMenuId(null);
+			}
+		};
 
-                                                {comment.screenshot_url && (
-                                                    <div className="sn-task-screenshot">
-                                                        <img 
-                                                            src={comment.screenshot_url} 
-                                                            alt={__('Comment screenshot', 'analogwp-site-notes')}
-                                                            onClick={() => window.open(comment.screenshot_url, '_blank')}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, []);
 
-                                            {canManageComments && (
-                                                <div className="sn-task-status">
-                                                    <select
-                                                        value={comment.status}
-                                                        onChange={(e) => onUpdateStatus(comment.id, e.target.value)}
-                                                        className="sn-status-select"
-                                                    >
-                                                        <option value="open">{__('Open', 'analogwp-site-notes')}</option>
-                                                        <option value="in_progress">{__('In Progress', 'analogwp-site-notes')}</option>
-                                                        <option value="resolved">{__('Resolved', 'analogwp-site-notes')}</option>
-                                                    </select>
-                                                </div>
-                                            )}
+	useEffect(() => {
+		return () => {
+			if (highlightTimerRef.current) {
+				clearTimeout(highlightTimerRef.current);
+			}
+		};
+	}, []);
 
-                                            {comment.replies && comment.replies.length > 0 && (
-                                                <div className="sn-task-replies">
-                                                    <div className="sn-replies-header">
-                                                        <strong>{__('Replies:', 'analogwp-site-notes')}</strong>
-                                                    </div>
-                                                    {comment.replies.map(reply => (
-                                                        <div key={reply.id} className="sn-task-reply">
-                                                            <div className="sn-reply-header">
-                                                                <strong>{reply.display_name}</strong>
-                                                                <span className="sn-reply-date">{formatDate(reply.created_at)}</span>
-                                                            </div>
-                                                            <p className="sn-reply-text">{reply.reply_text}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
+	useEffect(() => {
+		setReplyText('');
+		setReplyHoney('');
+		setIsSubmittingReply(false);
+		setOpenMenuId(null);
+	}, [selectedCommentId]);
 
-                                            <div className="sn-task-actions">
-                                                {!showReplyForms[comment.id] ? (
-                                                    <Button
-                                                        variant="secondary"
-                                                        size="sm"
-                                                        onClick={() => setShowReplyForms(prev => ({ ...prev, [comment.id]: true }))}
-                                                    >
-                                                        {__('Reply', 'analogwp-site-notes')}
-                                                    </Button>
-                                                ) : (
-                                                    <form onSubmit={(e) => handleReplySubmit(comment.id, e)} className="sn-reply-form">
-                                                        <textarea
-                                                            value={replyTexts[comment.id] || ''}
-                                                            onChange={(e) => setReplyTexts(prev => ({ ...prev, [comment.id]: e.target.value }))}
-                                                            placeholder={__('Add a reply...', 'analogwp-site-notes')}
-                                                            className="sn-reply-textarea"
-                                                            rows="3"
-                                                        />
-                                                <input
-                                                    type="text"
-                                                    name="website"
-                                                    value={replyHoney[comment.id] || ''}
-                                                    onChange={(e) => setReplyHoney(prev => ({ ...prev, [comment.id]: e.target.value }))}
-                                                    tabIndex="-1"
-                                                    autoComplete="off"
-                                                    style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }}
-                                                    aria-hidden="true"
-                                                />
-                                                        <div className="sn-reply-actions">
-                                                            <Button
-                                                                type="submit"
-                                                                variant="primary"
-                                                                disabled={isSubmittingReply[comment.id]}
-                                                                loading={isSubmittingReply[comment.id]}
-                                                                size="sm"
-                                                            >
-                                                                {isSubmittingReply[comment.id] ? __('Submitting...', 'analogwp-site-notes') : __('Reply', 'analogwp-site-notes')}
-                                                            </Button>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                onClick={() => {
-                                                                    setShowReplyForms(prev => ({ ...prev, [comment.id]: false }));
-                                                                    setReplyTexts(prev => ({ ...prev, [comment.id]: '' }));
-                                                                }}
-                                                            >
-                                                                {__('Cancel', 'analogwp-site-notes')}
-                                                            </Button>
-                                                        </div>
-                                                    </form>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
-            </div>
-            )}
-        </>
-    );
+	const clearScreenshotHighlight = () => {
+		if (highlightTimerRef.current) {
+			clearTimeout(highlightTimerRef.current);
+			highlightTimerRef.current = null;
+		}
+		setHighlightPosition(null);
+	};
+
+	const showScreenshotHighlight = (position) => {
+		clearScreenshotHighlight();
+
+		// Wait for smooth scroll to settle so the frame lands on the capture area.
+		highlightTimerRef.current = setTimeout(() => {
+			setHighlightPosition(position);
+			highlightTimerRef.current = setTimeout(() => {
+				setHighlightPosition(null);
+				highlightTimerRef.current = null;
+			}, 3500);
+		}, 350);
+	};
+
+	const getCommentCapturePosition = (comment) => {
+		const x = Number(comment?.x_position);
+		const y = Number(comment?.y_position);
+
+		if (!Number.isFinite(x) || !Number.isFinite(y)) {
+			return null;
+		}
+
+		// Default DB zeros mean "no stored capture point".
+		if (x === 0 && y === 0) {
+			return null;
+		}
+
+		return { x, y };
+	};
+
+	const filterLabel =
+		pageFilter === FILTER_ALL
+			? __('All Notes', 'analogwp-site-notes')
+			: __('Current Page', 'analogwp-site-notes');
+
+	const handleReplySubmit = async (commentId, event) => {
+		event.preventDefault();
+		if (!replyText.trim() || isSubmittingReply) {
+			return;
+		}
+
+		setIsSubmittingReply(true);
+		try {
+			await onAddReply(commentId, replyText.trim(), replyHoney);
+			setReplyText('');
+			setReplyHoney('');
+		} catch (error) {
+			logger.error('Error submitting reply:', error);
+		} finally {
+			setIsSubmittingReply(false);
+		}
+	};
+
+	const isOnCurrentPage = (comment) => {
+		if (!comment?.page_url || !pageUrl) {
+			return true;
+		}
+		return comment.page_url === pageUrl;
+	};
+
+	const scrollToElement = (comment) => {
+		if (!isOnCurrentPage(comment) && comment.page_url) {
+			window.location.href = comment.page_url;
+			return;
+		}
+
+		const capturePosition = getCommentCapturePosition(comment);
+
+		if (capturePosition) {
+			window.scrollTo({
+				left: Math.max(0, capturePosition.x - window.innerWidth / 2),
+				top: Math.max(0, capturePosition.y - window.innerHeight / 2),
+				behavior: 'smooth',
+			});
+			showScreenshotHighlight(capturePosition);
+			return;
+		}
+
+		// Fallback for older notes without stored capture coordinates.
+		const element = document.querySelector(comment.element_selector);
+		if (element) {
+			element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			element.style.outline = '3px solid #3858e9';
+			element.style.outlineOffset = '2px';
+			setTimeout(() => {
+				element.style.outline = '';
+				element.style.outlineOffset = '';
+			}, 2000);
+		}
+	};
+
+	const handleOpenNote = (commentId) => {
+		setSelectedCommentId(commentId);
+		setOpenMenuId(null);
+		setFilterOpen(false);
+	};
+
+	const handleBackToList = () => {
+		setSelectedCommentId(null);
+		setOpenMenuId(null);
+	};
+
+	const handleViewAtAdmin = (comment) => {
+		setOpenMenuId(null);
+		if (!adminDashboardUrl) {
+			return;
+		}
+		const url = new URL(adminDashboardUrl, window.location.origin);
+		// Keep query param "task" — deep-link URL contract; renaming needs a compat alias (no DB change, but leave as-is).
+		url.searchParams.set('task', String(comment.id));
+		window.open(url.toString(), '_blank', 'noopener,noreferrer');
+	};
+
+	const handleDelete = async (comment) => {
+		setOpenMenuId(null);
+		if (!onDelete) {
+			return;
+		}
+
+		const confirmed = window.confirm(
+			__('Are you sure you want to delete this note?', 'analogwp-site-notes')
+		);
+		if (!confirmed) {
+			return;
+		}
+
+		try {
+			await onDelete(comment.id);
+			if (selectedCommentId === comment.id) {
+				setSelectedCommentId(null);
+			}
+		} catch (error) {
+			logger.error('Error deleting note:', error);
+		}
+	};
+
+	const handleDeleteReply = async (replyId) => {
+		if (!onDeleteReply) {
+			return;
+		}
+		if (
+			!window.confirm(
+				__('Are you sure you want to delete this reply?', 'analogwp-site-notes')
+			)
+		) {
+			return;
+		}
+		await onDeleteReply(replyId);
+	};
+
+	const getStatusDotColor = (status) => {
+		const statusObj = getStatusByKey(status);
+		return statusObj?.color || null;
+	};
+
+	const emptyMessage =
+		pageFilter === FILTER_ALL
+			? __('No notes yet.', 'analogwp-site-notes')
+			: __('No notes on this page yet.', 'analogwp-site-notes');
+
+	const renderNoteMenuItems = (comment) => (
+		<>
+			{canManageComments && adminDashboardUrl && (
+				<li role="none">
+					<button
+						type="button"
+						role="menuitem"
+						onClick={(event) => {
+							event.stopPropagation();
+							handleViewAtAdmin(comment);
+						}}
+					>
+						{__('View at Dashboard', 'analogwp-site-notes')}
+					</button>
+				</li>
+			)}
+			{canManageComments && onDelete && (
+				<li role="none">
+					<button
+						type="button"
+						role="menuitem"
+						className="sn-note-item__menu-danger"
+						onClick={(event) => {
+							event.stopPropagation();
+							handleDelete(comment);
+						}}
+					>
+						{__('Delete', 'analogwp-site-notes')}
+					</button>
+				</li>
+			)}
+		</>
+	);
+
+	const hasMenuItems = (comment) =>
+		(canManageComments && adminDashboardUrl) || (canManageComments && onDelete);
+
+	return (
+		<>
+			{highlightPosition && (
+				<ScreenshotSelectionFrame
+					position={highlightPosition}
+					className="sn-screenshot-frame--sidebar-highlight"
+					withOverlay
+					portal
+					onDismiss={clearScreenshotHighlight}
+				/>
+			)}
+
+			<Button
+				variant={isVisible ? 'primary' : 'secondary'}
+				className={`sn-sidebar-close ${!isVisible ? 'sn-sidebar-hidden' : ''}`}
+				onClick={onClose}
+				ariaLabel={__('Toggle Sidebar', 'analogwp-site-notes')}
+				icon={isVisible ? <ChevronRightIcon className="sn-icon" /> : <ChevronLeftIcon className="sn-icon" />}
+				iconPosition="left"
+			/>
+
+			{isVisible && (
+				<div className="sn-comment-sidebar">
+					{selectedComment ? (
+						<>
+							<div className="sn-sidebar-header sn-sidebar-header--detail">
+								<button
+									type="button"
+									className="sn-sidebar-back"
+									onClick={handleBackToList}
+									aria-label={__('Back to notes', 'analogwp-site-notes')}
+								>
+									<ArrowLeftIcon className="sn-icon" size="sm" />
+									<span>{__('Back', 'analogwp-site-notes')}</span>
+								</button>
+							</div>
+
+							<div className="sn-sidebar-content sn-sidebar-content--detail">
+								<div className="sn-note-detail">
+									<div className="sn-note-detail__note">
+										<NoteMainContent
+											comment={selectedComment}
+											statusDotColor={getStatusDotColor(selectedComment.status)}
+											onScrollTo={() => scrollToElement(selectedComment)}
+											onMenuToggle={() =>
+												setOpenMenuId((id) =>
+													id === selectedComment.id ? null : selectedComment.id
+												)
+											}
+											menuOpen={openMenuId === selectedComment.id}
+											menuRef={menuRef}
+											menuItems={
+												hasMenuItems(selectedComment)
+													? renderNoteMenuItems(selectedComment)
+													: null
+											}
+										/>
+
+										{canManageComments && onUpdateStatus && (
+											<div className="sn-note-detail__status">
+												<StatusSelect
+													value={selectedComment.status}
+													onChange={(status) =>
+														onUpdateStatus(selectedComment.id, status)
+													}
+												/>
+											</div>
+										)}
+									</div>
+
+									{(selectedComment.replies || []).length > 0 && (
+										<div className="sn-note-detail__replies">
+											{selectedComment.replies.map((reply) => (
+												<NoteReplyItem
+													key={reply.id}
+													reply={reply}
+													canDelete={canManageComments && !!onDeleteReply}
+													onDelete={() => handleDeleteReply(reply.id)}
+												/>
+											))}
+										</div>
+									)}
+
+									<form
+										className="sn-note-thread__composer sn-note-detail__composer"
+										onSubmit={(event) =>
+											handleReplySubmit(selectedComment.id, event)
+										}
+									>
+										<textarea
+											value={replyText}
+											onChange={(event) => setReplyText(event.target.value)}
+											placeholder={__('Add your reply', 'analogwp-site-notes')}
+											rows={3}
+											disabled={isSubmittingReply}
+										/>
+										<input
+											type="text"
+											name="website"
+											value={replyHoney}
+											onChange={(event) => setReplyHoney(event.target.value)}
+											tabIndex="-1"
+											autoComplete="off"
+											className="sn-note-detail__honeypot"
+											aria-hidden="true"
+										/>
+										<button
+											type="submit"
+											className="sn-note-thread__send"
+											disabled={isSubmittingReply || !replyText.trim()}
+											aria-label={
+												isSubmittingReply
+													? __('Submitting...', 'analogwp-site-notes')
+													: __('Send reply', 'analogwp-site-notes')
+											}
+										>
+											{isSubmittingReply ? (
+												<span className="sn-spinner" />
+											) : (
+												<ArrowUpIcon size="md" />
+											)}
+										</button>
+									</form>
+								</div>
+							</div>
+						</>
+					) : (
+						<>
+							<div className="sn-sidebar-header">
+								<h3>{__('Page Notes', 'analogwp-site-notes')}</h3>
+
+								<div className="sn-sidebar-filter" ref={filterRef}>
+									<button
+										type="button"
+										className="sn-sidebar-filter__trigger"
+										onClick={() => setFilterOpen((open) => !open)}
+										aria-expanded={filterOpen}
+										aria-haspopup="listbox"
+									>
+										<span>{filterLabel}</span>
+										<ChevronDownIcon className="sn-icon" size="sm" />
+									</button>
+
+									{filterOpen && (
+										<ul className="sn-sidebar-filter__menu" role="listbox">
+											<li role="option" aria-selected={pageFilter === FILTER_CURRENT}>
+												<button
+													type="button"
+													className={
+														pageFilter === FILTER_CURRENT
+															? 'sn-sidebar-filter__option sn-sidebar-filter__option--selected'
+															: 'sn-sidebar-filter__option'
+													}
+													onClick={() => {
+														onPageFilterChange?.(FILTER_CURRENT);
+														setFilterOpen(false);
+													}}
+												>
+													{__('Current Page', 'analogwp-site-notes')}
+												</button>
+											</li>
+											<li role="option" aria-selected={pageFilter === FILTER_ALL}>
+												<button
+													type="button"
+													className={
+														pageFilter === FILTER_ALL
+															? 'sn-sidebar-filter__option sn-sidebar-filter__option--selected'
+															: 'sn-sidebar-filter__option'
+													}
+													onClick={() => {
+														onPageFilterChange?.(FILTER_ALL);
+														setFilterOpen(false);
+													}}
+												>
+													{__('All Notes', 'analogwp-site-notes')}
+												</button>
+											</li>
+										</ul>
+									)}
+								</div>
+							</div>
+
+							<div className="sn-sidebar-content">
+								{comments.length === 0 ? (
+									<div className="sn-no-comments-sidebar">
+										<p>{emptyMessage}</p>
+										<p className="sn-instruction">
+											{__('Click on any element to add a comment.', 'analogwp-site-notes')}
+										</p>
+									</div>
+								) : (
+									<ul className="sn-notes-list">
+										{comments.map((comment) => {
+											const statusDotColor = getStatusDotColor(comment.status);
+
+											return (
+												<li
+													key={comment.id}
+													className="sn-note-item sn-note-item--clickable"
+													onClick={() => handleOpenNote(comment.id)}
+												>
+													<NoteMainContent
+														comment={comment}
+														statusDotColor={statusDotColor}
+														onScrollTo={() => scrollToElement(comment)}
+														onMenuToggle={() =>
+															setOpenMenuId((id) =>
+																id === comment.id ? null : comment.id
+															)
+														}
+														menuOpen={openMenuId === comment.id}
+														menuRef={menuRef}
+														menuItems={
+															hasMenuItems(comment)
+																? renderNoteMenuItems(comment)
+																: null
+														}
+													/>
+												</li>
+											);
+										})}
+									</ul>
+								)}
+							</div>
+						</>
+					)}
+				</div>
+			)}
+		</>
+	);
 };
 
 export default CommentSidebar;

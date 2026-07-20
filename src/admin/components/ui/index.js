@@ -1,16 +1,21 @@
-/**
- * UI Components index file
- */
-// Export all UI components
-export { Badge, Card, Spinner, Alert } from './Components';
+import './styles.scss';
 
-// Export wrapper components over WordPress Components
-export { default as Button, IconButton } from './Button';
-export { 
-    Select,
-    TextInput,
-    Textarea,
-    Toggle,
-    Range,
-    ColorPicker
-} from './FormControls';
+export { default as Badge } from './Badge/Badge';
+export { default as Card } from './Card/Card';
+export { default as Spinner } from './Spinner/Spinner';
+export { default as Alert } from './Alert/Alert';
+export { default as Button, IconButton } from './Button/Button';
+export { default as Select } from './Select/Select';
+export { default as TextInput } from './TextInput/TextInput';
+export { default as Textarea } from './Textarea/Textarea';
+export { default as Toggle } from './Toggle/Toggle';
+export { default as Range } from './Range/Range';
+export { default as ColorPicker } from './ColorPicker/ColorPicker';
+export { default as BadgeSelect } from './BadgeSelect/BadgeSelect';
+export { default as FieldSelect } from './FieldSelect/FieldSelect';
+export { default as FieldMultiSelect } from './FieldMultiSelect/FieldMultiSelect';
+export { default as SidebarSelect } from './SidebarSelect/SidebarSelect';
+export { default as SidebarMultiSelect } from './SidebarMultiSelect/SidebarMultiSelect';
+export { default as FieldDate } from './FieldDate/FieldDate';
+export { default as FieldTime } from './FieldTime/FieldTime';
+export { parseTimeInput } from './FieldTime/parseTimeInput';

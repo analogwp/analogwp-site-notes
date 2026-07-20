@@ -1,0 +1,51 @@
+.sn-badge {
+	display: inline-flex;
+	align-items: center;
+	font-weight: var(--sn-font-weight-medium);
+	border-radius: var(--sn-radius-pill);
+
+	&--default {
+		background-color: var(--sn-color-neutral-bg);
+		color: var(--sn-color-neutral-text);
+	}
+
+	&--primary {
+		background-color: var(--sn-color-info-bg);
+		color: var(--sn-color-info-text);
+	}
+
+	&--success {
+		background-color: var(--sn-color-success-bg);
+		color: var(--sn-color-success-text);
+	}
+
+	&--warning {
+		background-color: var(--sn-color-warning-bg);
+		color: var(--sn-color-warning-text);
+	}
+
+	&--danger {
+		background-color: var(--sn-color-danger-bg);
+		color: var(--sn-color-danger-text);
+	}
+
+	&--info {
+		background-color: var(--sn-color-info-bg);
+		color: var(--sn-color-info-text);
+	}
+
+	&--small {
+		padding: var(--sn-space-2xs) var(--sn-space-xs);
+		font-size: var(--sn-text-s-size);
+	}
+
+	&--medium {
+		padding: 0.125rem 0.625rem;
+		font-size: var(--sn-text-m-size);
+	}
+
+	&--large {
+		padding: var(--sn-space-2xs) var(--sn-space-s);
+		font-size: var(--sn-text-m-size);
+	}
+}

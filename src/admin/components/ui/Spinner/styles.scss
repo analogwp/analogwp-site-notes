@@ -1,0 +1,30 @@
+.sn-spinner {
+	animation: sn-spin 1s linear infinite;
+
+	&--small { width: 1rem; height: 1rem; }
+	&--medium { width: 1.5rem; height: 1.5rem; }
+	&--large { width: 2rem; height: 2rem; }
+
+	circle {
+		opacity: 0.25;
+	}
+
+	path {
+		opacity: 0.75;
+	}
+}
+
+.sn-admin-loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: var(--sn-space-4xl);
+	gap: var(--sn-space-m);
+	color: var(--sn-text-secondary);
+}
+
+@keyframes sn-spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}

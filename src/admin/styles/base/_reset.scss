@@ -1,0 +1,35 @@
+/**
+ * Minimal scoped reset for the admin app.
+ * Keeps WP admin styles from leaking in unpredictably.
+ */
+
+.sn-admin-app-wp {
+	box-sizing: border-box;
+	font-family: var(--sn-font-family);
+	color: var(--sn-text-primary);
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p {
+		margin: 0;
+	}
+
+	button {
+		font-family: inherit;
+		cursor: pointer;
+	}
+
+	.components-button svg {
+		fill: none;
+	}
+}

@@ -5,256 +5,266 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
- * External dependencies
- */
-import { 
-    PlusIcon, 
-    TrashIcon, 
-    PencilIcon,
-    XMarkIcon,
-    CheckIcon
-} from '@heroicons/react/24/outline';
-
-/**
  * Internal dependencies
  */
+import {
+	CheckmarkIcon,
+	CloseIcon,
+	PencilIcon,
+	TrashIcon,
+} from '../../../shared/icons';
 import { Button } from '../ui';
 import { useSettings } from './SettingsProvider';
-import { 
-    SettingsSection, 
-    SettingsCard, 
-    TextInputField, 
-    ColorInput,
-    FieldDescription 
+import {
+	SettingsSection,
+	SettingsCard,
+	FieldDescription,
 } from './FieldComponents';
 import { showToast } from '../ToastProvider';
 import logger from '../../../shared/utils/logger';
 
+const DEFAULT_PRIORITY_COLOR = '#3858e9';
+
 const LabelsAndFiltersSettings = () => {
-    const { priorities, setPriorities, saveSettings } = useSettings();
+	const { priorities, setPriorities, saveSettings } = useSettings();
 
-    // Priorities state
-    const [newPriority, setNewPriority] = useState({ name: '', color: '#3858e9' });
-    const [editingPriorityId, setEditingPriorityId] = useState(null);
-    const [editPriorityForm, setEditPriorityForm] = useState({ name: '', color: '' });
+	const [newPriority, setNewPriority] = useState({
+		name: '',
+		color: DEFAULT_PRIORITY_COLOR,
+	});
+	const [editingPriorityId, setEditingPriorityId] = useState(null);
+	const [editPriorityForm, setEditPriorityForm] = useState({ name: '', color: '' });
 
-    // Helper function to update priorities and auto-save
-    const updatePriorities = async (newPriorities) => {
-        setPriorities(newPriorities);
-        try {
-            await saveSettings(true, null, newPriorities);
-        } catch (error) {
-            logger.error('Error saving priorities:', error);
-            showToast.error(__('Failed to save priorities', 'analogwp-site-notes'));
-        }
-    };
+	const updatePriorities = async (nextPriorities) => {
+		setPriorities(nextPriorities);
+		try {
+			await saveSettings(false, null, nextPriorities);
+		} catch (error) {
+			logger.error('Error saving priorities:', error);
+			showToast.error(__('Failed to save priorities', 'analogwp-site-notes'));
+		}
+	};
 
-    // Priority functions
-    const addPriority = async () => {
-        if (!newPriority.name.trim()) {
-            showToast.error(__('Priority name is required', 'analogwp-site-notes'));
-            return;
-        }
+	const addPriority = async () => {
+		if (!newPriority.name.trim()) {
+			showToast.error(__('Priority name is required', 'analogwp-site-notes'));
+			return;
+		}
 
-        if (priorities.some(pri => pri.name.toLowerCase() === newPriority.name.toLowerCase())) {
-            showToast.error(__('Priority name already exists', 'analogwp-site-notes'));
-            return;
-        }
+		if (priorities.some((pri) => pri.name.toLowerCase() === newPriority.name.toLowerCase())) {
+			showToast.error(__('Priority name already exists', 'analogwp-site-notes'));
+			return;
+		}
 
-        const priority = {
-            id: Date.now(),
-            key: newPriority.name.toLowerCase().replace(/\s+/g, '_'),
-            name: newPriority.name.trim(),
-            color: newPriority.color
-        };
+		const priority = {
+			id: Date.now(),
+			key: newPriority.name.toLowerCase().replace(/\s+/g, '_'),
+			name: newPriority.name.trim(),
+			color: newPriority.color,
+		};
 
-        await updatePriorities([...priorities, priority]);
-        setNewPriority({ name: '', color: '#f59e0b' });
-        showToast.success(__('Priority added successfully', 'analogwp-site-notes'));
-    };
+		await updatePriorities([...priorities, priority]);
+		setNewPriority({ name: '', color: DEFAULT_PRIORITY_COLOR });
+		showToast.success(__('Priority added successfully', 'analogwp-site-notes'));
+	};
 
-    const startEditPriority = (priority) => {
-        setEditingPriorityId(priority.id);
-        setEditPriorityForm({ name: priority.name, color: priority.color });
-    };
+	const startEditPriority = (priority) => {
+		setEditingPriorityId(priority.id);
+		setEditPriorityForm({ name: priority.name, color: priority.color });
+	};
 
-    const cancelEditPriority = () => {
-        setEditingPriorityId(null);
-        setEditPriorityForm({ name: '', color: '' });
-    };
+	const cancelEditPriority = () => {
+		setEditingPriorityId(null);
+		setEditPriorityForm({ name: '', color: '' });
+	};
 
-    const saveEditPriority = async () => {
-        if (!editPriorityForm.name.trim()) {
-            showToast.error(__('Priority name is required', 'analogwp-site-notes'));
-            return;
-        }
+	const saveEditPriority = async () => {
+		if (!editPriorityForm.name.trim()) {
+			showToast.error(__('Priority name is required', 'analogwp-site-notes'));
+			return;
+		}
 
-        if (priorities.some(pri => pri.id !== editingPriorityId && pri.name.toLowerCase() === editPriorityForm.name.toLowerCase())) {
-            showToast.error(__('Priority name already exists', 'analogwp-site-notes'));
-            return;
-        }
+		if (
+			priorities.some(
+				(pri) =>
+					pri.id !== editingPriorityId &&
+					pri.name.toLowerCase() === editPriorityForm.name.toLowerCase()
+			)
+		) {
+			showToast.error(__('Priority name already exists', 'analogwp-site-notes'));
+			return;
+		}
 
-        await updatePriorities(priorities.map(pri => 
-            pri.id === editingPriorityId 
-                ? { ...pri, name: editPriorityForm.name.trim(), color: editPriorityForm.color, key: editPriorityForm.name.toLowerCase().replace(/\s+/g, '_') }
-                : pri
-        ));
-        
-        setEditingPriorityId(null);
-        setEditPriorityForm({ name: '', color: '' });
-        showToast.success(__('Priority updated successfully', 'analogwp-site-notes'));
-    };
+		await updatePriorities(
+			priorities.map((pri) =>
+				pri.id === editingPriorityId
+					? {
+							...pri,
+							name: editPriorityForm.name.trim(),
+							color: editPriorityForm.color,
+							key: editPriorityForm.name.toLowerCase().replace(/\s+/g, '_'),
+						}
+					: pri
+			)
+		);
 
-    const deletePriority = async (id) => {
-        await updatePriorities(priorities.filter(pri => pri.id !== id));
-        showToast.success(__('Priority deleted successfully', 'analogwp-site-notes'));
-    };
+		setEditingPriorityId(null);
+		setEditPriorityForm({ name: '', color: '' });
+		showToast.success(__('Priority updated successfully', 'analogwp-site-notes'));
+	};
 
-    const predefinedColors = [
-        '#3858e9', '#e74c3c', '#2ecc71', '#f39c12', 
-        '#9b59b6', '#1abc9c', '#34495e', '#9fa1a3'
-    ];
+	const deletePriority = async (id) => {
+		await updatePriorities(priorities.filter((pri) => pri.id !== id));
+		showToast.success(__('Priority deleted successfully', 'analogwp-site-notes'));
+	};
 
-    return (
-        <div className="p-6 max-w-4xl">
-            <SettingsSection
-                title={__('Task Priorities', 'analogwp-site-notes')}
-                description={__('Define priority levels for tasks with customizable colors.', 'analogwp-site-notes')}
-            >
-                <SettingsCard title={__('Add New Priority', 'analogwp-site-notes')}>
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <TextInputField
-                                id="new_priority_name"
-                                label={__('Priority Name', 'analogwp-site-notes')}
-                                value={newPriority.name}
-                                onChange={(value) => setNewPriority({ ...newPriority, name: value })}
-                                placeholder={__('Enter priority name...', 'analogwp-site-notes')}
-                            />
-                            
-                            <ColorInput
-                                id="new_priority_color"
-                                label={__('Priority Color', 'analogwp-site-notes')}
-                                value={newPriority.color}
-                                onChange={(value) => setNewPriority({ ...newPriority, color: value })}
-                            />
-                        </div>
-                        
-                        <div className="space-y-3">
-                            <label className="block text-sm font-medium text-gray-700">{__('Quick Colors:', 'analogwp-site-notes')}</label>
-                            <div className="flex flex-wrap gap-2">
-                                {predefinedColors.map(color => (
-                                    <button
-                                        key={color}
-                                        className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
-                                            newPriority.color === color 
-                                                ? 'border-gray-900 ring-2 ring-gray-900 ring-offset-2' 
-                                                : 'border-gray-300 hover:border-gray-400'
-                                        }`}
-                                        style={{ backgroundColor: color }}
-                                        onClick={() => setNewPriority({ ...newPriority, color })}
-                                        title={color}
-                                    />
-                                ))}
-                            </div>
-                        </div>
+	const renderPriorityFormRow = ({
+		name,
+		color,
+		onNameChange,
+		onColorChange,
+		primaryAction,
+	}) => (
+		<div className="sn-priority-form-row">
+			<input
+				type="text"
+				className="sn-input sn-priority-form-row__name"
+				value={name}
+				onChange={(event) => onNameChange(event.target.value)}
+				placeholder={__('Priority Name', 'analogwp-site-notes')}
+			/>
+			<input
+				type="color"
+				className="sn-priority-form-row__swatch"
+				value={color}
+				onChange={(event) => onColorChange(event.target.value)}
+				aria-label={__('Priority color', 'analogwp-site-notes')}
+			/>
+			<input
+				type="text"
+				className="sn-input sn-priority-form-row__hex sn-font-mono"
+				value={color}
+				onChange={(event) => onColorChange(event.target.value)}
+				placeholder="#000000"
+				pattern="^#[0-9A-Fa-f]{6}$"
+				aria-label={__('Priority color hex', 'analogwp-site-notes')}
+			/>
+			{primaryAction}
+		</div>
+	);
 
-                        <Button
-                            onClick={addPriority}
-                            disabled={!newPriority.name.trim()}
-                            variant="primary"
-                            size="default"
-                            icon={<PlusIcon className="w-4 h-4" />}
-                        >
-                            {__('Add Priority', 'analogwp-site-notes')}
-                        </Button>
-                    </div>
-                </SettingsCard>
+	return (
+		<SettingsSection
+			title={__('Note Priorities', 'analogwp-site-notes')}
+			description={__('Define priority levels for notes with customizable colors.', 'analogwp-site-notes')}
+		>
+			<SettingsCard title={__('Note Priorities', 'analogwp-site-notes')}>
+				{priorities.length === 0 ? (
+					<FieldDescription>
+						{__('No priorities created yet. Add your first priority below.', 'analogwp-site-notes')}
+					</FieldDescription>
+				) : (
+					<ul className="sn-priority-list">
+						{priorities.map((priority) => (
+							<li key={priority.id} className="sn-priority-list__item">
+								{editingPriorityId === priority.id ? (
+									<div className="sn-priority-list__row">
+										{renderPriorityFormRow({
+											name: editPriorityForm.name,
+											color: editPriorityForm.color,
+											onNameChange: (value) =>
+												setEditPriorityForm({ ...editPriorityForm, name: value }),
+											onColorChange: (value) =>
+												setEditPriorityForm({ ...editPriorityForm, color: value }),
+										})}
+										<div className="sn-priority-list__actions">
+											<button
+												type="button"
+												className="sn-priority-list__action"
+												onClick={saveEditPriority}
+												title={__('Save changes', 'analogwp-site-notes')}
+											>
+												<CheckmarkIcon size="md" />
+											</button>
+											<button
+												type="button"
+												className="sn-priority-list__action"
+												onClick={cancelEditPriority}
+												title={__('Cancel editing', 'analogwp-site-notes')}
+											>
+												<CloseIcon size="md" />
+											</button>
+										</div>
+									</div>
+								) : (
+									<div className="sn-priority-list__row">
+										<div className="sn-priority-list__info">
+											<span
+												className="sn-priority-list__dot"
+												style={{ backgroundColor: priority.color }}
+												aria-hidden="true"
+											/>
+											<span className="sn-priority-list__name">{priority.name}</span>
+										</div>
+										<div className="sn-priority-list__actions">
+											<button
+												type="button"
+												className="sn-priority-list__action"
+												onClick={() => startEditPriority(priority)}
+												title={__('Edit priority', 'analogwp-site-notes')}
+											>
+												<PencilIcon size="md" />
+											</button>
+											<button
+												type="button"
+												className="sn-priority-list__action"
+												onClick={() => {
+													if (
+														confirm(
+															__(
+																'Are you sure you want to delete this priority?',
+																'analogwp-site-notes'
+															)
+														)
+													) {
+														deletePriority(priority.id);
+													}
+												}}
+												title={__('Delete priority', 'analogwp-site-notes')}
+											>
+												<TrashIcon size="md" />
+											</button>
+										</div>
+									</div>
+								)}
+							</li>
+						))}
+					</ul>
+				)}
+			</SettingsCard>
 
-                <SettingsCard title={__('Existing Priorities', 'analogwp-site-notes')}>
-                    {priorities.length === 0 ? (
-                        <FieldDescription>
-                            {__('No priorities created yet. Add your first priority above.', 'analogwp-site-notes')}
-                        </FieldDescription>
-                    ) : (
-                        <div className="space-y-3">
-                            {priorities.map(priority => (
-                                <div key={priority.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                    {editingPriorityId === priority.id ? (
-                                        <div className="space-y-4">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <TextInputField
-                                                    value={editPriorityForm.name}
-                                                    onChange={(value) => setEditPriorityForm({ ...editPriorityForm, name: value })}
-                                                    placeholder={__('Priority name...', 'analogwp-site-notes')}
-                                                />
-                                                <ColorInput
-                                                    value={editPriorityForm.color}
-                                                    onChange={(value) => setEditPriorityForm({ ...editPriorityForm, color: value })}
-                                                />
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    onClick={saveEditPriority}
-                                                    variant="primary"
-                                                    size="small"
-                                                    icon={<CheckIcon className="w-4 h-4" />}
-                                                    title={__('Save changes', 'analogwp-site-notes')}
-                                                >
-                                                    {__('Save', 'analogwp-site-notes')}
-                                                </Button>
-                                                <Button
-                                                    onClick={cancelEditPriority}
-                                                    variant="secondary"
-                                                    size="small"
-                                                    icon={<XMarkIcon className="w-4 h-4" />}
-                                                    title={__('Cancel editing', 'analogwp-site-notes')}
-                                                >
-                                                    {__('Cancel', 'analogwp-site-notes')}
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <span 
-                                                    className="w-4 h-4 rounded-full border border-gray-300"
-                                                    style={{ backgroundColor: priority.color }}
-                                                />
-                                                <span className="font-medium text-gray-900">{priority.name}</span>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    onClick={() => startEditPriority(priority)}
-                                                    variant="tertiary"
-                                                    size="small"
-                                                    title={__('Edit priority', 'analogwp-site-notes')}
-                                                >
-                                                    <PencilIcon className="w-4 h-4" />
-                                                </Button>
-                                                <Button
-                                                    onClick={() => {
-                                                        if (confirm(__('Are you sure you want to delete this priority?', 'analogwp-site-notes'))) {
-                                                            deletePriority(priority.id);
-                                                        }
-                                                    }}
-                                                    variant="destructive"
-                                                    size="small"
-                                                    title={__('Delete priority', 'analogwp-site-notes')}
-                                                >
-                                                    <TrashIcon className="w-4 h-4" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </SettingsCard>
-            </SettingsSection>
-        </div>
-    );
+			<div className="sn-priority-create">
+				<h4 className="sn-priority-create__title">
+					{__('Create New Priority', 'analogwp-site-notes')}
+				</h4>
+				{renderPriorityFormRow({
+					name: newPriority.name,
+					color: newPriority.color,
+					onNameChange: (value) => setNewPriority({ ...newPriority, name: value }),
+					onColorChange: (value) => setNewPriority({ ...newPriority, color: value }),
+					primaryAction: (
+						<Button
+							onClick={addPriority}
+							disabled={!newPriority.name.trim()}
+							variant="primary"
+						>
+							{__('Add Priority', 'analogwp-site-notes')}
+						</Button>
+					),
+				})}
+			</div>
+		</SettingsSection>
+	);
 };
 
 export default LabelsAndFiltersSettings;

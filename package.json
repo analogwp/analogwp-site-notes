@@ -1,10 +1,11 @@
 {
 	"name": "analogwp-site-notes",
-	"version": "1.4.0",
+	"version": "1.5.0",
 	"description": "A comprehensive solution for agency-client transitions with visual commenting system",
 	"main": "index.js",
 	"scripts": {
-		"build": "wp-scripts build",
+		"build": "npm run copy:fonts && wp-scripts build",
+		"copy:fonts": "node scripts/copy-inter-fonts.js",
 		"start": "wp-scripts start",
 		"dev": "wp-scripts start",
 		"format": "wp-scripts format",
@@ -14,36 +15,34 @@
 		"packages-update": "wp-scripts packages-update",
 		"package": "npm run build && bash build-package.sh",
 		"clean": "rm -rf assets/js/app build *.zip *.tar.gz"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.14",
-    "@wordpress/scripts": "^26.0.0",
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.14"
-  },
-  "dependencies": {
-    "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/sortable": "^10.0.0",
-    "@dnd-kit/utilities": "^3.2.2",
-    "@heroicons/react": "^2.2.0",
-    "@wordpress/api-fetch": "^6.0.0",
-    "@wordpress/components": "^25.0.0",
-    "@wordpress/data": "^9.0.0",
-    "@wordpress/element": "^5.0.0",
-    "@wordpress/hooks": "^3.0.0",
-    "@wordpress/i18n": "^4.0.0",
-    "html2canvas": "^1.4.1",
-    "react-draggable": "^4.5.0",
-    "react-hot-toast": "^2.6.0"
-  },
-  "author": "AnalogWP",
-  "license": "GPL-2.0-or-later",
-  "keywords": [
-    "wordpress",
-    "plugin",
-    "visual-comments",
-    "site-notes",
-    "agency"
-  ]
+	},
+	"devDependencies": {
+		"@fontsource/inter": "^5.2.8",
+		"@wordpress/scripts": "^26.0.0",
+		"autoprefixer": "^10.4.21",
+		"postcss": "^8.5.6"
+	},
+	"dependencies": {
+		"@dnd-kit/core": "^6.3.1",
+		"@dnd-kit/sortable": "^10.0.0",
+		"@dnd-kit/utilities": "^3.2.2",
+		"@wordpress/api-fetch": "^6.0.0",
+		"@wordpress/components": "^25.0.0",
+		"@wordpress/data": "^9.0.0",
+		"@wordpress/element": "^5.0.0",
+		"@wordpress/hooks": "^3.0.0",
+		"@wordpress/i18n": "^4.0.0",
+		"html2canvas": "^1.4.1",
+		"react-draggable": "^4.5.0",
+		"react-hot-toast": "^2.6.0"
+	},
+	"author": "AnalogWP",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"plugin",
+		"visual-comments",
+		"site-notes",
+		"agency"
+	]
 }

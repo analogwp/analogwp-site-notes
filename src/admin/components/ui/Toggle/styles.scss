@@ -1,0 +1,14 @@
+.sn-toggle {
+	.components-form-toggle__input:checked + .components-form-toggle__track {
+		background-color: var(--sn-accent) !important;
+		border-color: var(--sn-accent) !important;
+	}
+
+	.components-form-toggle__input:focus + .components-form-toggle__track {
+		box-shadow: 0 0 0 1px transparent !important;
+	}
+
+	.components-form-toggle__input:focus:checked + .components-form-toggle__track {
+		box-shadow: 0 0 0 2px var(--sn-surface-body-ultra-light), 0 0 0 4px var(--sn-accent) !important;
+	}
+}

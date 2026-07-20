@@ -45,6 +45,7 @@ class Database {
 						post_id int(11) NOT NULL,
 						user_id int(11) NOT NULL DEFAULT 0,
 						assigned_to int(11) DEFAULT 0,
+						assigned_users text DEFAULT NULL,
 						comment_title varchar(255) DEFAULT '',
 						comment_text text NOT NULL,
 						element_selector varchar(500) DEFAULT '',
@@ -196,38 +197,57 @@ class Database {
 			}
 		}
 
-		// Run database upgrades.
-		$this->upgrade_database();
-
-		// Update database version.
-		update_option( 'agwp_sn_db_version', AGWP_SN_VERSION );
+		Migrations::get_instance()->maybe_run();
 	}
 
 	/**
-	 * Upgrade database schema if needed.
+	 * Normalize assigned user IDs from request data.
 	 *
 	 * @since 1.0.0
+	 * @param array $data Request data.
+	 * @return array<int>
 	 */
-	public function upgrade_database() {
-		global $wpdb;
+	private function normalize_assigned_user_ids( $data ) {
+		$ids = array();
 
-		$comments_table = esc_html( self::tables( 'comments', 'name' ) );
+		if ( isset( $data['assigned_users'] ) ) {
+			$assigned_users = $data['assigned_users'];
 
-		// Check if timesheet column exists, if not add it.
-		$column_exists = self::column_exists( $comments_table, 'timesheet' );
+			if ( is_string( $assigned_users ) ) {
+				$assigned_users = json_decode( wp_unslash( $assigned_users ), true );
+			}
 
-		if ( empty( $column_exists ) ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Required schema update.
-			$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD COLUMN timesheet longtext DEFAULT NULL AFTER time_estimation', $comments_table ) );
+			if ( is_array( $assigned_users ) ) {
+				foreach ( $assigned_users as $user_id ) {
+					$user_id = absint( $user_id );
+					if ( $user_id ) {
+						$ids[] = $user_id;
+					}
+				}
+			}
+		} elseif ( isset( $data['assigned_to'] ) ) {
+			$user_id = absint( $data['assigned_to'] );
+			if ( $user_id ) {
+				$ids[] = $user_id;
+			}
 		}
 
-		// Check if comment_title column exists, if not add it.
-		$title_column_exists = self::column_exists( $comments_table, 'comment_title' );
+		return array_values( array_unique( $ids ) );
+	}
 
-		if ( empty( $title_column_exists ) ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Required schema update.
-			$wpdb->query( $wpdb->prepare( "ALTER TABLE %i ADD COLUMN comment_title varchar(255) DEFAULT '' AFTER assigned_to", $comments_table ) );
+	/**
+	 * Encode assigned user IDs for storage.
+	 *
+	 * @since 1.0.0
+	 * @param array<int> $user_ids User IDs.
+	 * @return string|null
+	 */
+	private function encode_assigned_user_ids( $user_ids ) {
+		if ( empty( $user_ids ) ) {
+			return null;
 		}
+
+		return wp_json_encode( array_values( array_unique( array_map( 'absint', $user_ids ) ) ) );
 	}
 
 	/**
@@ -241,7 +261,6 @@ class Database {
 		global $wpdb;
 
 		$comments_table = self::tables( 'comments', 'name' );
-		$replies_table  = self::tables( 'comment_replies', 'name' );
 
 		// Prepare query based on whether page_url is provided.
 		if ( empty( $page_url ) ) {
@@ -280,10 +299,145 @@ class Database {
 			return array();
 		}
 
-		// Get replies for each comment.
+		return $this->hydrate_comments( $comments );
+	}
+
+	/**
+	 * Query admin notes with filters and pagination.
+	 *
+	 * @since 1.5.0
+	 * @param array $args {
+	 *     Optional. Query arguments.
+	 *
+	 *     @type string $status   Note status slug.
+	 *     @type int    $user_id  Creator user ID.
+	 *     @type string $category Category name to match in JSON.
+	 *     @type string $orderby  created_at|updated_at|priority.
+	 *     @type int    $limit    Max rows to return.
+	 *     @type int    $offset   Offset for pagination.
+	 * }
+	 * @return array{comments: array, total: int}
+	 */
+	public function query_admin_comments( $args = array() ) {
+		global $wpdb;
+
+		$args = wp_parse_args(
+			$args,
+			array(
+				'status'   => '',
+				'user_id'  => 0,
+				'category' => '',
+				'orderby'  => 'created_at',
+				'limit'    => 10,
+				'offset'   => 0,
+			)
+		);
+
+		$comments_table = self::tables( 'comments', 'name' );
+		$limit          = max( 1, absint( $args['limit'] ) );
+		$offset         = max( 0, absint( $args['offset'] ) );
+		$user_id        = absint( $args['user_id'] );
+		$status         = sanitize_key( $args['status'] );
+		$category       = sanitize_text_field( $args['category'] );
+		$orderby        = sanitize_key( $args['orderby'] );
+
+		$where  = array( '1=1' );
+		$values = array( $comments_table );
+
+		if ( '' !== $status ) {
+			$where[]  = 'c.status = %s';
+			$values[] = $status;
+		}
+
+		if ( $user_id > 0 ) {
+			$where[]  = 'c.user_id = %d';
+			$values[] = $user_id;
+		}
+
+		if ( '' !== $category ) {
+			$where[]  = 'c.category LIKE %s';
+			$values[] = '%' . $wpdb->esc_like( $category ) . '%';
+		}
+
+		$where_sql = implode( ' AND ', $where );
+
+		switch ( $orderby ) {
+			case 'updated_at':
+				$order_sql = 'c.updated_at DESC';
+				break;
+			case 'priority':
+				$order_sql = "FIELD(c.priority, 'high', 'medium', 'low') ASC, c.created_at DESC";
+				break;
+			case 'created_at':
+			default:
+				$order_sql = 'c.created_at DESC';
+				break;
+		}
+
+		$count_values = $values;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Dynamic WHERE built with placeholders.
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM %i c WHERE {$where_sql}",
+				...$count_values
+			)
+		);
+
+		$query_values   = $values;
+		$query_values[] = $limit;
+		$query_values[] = $offset;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Dynamic WHERE/ORDER built with placeholders.
+		$comments = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT c.*, u.display_name as user_name, u.user_email,
+				        a.display_name as assigned_name, a.user_email as assigned_email
+				FROM %i c
+				LEFT JOIN {$wpdb->users} u ON c.user_id = u.ID
+				LEFT JOIN {$wpdb->users} a ON c.assigned_to = a.ID
+				WHERE {$where_sql}
+				ORDER BY {$order_sql}
+				LIMIT %d OFFSET %d",
+				...$query_values
+			)
+		);
+
+		if ( empty( $comments ) ) {
+			return array(
+				'comments' => array(),
+				'total'    => $total,
+			);
+		}
+
+		return array(
+			'comments' => $this->hydrate_comments( $comments ),
+			'total'    => $total,
+		);
+	}
+
+	/**
+	 * Hydrate comment rows with avatars, replies, categories, and assignees.
+	 *
+	 * @since 1.5.0
+	 * @param array $comments Comment rows.
+	 * @return array
+	 */
+	private function hydrate_comments( $comments ) {
+		global $wpdb;
+
+		$replies_table = self::tables( 'comment_replies', 'name' );
+
 		foreach ( $comments as $comment ) {
 			$comment->display_name = ! empty( $comment->user_name ) ? $comment->user_name : __( 'Guest', 'analogwp-site-notes' );
 			$comment->user_email   = ! empty( $comment->user_email ) ? $comment->user_email : '';
+
+			if ( ! empty( $comment->user_id ) ) {
+				$comment->avatar = get_avatar_url( $comment->user_id, array( 'size' => 64 ) );
+			} elseif ( ! empty( $comment->user_email ) ) {
+				$comment->avatar = get_avatar_url( $comment->user_email, array( 'size' => 64 ) );
+			} else {
+				$comment->avatar = get_avatar_url( 0, array( 'size' => 64 ) );
+			}
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Replies fetched per comment, part of parent query result.
 			$comment->replies = $wpdb->get_results(
@@ -298,7 +452,6 @@ class Database {
 				)
 			);
 
-			// Add avatar URLs to replies.
 			if ( is_array( $comment->replies ) ) {
 				foreach ( $comment->replies as $reply ) {
 					$reply->display_name = ! empty( $reply->display_name ) ? $reply->display_name : __( 'Guest', 'analogwp-site-notes' );
@@ -314,12 +467,22 @@ class Database {
 				}
 			}
 
-			// Decode categories from JSON.
 			if ( ! empty( $comment->category ) ) {
 				$decoded_categories  = json_decode( $comment->category, true );
 				$comment->categories = is_array( $decoded_categories ) ? $decoded_categories : array();
 			} else {
 				$comment->categories = array();
+			}
+
+			if ( ! empty( $comment->assigned_users ) ) {
+				$decoded_assignees          = json_decode( $comment->assigned_users, true );
+				$comment->assigned_user_ids = is_array( $decoded_assignees )
+					? array_values( array_filter( array_map( 'absint', $decoded_assignees ) ) )
+					: array();
+			} elseif ( ! empty( $comment->assigned_to ) && absint( $comment->assigned_to ) > 0 ) {
+				$comment->assigned_user_ids = array( absint( $comment->assigned_to ) );
+			} else {
+				$comment->assigned_user_ids = array();
 			}
 		}
 
@@ -363,8 +526,8 @@ class Database {
 		global $wpdb;
 
 		// Validate required fields.
-		// For comments we require comment_text and page_url, but for tasks
-		// we allow a title-only task (comment_title) with an empty comment_text.
+		// For comments we require comment_text and page_url, but for notes
+		// we allow a title-only note (comment_title) with an empty comment_text.
 		// So require that page_url is present and at least one of comment_text or comment_title is non-empty.
 		if ( empty( $data['page_url'] ) ) {
 			return false;
@@ -377,11 +540,13 @@ class Database {
 		}
 
 		$table_name = self::tables( 'comments', 'name' );
+		$assigned_user_ids = $this->normalize_assigned_user_ids( $data );
 
 		$insert_data = array(
 			'post_id'          => isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0,
 			'user_id'          => get_current_user_id(),
-			'assigned_to'      => isset( $data['assigned_to'] ) ? intval( $data['assigned_to'] ) : 0,
+			'assigned_to'      => ! empty( $assigned_user_ids ) ? $assigned_user_ids[0] : 0,
+			'assigned_users'   => $this->encode_assigned_user_ids( $assigned_user_ids ),
 			'comment_title'    => isset( $data['comment_title'] ) ? sanitize_text_field( wp_unslash( $data['comment_title'] ) ) : '',
 			'comment_text'     => sanitize_textarea_field( wp_unslash( $data['comment_text'] ) ),
 			'element_selector' => isset( $data['element_selector'] ) ? sanitize_text_field( wp_unslash( $data['element_selector'] ) ) : '',
@@ -469,6 +634,7 @@ class Database {
 			'post_id',
 			'page_url',
 			'assigned_to',
+			'assigned_users',
 			'priority',
 			'category',
 			'status',
@@ -479,6 +645,13 @@ class Database {
 
 		// Filter data to only include allowed fields.
 		$filtered_data = array_intersect_key( $data, array_flip( $allowed_fields ) );
+
+		// Handle assignees array - convert to JSON for storage.
+		if ( isset( $data['assigned_users'] ) ) {
+			$assigned_user_ids               = $this->normalize_assigned_user_ids( $data );
+			$filtered_data['assigned_users'] = $this->encode_assigned_user_ids( $assigned_user_ids );
+			$filtered_data['assigned_to']    = ! empty( $assigned_user_ids ) ? $assigned_user_ids[0] : 0;
+		}
 
 		// Handle categories array - convert to JSON for storage.
 		if ( isset( $data['categories'] ) && is_array( $data['categories'] ) ) {
@@ -496,8 +669,18 @@ class Database {
 			if ( null === $value ) {
 				continue; // Keep NULL values as NULL.
 			}
-			// Skip sanitization for category as it's already JSON-encoded.
+			// Skip sanitization for JSON-encoded fields.
 			if ( 'category' === $key && is_string( $value ) && strpos( $value, '[' ) === 0 ) {
+				continue;
+			}
+			if ( 'assigned_users' === $key && is_string( $value ) && strpos( $value, '[' ) === 0 ) {
+				continue;
+			}
+			if ( 'timesheet' === $key ) {
+				continue;
+			}
+			if ( 'comment_text' === $key ) {
+				$filtered_data[ $key ] = sanitize_textarea_field( $value );
 				continue;
 			}
 			$filtered_data[ $key ] = sanitize_text_field( $value );
@@ -546,6 +729,32 @@ class Database {
 		}
 
 		return $wpdb->insert_id;
+	}
+
+	/**
+	 * Delete a reply by ID.
+	 *
+	 * @since 1.4.0
+	 * @param int $reply_id Reply ID.
+	 * @return bool True on success, false on error.
+	 */
+	public function delete_reply( $reply_id ) {
+		global $wpdb;
+
+		if ( empty( $reply_id ) ) {
+			return false;
+		}
+
+		$table_name = self::tables( 'comment_replies', 'name' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Delete operation, no caching needed.
+		$result = $wpdb->delete(
+			$table_name,
+			array( 'id' => intval( $reply_id ) ),
+			array( '%d' )
+		);
+
+		return false !== $result && $result > 0;
 	}
 
 	/**

@@ -73,7 +73,7 @@ function createSimpleInterface() {
         padding: 20px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         z-index: 999999;
-        font-family: Arial, sans-serif;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         overflow-y: auto;
     `;
     

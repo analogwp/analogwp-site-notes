@@ -1,83 +1,16 @@
-/* Tailwind CSS v4 - Standard import */
-/* 1) Global Tailwind theme → registers all the CSS vars */
-@import "tailwindcss/theme";
+/**
+ * Site Notes Admin Styles
+ * Custom design system — no Tailwind
+ */
 
-/* 3) Scope the actual styles to your wrapper */
-@scope (#wpbody-content) {
-	/* Scoped preflight (optional) */
-	@import "tailwindcss/preflight";
-
-	/* Scoped utilities */
-	@import "tailwindcss/utilities";
-}
-
-
-/* ====================================
-   Minimal Styles Only.
-   ==================================== */
-
-.sn-admin-app-wp {
-	padding: 0 20px;
-
-	.components-button svg {
-		fill: none;
-	}
-}
-
-/* React Hot Toast container positioning - Required for ToastProvider */
-.sn-toast-container {
-  top: 52px !important; /* Account for WP admin bar (32px) + margin (20px) */
-  z-index: 999999 !important;
-
-  /* Mobile adjustments */
-  @media (max-width: 782px) {
-    top: 66px !important; /* WP admin bar is taller on mobile (46px) + margin (20px) */
-  }
-}
-
-.sn-kanban-card::before {
-	content: "";
-	position: absolute;
-	top: 30px;
-	left: 15px;
-	transform: translateY(-50%);
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	background-color: #ccc;
-	box-shadow: 0 -8px 0 #ccc, 0 8px 0 #ccc, 8px -8px 0 #ccc, 8px 0 0 #ccc, 8px 8px 0 #ccc;
-	opacity: .5;
-}
-
-/* ====================================
-   Component Styles Only
-   ==================================== */
-
-/* Form Control: Select */
-.sn-select {
-		select {
-			padding: 0.3rem 1.75rem 0.3rem 0.7rem !important;
-      height: auto !important;
-			@apply text-[14px]!;
-		}
-
-		select,
-		.components-input-control__backdrop {
-			@apply border border-gray-300!;
-		}
-
-		.components-input-control__container {
-			@apply rounded-md!; 
-		}
-}
-
-/* Form Control: Toggle */
-.sn-toggle {
-	.components-form-toggle__input:checked + .components-form-toggle__track {
-		@apply bg-blue-600! border-blue-600!;
-	}
-
-	.components-form-toggle__input:focus + .components-form-toggle__track {
-		box-shadow: 0 0 0 1px transparent !important;
-	}
-}
+@import "tokens/variables";
+@import "base/reset";
+@import "utilities/layout";
+@import "utilities/spacing";
+@import "utilities/typography";
+@import "components/kanban";
+@import "components/list";
+@import "components/app";
+@import "components/settings";
+@import "components/modal";
+@import "components/toast";

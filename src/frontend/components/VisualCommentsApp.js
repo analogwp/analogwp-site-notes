@@ -12,11 +12,14 @@ import CommentToggle from './CommentToggle';
 import CommentOverlay from './CommentOverlay';
 import CommentPopup from './CommentPopup';
 import CommentSidebar from './CommentSidebar';
+import CommentsDisplay from './CommentsDisplay';
 import logger from '../../shared/utils/logger';
 
 const VisualCommentsApp = () => {
     const [isActive, setIsActive] = useState(false);
+    const [markersEnabled, setMarkersEnabled] = useState(true);
     const [sidebarVisible, setSidebarVisible] = useState(true);
+    const [pageFilter, setPageFilter] = useState('current');
     const [comments, setComments] = useState([]);
     const [selectedElement, setSelectedElement] = useState(null);
     const [showCommentForm, setShowCommentForm] = useState(false);
@@ -25,20 +28,23 @@ const VisualCommentsApp = () => {
     const pageToken = agwp_sn_ajax.pageToken || '';
     const renderedAt = agwp_sn_ajax.renderTimestamp || 0;
 
-    // Load existing comments on mount and when page changes
+    // Load comments when commenting is active or the page filter changes.
     useEffect(() => {
         if (isActive) {
-            loadComments();
+            loadComments(pageFilter);
         }
-    }, [isActive]);
+    }, [isActive, pageFilter]);
 
-    // Handle element clicking when comments mode is active
+    // Handle element clicking when Notes mode is active
     useEffect(() => {
         if (!isActive) return;
 
         const handleElementClick = (e) => {
             // Prevent creating popups when clicking specific UI elements
             if (
+                e.target.closest('.sn-comment-marker') ||
+                e.target.closest('.sn-note-thread-card') ||
+                e.target.closest('.sn-comments-display') ||
                 e.target.closest('.sn-comment-popup') ||
                 e.target.closest('.sn-comment-sidebar') ||
                 e.target.closest('.sn-toggle-button') ||
@@ -46,6 +52,8 @@ const VisualCommentsApp = () => {
                 e.target.closest('#wp-admin-bar-agwp-sn-toggle') ||
                 e.target.closest('.sn-admin-bar-item') ||
                 e.target.closest('.sn-overlay') ||
+                e.target.closest('.sn-screenshot-highlight') ||
+                e.target.closest('.sn-screenshot-frame') ||
                 e.target.closest('#wpadminbar') ||
                 e.target.hasAttribute('data-sn-ignore') ||
                 e.target.closest('[data-sn-ignore]') ||
@@ -135,7 +143,7 @@ const VisualCommentsApp = () => {
     };
 
     // Load comments from server
-    const loadComments = async () => {
+    const loadComments = async (filter = pageFilter) => {
         try {
             const response = await fetch(agwp_sn_ajax.ajaxUrl, {
                 method: 'POST',
@@ -146,18 +154,21 @@ const VisualCommentsApp = () => {
                     action: 'agwp_sn_get_comments',
                     nonce: agwp_sn_ajax.nonce,
                     page_url: pageUrl,
-                    page_token: pageToken
+                    page_token: pageToken,
+                    scope: filter === 'all' ? 'all' : 'page',
                 })
             });
 
             const data = await response.json();
-                if (data.success) {
+            if (data.success) {
                 setComments(data.data);
             }
         } catch (error) {
             logger.error('Error loading comments:', error);
         }
-    };    // Save new comment
+    };
+
+    // Save new comment
     const saveComment = async (commentText, screenshotUrl = '', priority = 'medium', commentTitle = '', website = '') => {
         if (!selectedElement) return;
 
@@ -187,7 +198,7 @@ const VisualCommentsApp = () => {
 
             const data = await response.json();
             if (data.success) {
-                await loadComments(); // Reload comments
+                await loadComments();
                 setShowCommentForm(false);
                 setSelectedElement(null);
                 
@@ -224,7 +235,7 @@ const VisualCommentsApp = () => {
 
             const data = await response.json();
             if (data.success) {
-                await loadComments(); // Reload comments
+                await loadComments();
                 showNotification(__('Reply added successfully!', 'analogwp-site-notes'), 'success');
             } else {
                 showNotification(data.data?.message || __('Error adding reply', 'analogwp-site-notes'), 'error');
@@ -255,7 +266,7 @@ const VisualCommentsApp = () => {
 
             const data = await response.json();
             if (data.success) {
-                await loadComments(); // Reload comments
+                await loadComments();
                 showNotification(__('Status updated successfully!', 'analogwp-site-notes'), 'success');
             } else {
                 showNotification(__('Error updating status', 'analogwp-site-notes'), 'error');
@@ -266,24 +277,71 @@ const VisualCommentsApp = () => {
         }
     };
 
+    // Delete comment
+    const deleteComment = async (commentId) => {
+        if (!agwp_sn_ajax.canManageComments) return;
+
+        try {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'agwp_sn_delete_comment',
+                    nonce: agwp_sn_ajax.nonce,
+                    comment_id: commentId,
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                await loadComments();
+                showNotification(__('Comment deleted successfully!', 'analogwp-site-notes'), 'success');
+            } else {
+                showNotification(data.data?.message || __('Error deleting comment', 'analogwp-site-notes'), 'error');
+            }
+        } catch (error) {
+            logger.error('Error deleting comment:', error);
+            showNotification(__('Error deleting comment', 'analogwp-site-notes'), 'error');
+        }
+    };
+
+    // Delete reply
+    const deleteReply = async (replyId) => {
+        if (!agwp_sn_ajax.canManageComments) return;
+
+        try {
+            const response = await fetch(agwp_sn_ajax.ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'agwp_sn_delete_reply',
+                    nonce: agwp_sn_ajax.nonce,
+                    reply_id: replyId,
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                await loadComments();
+                showNotification(__('Reply deleted successfully!', 'analogwp-site-notes'), 'success');
+            } else {
+                showNotification(data.data?.message || __('Error deleting reply', 'analogwp-site-notes'), 'error');
+            }
+        } catch (error) {
+            logger.error('Error deleting reply:', error);
+            showNotification(__('Error deleting reply', 'analogwp-site-notes'), 'error');
+        }
+    };
+
     // Show notification
     const showNotification = (message, type = 'info') => {
         const notification = document.createElement('div');
         notification.className = `sn-notification sn-notification-${type}`;
         notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: ${type === 'success' ? '#00a32a' : type === 'error' ? '#d63638' : '#2271b1'};
-            color: white;
-            padding: 12px 20px;
-            border-radius: 4px;
-            z-index: 100000;
-            font-size: 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        `;
-
         document.body.appendChild(notification);
 
         setTimeout(() => {
@@ -294,9 +352,10 @@ const VisualCommentsApp = () => {
     return (
         <div className="sn-visual-comments">
             <CommentToggle 
-                isActive={isActive} 
+                isActive={isActive}
                 onToggle={setIsActive}
-                commentsCount={comments.length}
+                markersEnabled={markersEnabled}
+                onMarkersToggle={setMarkersEnabled}
             />
             
             {isActive && (
@@ -305,12 +364,30 @@ const VisualCommentsApp = () => {
                     
                     <CommentSidebar
                         comments={comments}
+                        pageFilter={pageFilter}
+                        onPageFilterChange={setPageFilter}
                         onAddReply={addReply}
                         onUpdateStatus={updateCommentStatus}
+                        onDelete={agwp_sn_ajax.canManageComments ? deleteComment : undefined}
+                        onDeleteReply={agwp_sn_ajax.canManageComments ? deleteReply : undefined}
                         canManageComments={agwp_sn_ajax.canManageComments}
                         isVisible={sidebarVisible}
                         onClose={() => setSidebarVisible(!sidebarVisible)}
+                        pageUrl={pageUrl}
+                        adminDashboardUrl={agwp_sn_ajax.adminDashboardUrl || ''}
                     />
+
+                    {markersEnabled && (
+                        <CommentsDisplay
+                            comments={comments}
+                            onAddReply={addReply}
+                            onDelete={agwp_sn_ajax.canManageComments ? deleteComment : undefined}
+                            onDeleteReply={agwp_sn_ajax.canManageComments ? deleteReply : undefined}
+                            canManageComments={agwp_sn_ajax.canManageComments}
+                            adminDashboardUrl={agwp_sn_ajax.adminDashboardUrl || ''}
+                            pageUrl={pageUrl}
+                        />
+                    )}
                     
                     {showCommentForm && selectedElement && (
                         <CommentPopup

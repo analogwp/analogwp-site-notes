@@ -68,8 +68,8 @@ class Admin {
 
 		add_submenu_page(
 			'agwp-sn-dashboard',
-			__( 'Tasks', 'analogwp-site-notes' ),
-			__( 'Tasks', 'analogwp-site-notes' ),
+			__( 'Notes', 'analogwp-site-notes' ),
+			__( 'Notes', 'analogwp-site-notes' ),
 			'read',
 			'agwp-sn-dashboard',
 			array( $this, 'render_admin_page' )
@@ -107,11 +107,11 @@ class Admin {
 			return;
 		}
 
-		// Add parent menu item.
+		// Add parent menu item with live On/Off status (click toggles Notes mode).
 		$wp_admin_bar->add_node(
 			array(
 				'id'    => 'agwp-sn-menu',
-				'title' => __( 'Tasks & Comments', 'analogwp-site-notes' ),
+				'title' => esc_html__( 'Site Notes', 'analogwp-site-notes' ) . ': <span id="sn-admin-bar-status" class="sn-admin-bar-status is-off">' . esc_html__( 'Off', 'analogwp-site-notes' ) . '</span>',
 				'href'  => '#',
 				'meta'  => array(
 					'class' => 'agwp-sn-admin-bar-menu',
@@ -119,12 +119,12 @@ class Admin {
 			)
 		);
 
-		// Add "Turn Comments ON/OFF" submenu item.
+		// Add "Enable/Disable Notes" submenu item.
 		$wp_admin_bar->add_node(
 			array(
 				'parent' => 'agwp-sn-menu',
 				'id'     => 'agwp-sn-toggle',
-				'title'  => '<span id="sn-admin-bar-toggle">' . __( 'Turn Comments ON', 'analogwp-site-notes' ) . '</span>',
+				'title'  => '<span id="sn-admin-bar-toggle">' . esc_html__( 'Enable Notes', 'analogwp-site-notes' ) . '</span>',
 				'href'   => '#',
 				'meta'   => array(
 					'class' => 'agwp-sn-admin-bar-toggle',
@@ -132,12 +132,25 @@ class Admin {
 			)
 		);
 
-		// Add "Tasks Board" submenu item.
+		// Add "Enable/Disable Markers" submenu item (default on).
 		$wp_admin_bar->add_node(
 			array(
 				'parent' => 'agwp-sn-menu',
-				'id'     => 'agwp-sn-tasks-board',
-				'title'  => __( 'Tasks Board', 'analogwp-site-notes' ),
+				'id'     => 'agwp-sn-markers-toggle',
+				'title'  => '<span id="sn-admin-bar-markers-toggle">' . esc_html__( 'Disable Markers', 'analogwp-site-notes' ) . '</span>',
+				'href'   => '#',
+				'meta'   => array(
+					'class' => 'agwp-sn-admin-bar-markers-toggle',
+				),
+			)
+		);
+
+		// Add "Notes Board" submenu item.
+		$wp_admin_bar->add_node(
+			array(
+				'parent' => 'agwp-sn-menu',
+				'id'     => 'agwp-sn-notes-board',
+				'title'  => __( 'Notes Board', 'analogwp-site-notes' ),
 				'href'   => admin_url( 'admin.php?page=agwp-sn-dashboard' ),
 			)
 		);
@@ -173,7 +186,7 @@ class Admin {
 				wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'analogwp-site-notes' ) );
 			}
 		} else {
-			// Dashboard/Tasks page requires user to have access based on allowed roles.
+			// Dashboard/Notes page requires user to have access based on allowed roles.
 			if ( ! Plugin::user_has_access() ) {
 				wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'analogwp-site-notes' ) );
 			}

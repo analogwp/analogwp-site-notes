@@ -1,0 +1,131 @@
+/**
+ * Site Notes Admin Design Tokens
+ * Source: Figma style guide
+ */
+
+:root {
+	/* Text */
+	--sn-text-primary: #000000;
+	--sn-text-secondary: #999999;
+	--sn-text-inverted: #ffffff;
+
+	/* Borders */
+	--sn-border-strong: #c3c4c7;
+	--sn-border-light: #e4e4e7;
+	--sn-border-dark: #313131;
+
+	/* Accent */
+	--sn-accent: #3858e9;
+	--sn-accent-hover: #3453e1;
+
+	/* Surfaces */
+	--sn-surface-body: #f1f1f1;
+	--sn-surface-body-light: #f8f8f8;
+	--sn-surface-body-ultra-light: #ffffff;
+	--sn-surface-body-dark: #1e1e1e;
+	--sn-surface-body-ultra-dark: #0c0c0c;
+
+	/* Semantic colors (status, feedback) */
+	--sn-color-success: #10b981;
+	--sn-color-warning: #f59e0b;
+	--sn-color-danger: #ef4444;
+	--sn-color-info: #3858e9;
+
+	--sn-color-success-bg: #ecfdf5;
+	--sn-color-success-border: #a7f3d0;
+	--sn-color-success-text: #065f46;
+
+	--sn-color-warning-bg: #fffbeb;
+	--sn-color-warning-border: #fde68a;
+	--sn-color-warning-text: #92400e;
+
+	--sn-color-danger-bg: #fef2f2;
+	--sn-color-danger-border: #fecaca;
+	--sn-color-danger-text: #991b1b;
+
+	--sn-color-info-bg: #eff6ff;
+	--sn-color-info-border: #bfdbfe;
+	--sn-color-info-text: #1e40af;
+
+	--sn-color-neutral-bg: #f3f4f6;
+	--sn-color-neutral-text: #1f2937;
+
+	/* Note board status colors */
+	--sn-status-open: #FFE7B8;
+	--sn-status-open-text: #4D3300;
+	--sn-status-in-progress: #8E6DD4;
+	--sn-status-in-progress-text: #F7F5FC;
+	--sn-status-resolved: #6AAE75;
+	--sn-status-resolved-text: #F8FBF8;
+
+	/* Spacing scale */
+	--sn-space-3xs: 2px;
+	--sn-space-2xs: 4px;
+	--sn-space-xs: 8px;
+	--sn-space-s: 12px;
+	--sn-space-m: 16px;
+	--sn-space-l: 20px;
+	--sn-space-xl: 24px;
+	--sn-space-2xl: 32px;
+	--sn-space-3xl: 40px;
+	--sn-space-4xl: 48px;
+	--sn-space-5xl: 56px;
+	--sn-space-6xl: 64px;
+	--sn-space-7xl: 80px;
+	--sn-space-8xl: 96px;
+	--sn-space-9xl: 128px;
+
+	/* Border radius */
+	--sn-radius-card: 16px;
+	--sn-radius-button: 5px;
+	--sn-radius-input: 5px;
+	--sn-radius-pill: 9999px;
+
+	/* Shadows */
+	--sn-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.05);
+	--sn-shadow-card-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+	--sn-shadow-ui: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+	/* Typography sizes */
+	--sn-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--sn-font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+	--sn-title-xl-size: 1.875rem;
+	--sn-title-xl-line: 2.25rem;
+	--sn-title-l-size: 1.5rem;
+	--sn-title-l-line: 2rem;
+	--sn-title-m-size: 1.25rem;
+	--sn-title-m-line: 1.75rem;
+	--sn-title-s-size: 1.125rem;
+	--sn-title-s-line: 1.75rem;
+
+	--sn-text-xl-size: 1.125rem;
+	--sn-text-xl-line: 1.75rem;
+	--sn-text-l-size: 1rem;
+	--sn-text-l-line: 1.5rem;
+	--sn-text-m-size: 0.875rem;
+	--sn-text-m-line: 1.25rem;
+	--sn-text-s-size: 0.75rem;
+	--sn-text-s-line: 1rem;
+
+	--sn-label-size: 0.75rem;
+	--sn-label-line: 1rem;
+	--sn-input-text-size: 0.875rem;
+	--sn-input-text-line: 1.25rem;
+	--sn-field-control-height: 2.75rem;
+
+	--sn-font-weight-regular: 400;
+	--sn-font-weight-medium: 500;
+	--sn-font-weight-semibold: 600;
+
+	/* Layout */
+	--sn-app-max-width: 1600px;
+	--sn-sidebar-width: 460px;
+	--sn-z-overlay: 40;
+	--sn-z-sidebar: 50;
+	--sn-z-toast: 999999;
+
+	/* Transitions */
+	--sn-transition-fast: 150ms ease;
+	--sn-transition-base: 200ms ease;
+}

@@ -12,6 +12,7 @@ use AnalogWP\SiteNotes\Core\Admin;
 use AnalogWP\SiteNotes\API\Ajax;
 use AnalogWP\SiteNotes\Core\Assets;
 use AnalogWP\SiteNotes\Core\Data\Database;
+use AnalogWP\SiteNotes\Core\Data\Migrations;
 
 /**
  * Main plugin class
@@ -115,8 +116,10 @@ final class Plugin {
 	private function includes() {
 		// Global includes.
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/utils/trait-instance.php';
+		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/class-priorities.php';
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/class-assets.php';
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/data/class-database.php';
+		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/data/class-migrations.php';
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/class-admin.php';
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/api/class-ajax.php';
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/class-extensions.php';
@@ -139,6 +142,9 @@ final class Plugin {
 		$this->assets   = Assets::get_instance();
 		$this->admin    = Admin::get_instance();
 		$this->ajax     = Ajax::get_instance();
+
+		// Apply pending versioned DB migrations for existing installs.
+		Migrations::get_instance()->maybe_run();
 	}
 
 	/**
@@ -153,6 +159,7 @@ final class Plugin {
 			if ( ! class_exists( Database::class ) ) {
 				require_once AGWP_SN_PLUGIN_PATH . 'includes/utils/trait-instance.php';
 				require_once AGWP_SN_PLUGIN_PATH . 'includes/core/data/class-database.php';
+				require_once AGWP_SN_PLUGIN_PATH . 'includes/core/data/class-migrations.php';
 			}
 			$this->database = Database::get_instance();
 		}

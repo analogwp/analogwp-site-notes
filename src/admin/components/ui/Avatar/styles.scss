@@ -1,0 +1,44 @@
+.sn-avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--sn-radius-pill);
+	font-size: var(--sn-text-s-size);
+	font-weight: var(--sn-font-weight-medium);
+	color: var(--sn-text-inverted);
+	background-color: var(--sn-text-secondary);
+	flex-shrink: 0;
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+
+	&--xs { width: 1.5rem; height: 1.5rem; }
+	&--sm { width: 2rem; height: 2rem; }
+	&--md { width: 2.5rem; height: 2.5rem; }
+	&--lg { width: 2.5rem; height: 2.5rem; border: 2px solid var(--sn-surface-body-ultra-light); box-shadow: var(--sn-shadow-card); }
+
+	&--accent {
+		background-color: var(--sn-accent);
+	}
+}
+
+.sn-avatar + span,
+.sn-kanban-card-user-row .sn-avatar {
+	margin-right: var(--sn-space-xs);
+}
+
+.sn-priority-dot {
+	width: 0.75rem;
+	height: 0.75rem;
+	border-radius: var(--sn-radius-pill);
+	flex-shrink: 0;
+	margin-top: var(--sn-space-2xs);
+	margin-right: var(--sn-space-xs);
+}
+
+.sn-priority-dot-sm {
+	width: 0.75rem;
+	height: 0.75rem;
+	border-radius: var(--sn-radius-pill);
+	flex-shrink: 0;
+}

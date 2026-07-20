@@ -62,10 +62,12 @@ class Assets {
 			true
 		);
 
+		$this->enqueue_inter_font();
+
 		wp_enqueue_style(
 			'agwp-sn-frontend',
 			AGWP_SN_PLUGIN_URL . 'assets/js/app/frontend.css',
-			array(),
+			array( 'agwp-sn-inter' ),
 			$asset['version']
 		);
 
@@ -113,10 +115,12 @@ class Assets {
 			get_bloginfo( 'version' )
 		);
 
+		$this->enqueue_inter_font();
+
 		wp_enqueue_style(
 			'agwp-sn-admin',
 			AGWP_SN_PLUGIN_URL . 'assets/js/app/admin.css',
-			array( 'wp-components' ),
+			array( 'wp-components', 'agwp-sn-inter' ),
 			$asset['version']
 		);
 
@@ -125,6 +129,26 @@ class Assets {
 			'agwp-sn-admin',
 			'agwp_sn_ajax',
 			$this->get_admin_localized_data()
+		);
+	}
+
+	/**
+	 * Enqueue self-hosted Inter font stylesheet.
+	 *
+	 * @since 1.4.0
+	 */
+	private function enqueue_inter_font() {
+		$font_css_path = AGWP_SN_PLUGIN_PATH . 'assets/fonts/inter/inter.css';
+
+		if ( ! file_exists( $font_css_path ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'agwp-sn-inter',
+			AGWP_SN_PLUGIN_URL . 'assets/fonts/inter/inter.css',
+			array(),
+			AGWP_SN_VERSION
 		);
 	}
 
@@ -195,15 +219,29 @@ class Assets {
 			'pageUrl'              => $current_page_url,
 			'pageToken'            => wp_create_nonce( 'agwp_sn_page_' . $current_page_url ),
 			'renderTimestamp'      => time(),
+			'adminDashboardUrl'    => admin_url( 'admin.php?page=agwp-sn-dashboard' ),
 			'currentUser'          => $this->get_current_user_data(),
 			'canAddComments'       => Plugin::current_visitor_can_access_frontend_comments(),
 			'canManageComments'    => Plugin::user_has_access(),
 			'canUploadScreenshots' => Plugin::current_visitor_can_access_frontend_comments(),
 			'settings'             => $settings,
+			'priorities'           => $this->get_task_priorities(),
 			'strings'              => $this->get_frontend_strings(),
 			'debug'                => $debug_enabled,
 			'logLevel'             => $log_level,
 		);
+	}
+
+	/**
+	 * Get saved task priorities with defaults.
+	 *
+	 * Keep method name get_task_priorities — option storage predates Notes naming (no migration).
+	 *
+	 * @since 1.5.0
+	 * @return array Priority definitions.
+	 */
+	private function get_task_priorities() {
+		return Priorities::get();
 	}
 
 	/**
@@ -233,6 +271,7 @@ class Assets {
 		return array(
 			'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 			'nonce'         => wp_create_nonce( 'agwp_sn_nonce' ),
+			'homeUrl'       => home_url( '/' ),
 			'currentUser'   => $this->get_current_user_data(),
 			'strings'       => $this->get_admin_strings(),
 			'pluginVersion' => AGWP_SN_VERSION,
@@ -299,7 +338,7 @@ class Assets {
 		return array(
 			'dashboard'    => __( 'Dashboard', 'analogwp-site-notes' ),
 			'comments'     => __( 'Comments', 'analogwp-site-notes' ),
-			'tasks'        => __( 'Tasks', 'analogwp-site-notes' ),
+			'tasks'        => __( 'Notes', 'analogwp-site-notes' ),
 			'settings'     => __( 'Settings', 'analogwp-site-notes' ),
 			'open'         => __( 'Open', 'analogwp-site-notes' ),
 			'inProgress'   => __( 'In Progress', 'analogwp-site-notes' ),
