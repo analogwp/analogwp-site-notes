@@ -241,30 +241,7 @@ class Assets {
 	 * @return array Priority definitions.
 	 */
 	private function get_task_priorities() {
-		$default_priorities = array(
-			array(
-				'id'    => 1,
-				'key'   => 'high',
-				'name'  => 'High',
-				'color' => '#ef4444',
-			),
-			array(
-				'id'    => 2,
-				'key'   => 'medium',
-				'name'  => 'Medium',
-				'color' => '#f59e0b',
-			),
-			array(
-				'id'    => 3,
-				'key'   => 'low',
-				'name'  => 'Low',
-				'color' => '#10b981',
-			),
-		);
-
-		$priorities = get_option( 'agwp_sn_priorities', $default_priorities );
-
-		return is_array( $priorities ) && ! empty( $priorities ) ? array_values( $priorities ) : $default_priorities;
+		return Priorities::get();
 	}
 
 	/**

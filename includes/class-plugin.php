@@ -116,6 +116,7 @@ final class Plugin {
 	private function includes() {
 		// Global includes.
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/utils/trait-instance.php';
+		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/class-priorities.php';
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/class-assets.php';
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/data/class-database.php';
 		require_once AGWP_SN_PLUGIN_PATH . 'includes/core/data/class-migrations.php';

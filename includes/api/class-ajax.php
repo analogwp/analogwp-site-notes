@@ -11,6 +11,7 @@ namespace AnalogWP\SiteNotes\API;
 use AnalogWP\SiteNotes\Plugin;
 use AnalogWP\SiteNotes\Utils\Has_Instance;
 use AnalogWP\SiteNotes\Core\Data\Database;
+use AnalogWP\SiteNotes\Core\Priorities;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -246,40 +247,7 @@ class Ajax {
 	 * @return string[]
 	 */
 	private function get_allowed_priority_keys() {
-		$default_priorities = array(
-			array(
-				'id'    => 1,
-				'key'   => 'high',
-				'name'  => 'High',
-				'color' => '#ef4444',
-			),
-			array(
-				'id'    => 2,
-				'key'   => 'medium',
-				'name'  => 'Medium',
-				'color' => '#f59e0b',
-			),
-			array(
-				'id'    => 3,
-				'key'   => 'low',
-				'name'  => 'Low',
-				'color' => '#10b981',
-			),
-		);
-
-		$priorities = get_option( 'agwp_sn_priorities', $default_priorities );
-		if ( ! is_array( $priorities ) || empty( $priorities ) ) {
-			$priorities = $default_priorities;
-		}
-
-		$keys = array();
-		foreach ( $priorities as $priority ) {
-			if ( ! empty( $priority['key'] ) ) {
-				$keys[] = sanitize_key( $priority['key'] );
-			}
-		}
-
-		return ! empty( $keys ) ? $keys : array( 'medium' );
+		return Priorities::get_keys();
 	}
 
 	/**
@@ -1666,34 +1634,11 @@ class Ajax {
 		// Get categories.
 		$categories = get_option( 'agwp_sn_categories', array() );
 
-		// Get priorities with defaults.
-		$default_priorities = array(
-			array(
-				'id'    => 1,
-				'key'   => 'high',
-				'name'  => 'High',
-				'color' => '#ef4444',
-			),
-			array(
-				'id'    => 2,
-				'key'   => 'medium',
-				'name'  => 'Medium',
-				'color' => '#f59e0b',
-			),
-			array(
-				'id'    => 3,
-				'key'   => 'low',
-				'name'  => 'Low',
-				'color' => '#10b981',
-			),
-		);
-		$priorities         = get_option( 'agwp_sn_priorities', $default_priorities );
-
 		$this->send_success(
 			array(
 				'settings'   => $settings,
 				'categories' => $categories,
-				'priorities' => $priorities,
+				'priorities' => Priorities::get(),
 			)
 		);
 	}
