@@ -8,10 +8,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	CheckIcon,
+	CheckmarkIcon,
+	CloseIcon,
 	PencilIcon,
 	TrashIcon,
-	XMarkIcon,
 } from '../../../shared/icons';
 import { Button } from '../ui';
 import { useSettings } from './SettingsProvider';
@@ -38,7 +38,7 @@ const LabelsAndFiltersSettings = () => {
 	const updatePriorities = async (nextPriorities) => {
 		setPriorities(nextPriorities);
 		try {
-			await saveSettings(true, null, nextPriorities);
+			await saveSettings(false, null, nextPriorities);
 		} catch (error) {
 			logger.error('Error saving priorities:', error);
 			showToast.error(__('Failed to save priorities', 'analogwp-site-notes'));
@@ -124,7 +124,6 @@ const LabelsAndFiltersSettings = () => {
 		onNameChange,
 		onColorChange,
 		primaryAction,
-		secondaryAction,
 	}) => (
 		<div className="sn-priority-form-row">
 			<input
@@ -151,7 +150,6 @@ const LabelsAndFiltersSettings = () => {
 				aria-label={__('Priority color hex', 'analogwp-site-notes')}
 			/>
 			{primaryAction}
-			{secondaryAction}
 		</div>
 	);
 
@@ -170,34 +168,34 @@ const LabelsAndFiltersSettings = () => {
 						{priorities.map((priority) => (
 							<li key={priority.id} className="sn-priority-list__item">
 								{editingPriorityId === priority.id ? (
-									renderPriorityFormRow({
-										name: editPriorityForm.name,
-										color: editPriorityForm.color,
-										onNameChange: (value) =>
-											setEditPriorityForm({ ...editPriorityForm, name: value }),
-										onColorChange: (value) =>
-											setEditPriorityForm({ ...editPriorityForm, color: value }),
-										primaryAction: (
-											<Button
+									<div className="sn-priority-list__row">
+										{renderPriorityFormRow({
+											name: editPriorityForm.name,
+											color: editPriorityForm.color,
+											onNameChange: (value) =>
+												setEditPriorityForm({ ...editPriorityForm, name: value }),
+											onColorChange: (value) =>
+												setEditPriorityForm({ ...editPriorityForm, color: value }),
+										})}
+										<div className="sn-priority-list__actions">
+											<button
+												type="button"
+												className="sn-priority-list__action"
 												onClick={saveEditPriority}
-												variant="primary"
-												icon={<CheckIcon className="sn-icon" />}
 												title={__('Save changes', 'analogwp-site-notes')}
 											>
-												{__('Save', 'analogwp-site-notes')}
-											</Button>
-										),
-										secondaryAction: (
-											<Button
+												<CheckmarkIcon size="md" />
+											</button>
+											<button
+												type="button"
+												className="sn-priority-list__action"
 												onClick={cancelEditPriority}
-												variant="secondary"
-												icon={<XMarkIcon className="sn-icon" />}
 												title={__('Cancel editing', 'analogwp-site-notes')}
 											>
-												{__('Cancel', 'analogwp-site-notes')}
-											</Button>
-										),
-									})
+												<CloseIcon size="md" />
+											</button>
+										</div>
+									</div>
 								) : (
 									<div className="sn-priority-list__row">
 										<div className="sn-priority-list__info">
@@ -209,6 +207,14 @@ const LabelsAndFiltersSettings = () => {
 											<span className="sn-priority-list__name">{priority.name}</span>
 										</div>
 										<div className="sn-priority-list__actions">
+											<button
+												type="button"
+												className="sn-priority-list__action"
+												onClick={() => startEditPriority(priority)}
+												title={__('Edit priority', 'analogwp-site-notes')}
+											>
+												<PencilIcon size="md" />
+											</button>
 											<button
 												type="button"
 												className="sn-priority-list__action"
@@ -226,15 +232,7 @@ const LabelsAndFiltersSettings = () => {
 												}}
 												title={__('Delete priority', 'analogwp-site-notes')}
 											>
-												<TrashIcon className="sn-icon" />
-											</button>
-											<button
-												type="button"
-												className="sn-priority-list__action"
-												onClick={() => startEditPriority(priority)}
-												title={__('Edit priority', 'analogwp-site-notes')}
-											>
-												<PencilIcon className="sn-icon" />
+												<TrashIcon size="md" />
 											</button>
 										</div>
 									</div>
