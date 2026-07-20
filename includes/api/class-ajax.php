@@ -1058,7 +1058,7 @@ class Ajax {
 				} else {
 					$comment->creator = array(
 						'id'     => (int) $comment->user_id,
-						'name'   => $comment->user_name ? $comment->user_name : 'Unknown User',
+						'name'   => $comment->user_name ? $comment->user_name : __( 'Unknown User', 'analogwp-site-notes' ),
 						'email'  => $comment->user_email ? $comment->user_email : '',
 						'avatar' => get_avatar_url( $comment->user_id, array( 'size' => 40 ) ),
 					);
@@ -1066,7 +1066,7 @@ class Ajax {
 			} else {
 				$comment->creator = array(
 					'id'     => 0,
-					'name'   => 'Guest',
+					'name'   => __( 'Guest', 'analogwp-site-notes' ),
 					'email'  => '',
 					'avatar' => get_avatar_url( 0, array( 'size' => 40 ) ),
 				);
@@ -1088,7 +1088,7 @@ class Ajax {
 					} else {
 						$comment->assignees[] = array(
 							'id'     => (int) $assigned_user_id,
-							'name'   => 'Unknown User',
+							'name'   => __( 'Unknown User', 'analogwp-site-notes' ),
 							'email'  => '',
 							'avatar' => get_avatar_url( $assigned_user_id, array( 'size' => 40 ) ),
 						);
