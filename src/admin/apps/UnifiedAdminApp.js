@@ -526,7 +526,7 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 		);
 
 		if (!confirmed) {
-			return;
+			return false;
 		}
 
 		const existing = comments.find((comment) => String(comment.id) === String(commentId));
@@ -549,13 +549,16 @@ const UnifiedAdminAppContent = ({ initialPage = 'dashboard' }) => {
 				setComments(comments.filter(comment => String(comment.id) !== String(commentId)));
 				adjustPaginationTotal(existing?.status, -1);
 				showToast.success(__('Note deleted successfully!', 'analogwp-site-notes'));
-			} else {
-				logger.error('Error deleting comment:', data.message);
-				showToast.error(__('Error deleting note. Please try again.', 'analogwp-site-notes'));
+				return true;
 			}
+
+			logger.error('Error deleting comment:', data.message);
+			showToast.error(__('Error deleting note. Please try again.', 'analogwp-site-notes'));
+			return false;
 		} catch (err) {
 			logger.error('Error deleting comment:', err);
 			showToast.error(__('Error deleting note. Please try again.', 'analogwp-site-notes'));
+			return false;
 		}
 	};
 

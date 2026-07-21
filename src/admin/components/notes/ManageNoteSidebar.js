@@ -327,18 +327,12 @@ const ManageNoteSidebar = ({
 			return;
 		}
 
-		const confirmed = await showConfirmation(
-			__('Are you sure you want to delete this note? This action cannot be undone.', 'analogwp-site-notes'),
-			{ confirmText: __('Delete', 'analogwp-site-notes') }
-		);
-
-		if (!confirmed) {
-			return;
-		}
-
 		try {
-			await onDelete(note.id);
-			onClose();
+			const deleted = await onDelete(note.id);
+
+			if (deleted) {
+				onClose();
+			}
 		} catch (err) {
 			logger.error('Error deleting note:', err);
 			showToast.error(__('Error deleting note. Please try again.', 'analogwp-site-notes'));

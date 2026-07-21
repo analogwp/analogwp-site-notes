@@ -89,10 +89,12 @@ const NotesView = ({
 		? comments.find((comment) => String(comment.id) === String(editingNote.id)) || editingNote
 		: null;
 
-	const handleDelete = (id) => {
-		if (onDelete) {
-			onDelete(id);
+	const handleDelete = async (id) => {
+		if (!onDelete) {
+			return false;
 		}
+
+		return onDelete(id);
 	};
 
 	const getCommentsByStatus = (status) => {

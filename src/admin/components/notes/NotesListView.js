@@ -19,7 +19,7 @@ const NotesListView = ({
 	users,
 	statuses,
 	formatDate,
-	onDelete,
+	handleDelete,
 	handleCloseModal,
 	handleSaveNote,
 	handleUpdateNote,
@@ -81,7 +81,7 @@ const NotesListView = ({
 								note={liveEditingNote || editingNote}
 								onClose={handleCloseModal}
 								onUpdate={handleUpdateNote}
-								onDelete={onDelete}
+								onDelete={handleDelete}
 								onAddReply={onAddReply}
 								onDeleteReply={onDeleteReply}
 								users={users}
