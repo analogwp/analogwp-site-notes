@@ -321,6 +321,20 @@ const CommentSidebar = ({
 		return { x, y };
 	};
 
+	const findCommentElement = (comment) => {
+		const selector = (comment?.element_selector || '').trim();
+		if (!selector) {
+			return null;
+		}
+
+		try {
+			return document.querySelector(selector);
+		} catch (error) {
+			logger.debug('Invalid note element selector:', selector, error);
+			return null;
+		}
+	};
+
 	const filterLabel =
 		pageFilter === FILTER_ALL
 			? __('All Notes', 'analogwp-site-notes')
@@ -351,6 +365,25 @@ const CommentSidebar = ({
 		return comment.page_url === pageUrl;
 	};
 
+	/**
+	 * Whether the eye action can scroll/highlight this note on the current page,
+	 * or navigate to its page when viewing "All Notes".
+	 *
+	 * @param {Object} comment
+	 * @return {boolean}
+	 */
+	const canViewNoteLocation = (comment) => {
+		if (!isOnCurrentPage(comment) && comment?.page_url) {
+			return true;
+		}
+
+		if (getCommentCapturePosition(comment)) {
+			return true;
+		}
+
+		return Boolean(findCommentElement(comment));
+	};
+
 	const scrollToElement = (comment) => {
 		if (!isOnCurrentPage(comment) && comment.page_url) {
 			window.location.href = comment.page_url;
@@ -370,7 +403,7 @@ const CommentSidebar = ({
 		}
 
 		// Fallback for older notes without stored capture coordinates.
-		const element = document.querySelector(comment.element_selector);
+		const element = findCommentElement(comment);
 		if (element) {
 			element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			element.style.outline = '3px solid #3858e9';
@@ -531,7 +564,11 @@ const CommentSidebar = ({
 										<NoteMainContent
 											comment={selectedComment}
 											statusDotColor={getStatusDotColor(selectedComment.status)}
-											onScrollTo={() => scrollToElement(selectedComment)}
+											onScrollTo={
+												canViewNoteLocation(selectedComment)
+													? () => scrollToElement(selectedComment)
+													: null
+											}
 											onMenuToggle={() =>
 												setOpenMenuId((id) =>
 													id === selectedComment.id ? null : selectedComment.id
@@ -692,7 +729,11 @@ const CommentSidebar = ({
 													<NoteMainContent
 														comment={comment}
 														statusDotColor={statusDotColor}
-														onScrollTo={() => scrollToElement(comment)}
+														onScrollTo={
+															canViewNoteLocation(comment)
+																? () => scrollToElement(comment)
+																: null
+														}
 														onMenuToggle={() =>
 															setOpenMenuId((id) =>
 																id === comment.id ? null : comment.id
