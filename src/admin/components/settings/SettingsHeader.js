@@ -9,7 +9,7 @@ const SettingsHeader = ({ activeTab, onTabChange }) => {
 		{ id: 'general', label: __('General', 'analogwp-site-notes') },
 		{ id: 'access-control', label: __('Access Control', 'analogwp-site-notes') },
 		// Keep id "task-priorities" — settings URL/tab key; renaming would break bookmarks (not a DB migration but stable API).
-		{ id: 'task-priorities', label: __('Note Priorities', 'analogwp-site-notes') },
+		{ id: 'task-priorities', label: __('Priorities', 'analogwp-site-notes') },
 		{ id: 'categories', label: __('Categories', 'analogwp-site-notes') },
 		{ id: 'advanced', label: __('Advanced', 'analogwp-site-notes') },
 	];

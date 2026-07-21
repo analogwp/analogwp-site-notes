@@ -155,10 +155,10 @@ const LabelsAndFiltersSettings = () => {
 
 	return (
 		<SettingsSection
-			title={__('Note Priorities', 'analogwp-site-notes')}
+			title={__('Priorities', 'analogwp-site-notes')}
 			description={__('Define priority levels for notes with customizable colors.', 'analogwp-site-notes')}
 		>
-			<SettingsCard title={__('Note Priorities', 'analogwp-site-notes')}>
+			<SettingsCard title={__('Priorities', 'analogwp-site-notes')}>
 				{priorities.length === 0 ? (
 					<FieldDescription>
 						{__('No priorities created yet. Add your first priority below.', 'analogwp-site-notes')}
