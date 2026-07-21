@@ -123,11 +123,11 @@ const CategoriesSettings = () => {
 		<SettingsSection
 			title={__('Categories', 'analogwp-site-notes')}
 			description={__(
-				'Organize comments and tasks into categories for better project management.',
+				'Organize notes into categories for better project management.',
 				'analogwp-site-notes'
 			)}
 		>
-			<SettingsCard title={__('Task Categories', 'analogwp-site-notes')}>
+			<SettingsCard>
 				{categories.length === 0 ? (
 					<FieldDescription>
 						{__('No categories created yet. Add your first category below.', 'analogwp-site-notes')}
